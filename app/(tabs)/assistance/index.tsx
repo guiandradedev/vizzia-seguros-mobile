@@ -16,7 +16,7 @@ export default function HomeScreen() {
     >
       <View style={styles.header}>
         <Text style={styles.headerText}>
-          Alguma dúvida?
+          Assistencia?
         </Text>
         <Text style={styles.headerSubTitle}>
           Nulla vehicula tortor in neque scelerisque, nec porttitor nisl sollicitudin.
@@ -32,7 +32,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#F5EFE6"
   },
   headerText: {
     fontSize: 32,

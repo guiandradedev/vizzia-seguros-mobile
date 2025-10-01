@@ -1,7 +1,10 @@
 import { Tabs } from 'expo-router';
 import { FontAwesome } from '@expo/vector-icons';
+import Colors from '@/constants/Colors';
 
 export default function TabLayout() {
+    const theme = Colors.light;
+    
     return (
         <Tabs
             screenOptions={{
@@ -10,7 +13,7 @@ export default function TabLayout() {
                     height: 93,
                     paddingTop: 10,
                     paddingBottom: 10,
-                    backgroundColor: "transparent",
+                    backgroundColor: theme.background,
                     // borderWidth: 2,
                     borderColor: '#E8DFCA',
                     borderStyle: 'solid',
