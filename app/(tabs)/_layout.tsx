@@ -15,7 +15,7 @@ export default function TabLayout() {
                     paddingBottom: 10,
                     backgroundColor: theme.background,
                     // borderWidth: 2,
-                    borderColor: '#E8DFCA',
+                    borderColor: theme.border,
                     borderStyle: 'solid',
                     borderTopWidth: 2
 
@@ -31,7 +31,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="index"
+                name="home"
                 options={{
                     title: 'Início', // Título que aparece na aba
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,

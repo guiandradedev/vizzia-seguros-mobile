@@ -8,10 +8,13 @@ import {
   Roboto_700Bold,
   Roboto_500Medium,
 } from '@expo-google-fonts/roboto';
+import Colors from '@/constants/Colors';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
+  const theme = Colors.light
+
   const [fontsLoaded, fontError] = useFonts({
     'Roboto-Regular': Roboto_400Regular,
     'Roboto-Bold': Roboto_700Bold,
@@ -30,8 +33,9 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+    <Stack screenOptions={{ headerShown: false, contentStyle: {backgroundColor: theme.background}}}>
+      {/* <Stack.Screen name="login/index"/> */}
+      <Stack.Screen name="(tabs)"/>
     </Stack>
   );
 }

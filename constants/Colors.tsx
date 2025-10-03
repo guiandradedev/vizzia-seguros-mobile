@@ -1,10 +1,10 @@
 // constants/Colors.ts
 
 export const TintColor = '#4CAF50'; // Verde: Cor de destaque principal
-export const BackgroundColor = '#F5EFE6'; // Fundo claro para o corpo da tela
+export const BackgroundColor = '#f0efeeff'; // Fundo claro para o corpo da tela
 export const TabBarColor = '#FFFFFF'; // Fundo da Navbar inferior (branco)
 export const HeaderColor = TintColor; // Fundo do Header superior
-export const Border = "#E8DFCA"
+export const Border = "#e4e1d8ff"
 
 export default {
   light: {
