@@ -31,7 +31,7 @@ export default function TabLayout() {
                 }}
             />
             <Tabs.Screen
-                name="home"
+                name="index"
                 options={{
                     title: 'Início', // Título que aparece na aba
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="home" color={color} />,
