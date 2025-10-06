@@ -10,7 +10,7 @@ import {
     KeyboardAvoidingView,
     Platform
 } from 'react-native';
-import { Link, Redirect } from 'expo-router';
+import { Link, Redirect, useRouter } from 'expo-router';
 import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginScreen() {
@@ -18,16 +18,16 @@ export default function LoginScreen() {
     const [password, setPassword] = useState('');
     const [isLoggingIn, setIsLoggingIn] = useState(false);
 
-    // Consome o hook de autenticação
+    const router = useRouter();
+
     const { signIn, user } = useAuth();
 
-    // Se o usuário já estiver logado, redireciona imediatamente para o app principal
-    // Isso é um fallback, pois o app/_layout já deveria ter feito o redirecionamento
     if (user) {
         return <Redirect href="/(app)/(tabs)" />;
     }
 
     const handleLogin = async () => {
+        console.log(email, password)
         if (!email || !password) {
             Alert.alert('Erro', 'Por favor, preencha todos os campos.');
             return;
@@ -35,65 +35,54 @@ export default function LoginScreen() {
 
         setIsLoggingIn(true);
 
-        // Chama a função de login do seu contexto
-        const success = await signIn({ username: email, password });
+        const success = await signIn({ email, password });
 
         setIsLoggingIn(false);
 
-        if (success) {
-            // O redirecionamento real acontece via estado do Contexto no app/_layout.tsx,
-            // mas podemos adicionar uma confirmação visual aqui.
-            Alert.alert('Sucesso', 'Login realizado com êxito!');
-            // Não precisa de redirect manual aqui, pois a mudança no estado de 'user' no useAuth
-            // acionará o Redirect no app/_layout.tsx.
-        } else {
-            // Mensagem de erro que viria da API
+        if (!success) {
             Alert.alert('Erro', 'Credenciais inválidas. Tente novamente.');
+            return
         }
+
+        router.replace('/(app)/(tabs)');
     };
 
     return (
-        // Usa KeyboardAvoidingView para evitar que o teclado esconda os inputs
         <KeyboardAvoidingView
             style={styles.container}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         >
             <Text style={styles.title}>Bem-vindo de volta!</Text>
 
-            {/* Input de Email */}
             <TextInput
                 style={styles.input}
                 placeholder="Email"
                 placeholderTextColor="#999"
                 keyboardType="email-address"
                 autoCapitalize="none"
-            // value={email}
-            // onChangeText={setEmail}
-            // editable={!isLoggingIn}
+                value={email}
+                onChangeText={setEmail}
+                editable={!isLoggingIn}
             />
 
-            {/* Input de Senha */}
             <TextInput
                 style={styles.input}
                 placeholder="Senha"
                 placeholderTextColor="#999"
                 secureTextEntry
-            // value={password}
-            // onChangeText={setPassword}
-            // editable={!isLoggingIn}
+                value={password}
+                onChangeText={setPassword}
+                editable={!isLoggingIn}
             />
 
-            {/* Botão de Login */}
             <View style={styles.buttonContainer}>
                 <Button
-                    title="Login"
-                // title={isLoggingIn ? 'Entrando...' : 'Entrar'}
-                // onPress={handleLogin}
-                // disabled={isLoggingIn}
+                title={isLoggingIn ? 'Entrando...' : 'Entrar'}
+                onPress={handleLogin}
+                disabled={isLoggingIn}
                 />
             </View>
 
-            {/* Link para cadastro (usa o nome do arquivo register.tsx) */}
             <Link href="/(auth)/register" style={styles.link}>
                 Não tem conta? Cadastre-se
             </Link>

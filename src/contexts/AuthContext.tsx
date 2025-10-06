@@ -52,7 +52,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsLoading(false);
       return true;
     } catch (error) {
-      console.error("Login falhou:", error);
+      // console.error("Login falhou:", error);
       setIsLoading(false);
       return false;
     }

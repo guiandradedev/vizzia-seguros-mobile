@@ -1,0 +1,50 @@
+[
+  {
+    "id": 1,
+    "name": "Guilherme Andrade",
+    "email": "guilherme.andrade@example.com",
+    "cpf": "123.456.789-00",
+    "cnh": "MG-12.345.678",
+    "expedition_cnh_date": 5,
+    "phone_id": "+55 31 99999-0001",
+    "birthday_date": "1990-04-15T00:00:00.000Z",
+    "status": true,
+    "password": "pass"
+  },
+  {
+    "id": 2,
+    "name": "Mariana Silva",
+    "email": "mariana.silva@example.com",
+    "cpf": "987.654.321-99",
+    "cnh": "SP-98.765.432",
+    "expedition_cnh_date": 8,
+    "phone_id": "+55 11 98888-0002",
+    "birthday_date": "1985-11-02T00:00:00.000Z",
+    "status": true,
+    "password": "pass"
+  },
+  {
+    "id": 3,
+    "name": "Carlos Pereira",
+    "email": "carlos.pereira@example.com",
+    "cpf": "111.222.333-44",
+    "cnh": "RJ-11.222.333",
+    "expedition_cnh_date": 2,
+    "phone_id": "+55 21 97777-0003",
+    "birthday_date": "1992-07-30T00:00:00.000Z",
+    "status": false,
+    "password": "pass"
+  },
+  {
+    "id": 4,
+    "name": "Ana Costa",
+    "email": "ana.costa@example.com",
+    "cpf": "555.666.777-88",
+    "cnh": "RS-55.666.777",
+    "expedition_cnh_date": 20,
+    "phone_id": "+55 51 96666-0004",
+    "birthday_date": "1978-02-10T00:00:00.000Z",
+    "status": true,
+    "password": "pass"
+  }
+]
