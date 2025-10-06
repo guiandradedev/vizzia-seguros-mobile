@@ -22,7 +22,7 @@ export default function LoginScreen() {
 
     const { signIn, user } = useAuth();
 
-    if (user) {
+    if (!user) {
         return <Redirect href="/(app)/(tabs)" />;
     }
 

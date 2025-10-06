@@ -39,6 +39,14 @@
           }
         }
       ],
+      [
+        "expo-camera",
+        {
+          "cameraPermission": "Permita $(PRODUCT_NAME) para acessar sua camera",
+          "microphonePermission": "Permita $(PRODUCT_NAME) para acessar seu microfone",
+          "recordAudioAndroid": true
+        }
+      ],
       "expo-font"
     ],
     "experiments": {

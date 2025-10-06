@@ -6,19 +6,19 @@ export default function MyCarsScreen() {
   const router = useRouter();
 
   const handleRedirect = () => {
-    router.push('/(app)/(policies)/create'); // Redireciona para login
+    router.push('/take_photo'); // Redireciona para login
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo meus carros!</Text>
+      <Text style={styles.title}>Tira!</Text>
       
       <TouchableOpacity 
         style={styles.button} 
         onPress={handleRedirect}
         activeOpacity={0.7}
       >
-        <Text style={styles.buttonText}>Ir para Login</Text>
+        <Text style={styles.buttonText}>dsadas</Text>
       </TouchableOpacity>
     </View>
   );
