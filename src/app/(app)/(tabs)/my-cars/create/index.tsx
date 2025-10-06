@@ -1,11 +1,15 @@
 import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
 import { useState } from 'react';
 import Camera from '@/components/Camera'; // Importe o componente Camera
+import Colors from '@/constants/Colors';
+import { FontAwesome } from '@expo/vector-icons';
 
 interface PhotoType {
     uri: string,
     title: string
 }
+
+const theme = Colors.light
 
 export default function MyCarsScreen() {
     const MAX_PHOTOS = 5;
@@ -20,13 +24,14 @@ export default function MyCarsScreen() {
         // {title: "", uri: ""},
     ]); // Estado para armazenar URIs das fotos
     const [isCameraOpen, setIsCameraOpen] = useState(false);
-    const [editingPhoto, setEditingPhoto] = useState(0);
+    const [editingPhoto, setEditingPhoto] = useState<number>(0);
 
     const openCamera = (photoIndex: number) => {
         setIsCameraOpen(true);
         setEditingPhoto(photoIndex)
     };
     const closeCamera = () => {
+        setEditingPhoto(0)
         setIsCameraOpen(false);
     };
 
@@ -41,47 +46,30 @@ export default function MyCarsScreen() {
 
     if (isCameraOpen) {
         return <View style={{ flex: 1 }}>
-            <Camera setPhoto={addPhoto} />
+            <Camera setPhoto={addPhoto} title={photos[editingPhoto].title} closeCamera={closeCamera} />
         </View>;
     }
 
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Cadastro do seguro!</Text>
-
-            {/* <TouchableOpacity
-                style={styles.button}
-                onPress={openCamera} // Abre a câmera
-                activeOpacity={0.7}
-            >
-                <Text style={styles.buttonText}>Abrir Câmera</Text>
-            </TouchableOpacity> */}
-
             <View style={styles.photoList}>
                 {photos.map((photo, index) => (
-                    <View key={index}>
+                    <View key={index} style={styles.photosContainer}>
                         <Text>{photo.title}</Text>
                         <TouchableOpacity
-                            style={styles.button}
+                            style={styles.imageButton}
                             onPress={() => openCamera(index)}
                         >
-
-                            {
-                                photo.uri && <Image key={index} source={{ uri: photo.uri }} style={styles.photo} />
-                            }
-                            {
-                                !photo.uri && <Text>Adicionar</Text>
-                            }
+                            {photo.uri && <Image key={index} source={{ uri: photo.uri }} style={styles.photo} />}
+                            {!photo.uri && <FontAwesome size={28} name="plus" color={"#000"} />}
                         </TouchableOpacity>
-
-
                     </View>
                 ))}
             </View>
         </View>
     );
 }
-
 const styles = StyleSheet.create({
     container: {
         flex: 1,
@@ -92,6 +80,22 @@ const styles = StyleSheet.create({
     title: {
         fontSize: 24,
         marginBottom: 30,
+    },
+    photosContainer: {
+        width: '50%', // Cada foto ocupa 50% da largura da tela
+        padding: 10, // Espaçamento entre as fotos
+        alignItems: 'center', // Centraliza o conteúdo dentro de cada item
+    },
+    imageButton: {
+        width: 150,
+        height: 150,
+        backgroundColor: theme.tabBackground,
+        padding: 8,
+        borderWidth: 1,
+        borderStyle: "dashed",
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center"
     },
     button: {
         backgroundColor: '#6D94C5',
@@ -116,14 +120,14 @@ const styles = StyleSheet.create({
     },
     photoList: {
         marginTop: 20,
-        flexDirection: 'row',
-        flexWrap: 'wrap',
-        justifyContent: 'center',
+        flexDirection: 'row', // Alinha os itens em linha
+        flexWrap: 'wrap', // Permite que os itens quebrem para a próxima linha
+        justifyContent: 'space-between', // Espaçamento entre as fotos
     },
     photo: {
-        width: 100,
-        height: 100,
-        margin: 5,
+        width: "100%",
+        height: "100%",
+        // margin: 5,r
         borderRadius: 8,
     },
 });

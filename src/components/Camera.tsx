@@ -6,10 +6,11 @@ import Colors from '@/constants/Colors';
 
 interface CameraProps {
     setPhoto: (photo_uri: string) => void,
-    title?: string
+    title?: string,
+    closeCamera: () => void
 }
 
-export default function Camera({ setPhoto, title }: CameraProps) {
+export default function Camera({ setPhoto, title, closeCamera }: CameraProps) {
     const [facing, setFacing] = useState<CameraType>('back');
     const [flash, setFlash] = useState<FlashMode>('auto');
     const cameraRef = useRef<CameraView | null>(null); // Referência para a câmera
@@ -54,42 +55,72 @@ export default function Camera({ setPhoto, title }: CameraProps) {
         setFacing(current => (current === 'back' ? 'front' : 'back'));
     }
     return (
-        <View style={styles.container}>
-            {!isCameraReady && (
-                <View style={styles.loadingContainer}>
-                    <ActivityIndicator size="large" color="#6D94C5" />
-                    <Text style={styles.loadingText}>Carregando câmera...</Text>
-                </View>
-            )}
-            <CameraView style={styles.camera} facing={facing} ref={cameraRef} onCameraReady={() => setIsCameraReady(true)} flash={flash} />
-            {
-                title && (
-                    <Text>{title}</Text>
-                )
-            }
-
-            {
-                isCameraReady && (
-                    <View style={styles.buttonContainer}>
-                        <TouchableOpacity onPress={toggleCameraFacing}>
-                            <FontAwesome size={28} name="refresh" color={"#fff"} />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={takePhoto}>
-                            <FontAwesome size={28} name="camera" color={"#fff"} />
-                        </TouchableOpacity>
-                        <TouchableOpacity onPress={toggleCameraFlash}>
-                            <FontAwesome size={28} name="bolt" color={"#fff"} />
-                        </TouchableOpacity>
-                    </View>
-                )
-            }
+    <View style={styles.container}>
+        {/* Contêiner para alinhar o botão de retorno e o texto absoluto */}
+        <View style={styles.headerContainer}>
+            <TouchableOpacity
+                style={styles.returnButton}
+                onPress={closeCamera}
+            >
+                <FontAwesome size={32} name="backward" color={"#fff"} />
+            </TouchableOpacity>
+            {title && <Text style={styles.textAbsolute}>{title}</Text>}
         </View>
-    );
+
+        {!isCameraReady && (
+            <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#6D94C5" />
+                <Text style={styles.loadingText}>Carregando câmera...</Text>
+            </View>
+        )}
+
+        <CameraView
+            style={styles.camera}
+            facing={facing}
+            ref={cameraRef}
+            onCameraReady={() => setIsCameraReady(true)}
+            flash={flash}
+        />
+
+        {isCameraReady && (
+            <View style={styles.buttonContainer}>
+                <TouchableOpacity onPress={toggleCameraFacing}>
+                    <FontAwesome size={32} name="refresh" color={"#fff"} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={takePhoto}>
+                    <FontAwesome size={32} name="camera" color={"#fff"} />
+                </TouchableOpacity>
+                <TouchableOpacity onPress={toggleCameraFlash}>
+                    <FontAwesome size={32} name="bolt" color={"#fff"} />
+                </TouchableOpacity>
+            </View>
+        )}
+    </View>
+);
 }
 
 const styles = StyleSheet.create({
-    container: {
+        container: {
         flex: 1,
+    },
+    headerContainer: {
+        position: 'absolute',
+        top: 30, // Ajuste a altura para uma posição confortável
+        left: 0,
+        right: 0,
+        flexDirection: 'row',
+        alignItems: 'center',
+        justifyContent: 'space-between', // Espaça o botão e o texto
+        paddingHorizontal: 20, // Espaçamento lateral
+        zIndex: 2, // Garante que fique acima da câmera
+    },
+    returnButton: {
+        padding: 10, // Área clicável maior
+    },
+    textAbsolute: {
+        fontSize: 20,
+        fontWeight: '600',
+        color: 'white',
     },
     text: {
         fontSize: 24,
@@ -102,7 +133,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         backgroundColor: 'transparent',
         width: '100%',
-        gap: 30,
+        justifyContent: "space-between",
         paddingHorizontal: 64,
     },
     camera: {
@@ -150,17 +181,6 @@ const styles = StyleSheet.create({
         justifyContent: 'flex-end',
         alignItems: 'center',
         paddingBottom: 20,
-    },
-    cameraButton: {
-        backgroundColor: '#6D94C5',
-        paddingHorizontal: 30,
-        paddingVertical: 12,
-        borderRadius: 8,
-    },
-    cameraButtonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: '600',
     },
     message: {
         textAlign: 'center',

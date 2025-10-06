@@ -1,6 +1,6 @@
 import { User, Credentials } from '../types/auth';
 
-import users from '../../mockup-users.json';
+import users from '../constants/mockup-users.json';
 
 interface UserMocked extends User {
   password: string

@@ -6,19 +6,21 @@ export default function MyCarsScreen() {
   const router = useRouter();
 
   const handleRedirect = () => {
-    router.push('/(app)/(policies)/create'); // Redireciona para login
+    router.push('/(app)/(tabs)/my-cars/create'); // Redireciona para login
   };
 
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Bem-vindo meus carros!</Text>
+
+      <Text>Aparentemente você não tem nenhum seguro ativo</Text>
       
       <TouchableOpacity 
         style={styles.button} 
         onPress={handleRedirect}
         activeOpacity={0.7}
       >
-        <Text style={styles.buttonText}>Ir para Login</Text>
+        <Text style={styles.buttonText}>Cadastre seu veículo</Text>
       </TouchableOpacity>
     </View>
   );

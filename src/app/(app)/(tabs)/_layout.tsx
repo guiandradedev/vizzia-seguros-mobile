@@ -20,6 +20,7 @@ export default function TabLayout() {
                     borderTopWidth: 2
 
                 },
+                
                 headerShown: false, // Tira o header do topo
             }}
         >
@@ -49,6 +50,14 @@ export default function TabLayout() {
                 options={{
                     title: 'Ajuda',
                     tabBarIcon: ({ color }) => <FontAwesome size={28} name="info-circle" color={color} />,
+                }}
+            />
+
+            {/* Rotas invisiveis na tab */}
+            <Tabs.Screen
+                name="my-cars/create/index"
+                options={{
+                    href: null
                 }}
             />
         </Tabs>
