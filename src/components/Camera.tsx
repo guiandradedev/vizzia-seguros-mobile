@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, Button, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Image, Button, ActivityIndicator, Platform } from 'react-native';
 import { CameraCapturedPicture, CameraType, CameraView, FlashMode, useCameraPermissions } from 'expo-camera';
 import { useState, useRef } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
@@ -17,6 +17,23 @@ export default function Camera({ setPhoto, title, closeCamera }: CameraProps) {
     const [permission, requestPermission] = useCameraPermissions();
     const [isCameraReady, setIsCameraReady] = useState(false); // Estado para verificar se a câmera está pronta
     const theme = Colors.light;
+
+    //     const [selectedLens, setSelectedLens] = useState<Lens | undefined>(
+    //     Platform.OS === 'ios' ? Lens.UltraWide : undefined // Exemplo: começar com UltraWide no iOS
+    // );
+    
+    // const cameraProps = Platform.select({
+    //     ios: {
+    //         // Se for iOS, inclui a prop selectedLens
+    //         selectedLens: selectedLens,
+    //     },
+    //     android: {
+    //         // Se for Android, não inclui a prop (ou inclui props específicas do Android se necessário)
+    //         // Aqui, o objeto está vazio, ou seja, nenhuma prop 'selectedLens' é passada.
+    //     },
+    //     default: {},
+    // });
+    // console.log(cameraRef.current?.getAvailableLensesAsync())
 
     if (!permission) {
         return <View />

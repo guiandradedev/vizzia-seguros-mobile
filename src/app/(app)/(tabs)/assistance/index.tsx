@@ -1,6 +1,7 @@
 import { View, Text, StyleSheet } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
+import { useEffect } from 'react';
 
 export default function HomeScreen() {
   const insets = useSafeAreaInsets();
