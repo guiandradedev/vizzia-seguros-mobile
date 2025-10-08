@@ -1,7 +1,7 @@
 import Axios from 'axios';
 
 export const axios = Axios.create({
-    baseURL: process.env.API_BASE_URL || 'http://192.168.15.50:3001',
+    baseURL: process.env.API_BASE_URL || 'http://192.168.15.105:3000',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',

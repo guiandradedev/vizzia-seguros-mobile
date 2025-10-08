@@ -46,13 +46,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signIn = async (credentials: Credentials): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const loggedUser = await loginApi(credentials); // Chamada de API real
-      setUser(loggedUser);
+      await loginApi(credentials); // Chamada de API real
+      // setUser(loggedUser);
       // Aqui você armazenaria o token/usuário no AsyncStorage ou SecureStore
       setIsLoading(false);
       return true;
     } catch (error) {
-      // console.error("Login falhou:", error);
+      console.error("Login falhou:", error);
       setIsLoading(false);
       return false;
     }
