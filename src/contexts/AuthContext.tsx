@@ -2,8 +2,9 @@
 
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 // Simulação de uma função de API
-import { loginApi, logoutApi, getStoredUser } from '../services/authService'; 
+import { loginApi, logoutApi, getStoredUser } from '../services/authService';
 import { User, Credentials } from '../types/auth'; // Tipos definidos em outro local (ex: src/types/auth.ts)
+import { getSecure, saveSecure } from '@/utils/secure-store';
 
 // 1. Definição da Interface do Contexto
 interface AuthContextType {
@@ -29,15 +30,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const loadUser = async () => {
       try {
-        const storedUser = await getStoredUser(); // Simula a verificação de token/usuário no AsyncStorage
-        if (storedUser) {
-          setUser(storedUser);
+        const tokenExists = await getSecure('accessToken')
+        if (tokenExists) {
+          const storedUser = await getStoredUser(); // Simula a verificação de token/usuário no AsyncStorage
+          if (storedUser) {
+            setUser(storedUser);
+          }
         }
       } catch (error) {
         console.error("Erro ao carregar usuário:", error);
       } finally {
         setIsLoading(false);
       }
+      // logoutApi()
     };
     loadUser();
   }, []);
@@ -46,13 +51,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const signIn = async (credentials: Credentials): Promise<boolean> => {
     try {
       setIsLoading(true);
-      const loggedUser = await loginApi(credentials); // Chamada de API real
-      setUser(loggedUser);
-      // Aqui você armazenaria o token/usuário no AsyncStorage ou SecureStore
+      const { accessToken, refreshToken } = await loginApi(credentials); // Chamada de API real
+      saveSecure('accessToken', accessToken)
+      saveSecure('refreshToken', refreshToken)
       setIsLoading(false);
       return true;
     } catch (error) {
-      // console.error("Login falhou:", error);
+      console.error("Login falhou:", error);
       setIsLoading(false);
       return false;
     }
