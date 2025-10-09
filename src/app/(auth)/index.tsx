@@ -13,11 +13,13 @@ import {
 import { Link, Redirect, useRouter } from 'expo-router';
 import { useAuth } from "@/hooks/useAuth";
 import * as LocalAuthentication from 'expo-local-authentication';
+import { getSecure } from "@/utils/secure-store";
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoggingIn, setIsLoggingIn] = useState(false);
+    const [token, setToken] = useState<string | null>(null)
 
     const router = useRouter();
 
@@ -57,7 +59,12 @@ export default function LoginScreen() {
     }
 
     useEffect(() => {
+        async function getToken() {
+            setToken(await getSecure('accessToken'))
+        }
+        getToken()
         verifyAvaiableAuthentication();
+
     }, []);
 
     if (user) {
@@ -125,11 +132,15 @@ export default function LoginScreen() {
                 Não tem conta? Cadastre-se
             </Link>
 
-            <Button
-                title={"Usar biometria"}
-                onPress={handleAuthentication}
-                disabled={isLoggingIn}
-            />
+            {
+                token && (
+                    <Button
+                        title={"Usar biometria"}
+                        onPress={handleAuthentication}
+                        disabled={isLoggingIn}
+                    />
+                )
+            }
         </KeyboardAvoidingView>
     );
 }

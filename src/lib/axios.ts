@@ -2,8 +2,10 @@ import { Tokens } from '@/types/auth';
 import { getSecure, saveSecure } from '@/utils/secure-store';
 import Axios, { AxiosResponse } from 'axios';
 
+console.log(process.env.EXPO_PUBLIC_API_BASE_URL)
 export const axios = Axios.create({
-    baseURL: process.env.API_BASE_URL || 'http://192.168.68.117:3001',
+    baseURL: process.env.EXPO_PUBLIC_API_BASE_URL || 'http://172.16.231.167:3001',
+    // baseURL: process.env.API_BASE_URL || 'http://172.16.231.167:3001',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
