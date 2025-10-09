@@ -12,6 +12,9 @@ interface AuthContextType {
   isLoading: boolean;
   signIn: (credentials: Credentials) => Promise<boolean>;
   signOut: () => Promise<void>;
+  isAuthenticated: boolean,
+  setAuthenticated: () => void,
+  loginBiometric: () => Promise<boolean>
 }
 
 // 2. Criação do Contexto
@@ -25,16 +28,18 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   // Efeito para carregar o usuário armazenado (token, etc.) ao iniciar
   useEffect(() => {
     const loadUser = async () => {
       try {
         const tokenExists = await getSecure('accessToken')
-        if (tokenExists) {
-          const storedUser = await getStoredUser(); // Simula a verificação de token/usuário no AsyncStorage
-          if (storedUser) {
-            setUser(storedUser);
+        console.log("token valido", tokenExists)
+        if (isAuthenticated) {
+          if (tokenExists) {
+            const storedUser = await getStoredUser(); // Simula a verificação de token/usuário no AsyncStorage
+            setUser(storedUser)
           }
         }
       } catch (error) {
@@ -55,6 +60,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       saveSecure('accessToken', accessToken)
       saveSecure('refreshToken', refreshToken)
       setIsLoading(false);
+      setIsAuthenticated(true)
       return true;
     } catch (error) {
       console.error("Login falhou:", error);
@@ -63,11 +69,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   };
 
+  function setAuthenticated() {
+    setIsAuthenticated(true)
+  }
+
+  async function loginBiometric(): Promise<boolean> {
+    const tokenExists = await getSecure('accessToken')
+    console.log("token valido", tokenExists)
+    const storedUser = await getStoredUser(); // Simula a verificação de token/usuário no AsyncStorage
+    setUser(storedUser)
+    return !!storedUser
+  }
+
   // Função de Logout
   const signOut = async () => {
     try {
       await logoutApi(); // Limpa tokens na API
       // Limpa dados locais (AsyncStorage)
+      setIsAuthenticated(false)
       setUser(null);
     } catch (error) {
       console.error("Logout falhou:", error);
@@ -79,6 +98,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     isLoading,
     signIn,
     signOut,
+    isAuthenticated,
+    setAuthenticated,
+    loginBiometric
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

@@ -1,5 +1,5 @@
 import Colors from "@/constants/Colors";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
     View,
     Text,
@@ -12,6 +12,7 @@ import {
 } from 'react-native';
 import { Link, Redirect, useRouter } from 'expo-router';
 import { useAuth } from "@/hooks/useAuth";
+import * as LocalAuthentication from 'expo-local-authentication';
 
 export default function LoginScreen() {
     const [email, setEmail] = useState('');
@@ -20,7 +21,44 @@ export default function LoginScreen() {
 
     const router = useRouter();
 
-    const { signIn, user } = useAuth();
+    const { signIn, user, loginBiometric, setAuthenticated } = useAuth();
+
+    async function verifyAvaiableAuthentication() {
+        const compatible = await LocalAuthentication.hasHardwareAsync();
+        console.log(compatible);
+
+        const types = await LocalAuthentication.supportedAuthenticationTypesAsync();
+        console.log(types.map(type => LocalAuthentication.AuthenticationType[type]));
+    }
+
+    async function handleAuthentication() {
+        setIsLoggingIn(true)
+        const isBiometricEnrolled = await LocalAuthentication.isEnrolledAsync();
+
+        if (!isBiometricEnrolled) {
+            return Alert.alert('Login', 'Nenhuma biometria encontrada. Por favor, cadastre no dispositivo.');
+        }
+
+        const auth = await LocalAuthentication.authenticateAsync({
+            promptMessage: 'Login com Biometria',
+            fallbackLabel: 'Biometria não reconhecida'
+        });
+
+        const user = await loginBiometric()
+
+        setIsLoggingIn(false)
+        if (user) {
+            setAuthenticated()
+            router.replace('/(app)/(tabs)');
+        } else {
+            Alert.alert('Erro', 'Credenciais inválidas. Tente novamente.');
+            return
+        }
+    }
+
+    useEffect(() => {
+        verifyAvaiableAuthentication();
+    }, []);
 
     if (user) {
         return <Redirect href="/(app)/(tabs)" />;
@@ -77,15 +115,21 @@ export default function LoginScreen() {
 
             <View style={styles.buttonContainer}>
                 <Button
-                title={isLoggingIn ? 'Entrando...' : 'Entrar'}
-                onPress={handleLogin}
-                disabled={isLoggingIn}
+                    title={isLoggingIn ? 'Entrando...' : 'Entrar'}
+                    onPress={handleLogin}
+                    disabled={isLoggingIn}
                 />
             </View>
 
             <Link href="/(auth)/register" style={styles.link}>
                 Não tem conta? Cadastre-se
             </Link>
+
+            <Button
+                title={"Usar biometria"}
+                onPress={handleAuthentication}
+                disabled={isLoggingIn}
+            />
         </KeyboardAvoidingView>
     );
 }

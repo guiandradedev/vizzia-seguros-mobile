@@ -3,7 +3,7 @@ import { getSecure, saveSecure } from '@/utils/secure-store';
 import Axios, { AxiosResponse } from 'axios';
 
 export const axios = Axios.create({
-    baseURL: process.env.API_BASE_URL || 'http://172.16.234.109:3001',
+    baseURL: process.env.API_BASE_URL || 'http://192.168.68.117:3001',
     timeout: 10000,
     headers: {
         'Content-Type': 'application/json',
@@ -26,7 +26,7 @@ axios.interceptors.response.use(
     async error => {
         const originalRequest = error.config;
 
-        if (error.response.status === 401 && originalRequest && !originalRequest._retry) {
+        if (error.response && error.response.status === 401 && originalRequest && !originalRequest._retry) {
             originalRequest._retry = true;
 
             // 1. RETURN the promise chain that starts with getting the refresh token.
