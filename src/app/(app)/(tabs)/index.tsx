@@ -13,16 +13,31 @@ export default function HomeScreen() {
     alert("Deslogado.")
     router.replace('/(auth)');
   }
+
+  const handleRedirect = () => {
+    router.push('/(app)/(tabs)/my-cars/create'); // Redireciona para login
+  };
+
   return (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <Text style={{ fontSize: 24 }}>Bem-vindo à Home!</Text>
 
-      <TouchableOpacity 
-        style={styles.button} 
+      <TouchableOpacity
+        style={styles.button}
         onPress={handleLogout}
         activeOpacity={0.7}
       >
         <Text style={styles.buttonText}>Logout</Text>
+      </TouchableOpacity>
+
+      <Text>Aparentemente você não tem nenhum seguro ativo</Text>
+
+      <TouchableOpacity
+        style={styles.button}
+        onPress={handleRedirect}
+        activeOpacity={0.7}
+      >
+        <Text style={styles.buttonText}>Cadastre seu veículo</Text>
       </TouchableOpacity>
     </View>
   );
@@ -31,8 +46,8 @@ export default function HomeScreen() {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1, 
-    justifyContent: 'center', 
+    flex: 1,
+    justifyContent: 'center',
     alignItems: 'center',
     padding: 20,
   },

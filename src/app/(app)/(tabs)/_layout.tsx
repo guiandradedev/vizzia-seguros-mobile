@@ -4,7 +4,7 @@ import Colors from '@/constants/Colors';
 
 export default function TabLayout() {
     const theme = Colors.light;
-    
+
     return (
         <Tabs
             screenOptions={{
@@ -20,7 +20,7 @@ export default function TabLayout() {
                     borderTopWidth: 2
 
                 },
-                
+
                 headerShown: false, // Tira o header do topo
             }}
         >
@@ -55,7 +55,7 @@ export default function TabLayout() {
 
             {/* Rotas invisiveis na tab */}
             <Tabs.Screen
-                name="my-cars/create/index"
+                name="my-cars/create"
                 options={{
                     href: null
                 }}
