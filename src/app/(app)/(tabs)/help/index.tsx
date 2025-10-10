@@ -14,15 +14,23 @@ interface FAQData {
   id: string,
   question: string,
   answer: string,
+  category: string,
 }
 
 export default function HelpScreen() {
   const insets = useSafeAreaInsets();
-  const [faq, setFaq] = useState<FAQData[]>([])
+  const [faq, setFaq] = useState<Record<string, FAQData[]>>({})
     useEffect(()=>{
       async function get_faq() {
-        const data: AxiosResponse<FAQData[]> = await axios.get("/faq?active=true")
-        setFaq(data.data)
+        const res: AxiosResponse<FAQData[]> = await axios.get("/faq?active=true")
+        // Agrupa os FAQs por categoria
+        const grouped = res.data.reduce((acc, item) => {
+        if (!acc[item.category]) acc[item.category] = []
+        acc[item.category].push(item)
+        return acc
+    }, {} as Record<string, FAQData[]>)
+
+     setFaq(grouped)
       }
       get_faq()
     }, [])
@@ -63,13 +71,19 @@ export default function HelpScreen() {
       </View>
 
       <ScrollView style={styles.listContainer}>
-        {faq.map((item, index) => (
-          <AccordionFAQ
-            key={item.id} 
-            question={item.question} 
-            answer={item.answer} 
-            isFirst={index === 0}
-          />
+        {Object.entries(faq).map(([categoria, items]) => (
+          <View key={categoria}>
+            <Text style={styles.categoryTitle}>{categoria.toUpperCase()}</Text>
+
+            {items.map((item, index) => (
+              <AccordionFAQ
+                key={item.id}
+                question={item.question}
+                answer={item.answer}
+                isFirst={index === 0}
+              />
+            ))}
+          </View>
         ))}
       </ScrollView>
     </View>
@@ -100,5 +114,16 @@ const styles = StyleSheet.create({
     listContainer: {
     // borderTopWidth: 1,
     // borderTopColor: theme.border,
-  }
+  },
+  categoryTitle: {
+    fontSize: 22,
+    fontWeight: 'regular',
+    fontFamily: "Roboto-Regular",
+    color: "black",
+    marginHorizontal: 15,
+    marginTop: 25,
+    marginBottom: 8,
+    textTransform: 'capitalize', // ou uppercase se quiser tudo maiúsculo
+  },
+
 });
