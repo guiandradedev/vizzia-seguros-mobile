@@ -20,7 +20,9 @@ export default function VehicleConductorsScreen() {
         router.push('/(app)/(tabs)/my-cars/create/add-conductors'); // Redireciona para login
     };
 
-    const { vehicle, setVehicle, initialCarPhoto, vehiclePhotos } = useCreateVehicle()
+    function handleBack() {
+        router.back();
+    }
 
     return (
         <View style={styles.container}>
@@ -42,7 +44,9 @@ export default function VehicleConductorsScreen() {
             >
                 <Text style={styles.buttonText}>Pular</Text>
             </TouchableOpacity>
-
+            <TouchableOpacity style={styles.button} onPress={handleBack}>
+                <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
 
 
         </View>

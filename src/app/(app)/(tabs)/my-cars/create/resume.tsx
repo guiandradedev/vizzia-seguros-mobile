@@ -13,11 +13,71 @@ export default function ResumeCreateVehicleScreen() {
     const router = useRouter();
     const [isCameraOpen, setIsCameraOpen] = useState(false);
 
+    const { vehicle, vehiclePhotos, initialCarPhoto, conductors } = useCreateVehicle()
+
+    function handleBack() {
+        router.back();
+    }
+
+    function handleSubmit() {
+        alert('Cadastro finalizado com sucesso!');
+        router.push('/(app)/(tabs)/my-cars'); 
+    }
+
     return (
         <ScrollView style={styles.container}>
-            <Text style={styles.title}>Cadastre um veículo!</Text>
+            <Text style={styles.title}>Resumo do cadastro!</Text>
 
-            <Text>Finalizando</Text>
+            <Text>Quase lá! Revise as informações do veículo antes de finalizar o cadastro.</Text>
+            <View>
+                <Image source={{ uri: initialCarPhoto }} style={styles.photo} />
+                <Text>Modelo: {vehicle.model}</Text>
+                <Text>Marca: {vehicle.brand}</Text>
+                <Text>Ano: {vehicle.year}</Text>
+                <Text>Cor: {vehicle.color}</Text>
+                <Text>Placa: {vehicle.plate}</Text>
+                <Text>Odômetro: {vehicle.odomether} km</Text>
+            </View>
+            <View>
+                <Text>Fotos do veículo:</Text>
+                {
+                    vehiclePhotos.map((photo, index) => (
+                        <View key={index}>
+                            {photo.uri ? (
+                                <Image source={{ uri: photo.uri }} style={styles.photo} />
+                            ) : (
+                                <Text>{photo.title} - Não fornecida</Text>
+                            )}
+                        </View>
+                    ))
+                }
+            </View>
+            <View>
+                <Text>Condutores adicionais:</Text>
+                {
+                    conductors.length > 0 ? conductors.map((conductor, index) => (
+                        <View key={index}>
+                            <Text>Nome: {conductor.name}</Text>
+                            <Text>CNH: {conductor.document}</Text>
+                            <Text>Data de Nascimento: {conductor.birthDate.toLocaleDateString()}</Text>
+                            <Text>Telefone: {conductor.phone}</Text>
+                            <Text>Email: {conductor.email}</Text>
+                            <Text>Relacionamento: {conductor.relationship}</Text>
+                            <Text>Emissor da CNH: {conductor.licenseFirstEmission}</Text>
+                            <Text>Número da CNH: {conductor.licenseNumber}</Text>
+                            <Text>Validade da CNH: {conductor.licenseExpiry}</Text>
+                            <Image source={{ uri: conductor.licensePhoto }} style={styles.photo} />
+                        </View>
+                    )) : <Text>Nenhum condutor adicional adicionado.</Text>
+                }
+            </View>
+
+            <TouchableOpacity style={styles.button} onPress={handleBack}>
+                <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
+                <Text style={styles.buttonText}>Finalizar cadastro</Text>
+            </TouchableOpacity>
         </ScrollView>
     );
 }

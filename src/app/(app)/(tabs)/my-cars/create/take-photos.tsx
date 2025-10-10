@@ -46,13 +46,14 @@ export default function MyCarsScreen() {
         router.push('/(app)/(tabs)/my-cars/create/conductors'); // Redireciona para login
     };
 
+    function handleBack() {
+        router.back();
+    }
+
     return (
         <View style={styles.container}>
             <Text style={styles.title}>Fotos do veiculo!</Text>
 
-            {/* <Text>{ initialCarPhoto }</Text>
-            {initialCarPhoto && <Image source={{ uri: initialCarPhoto }} style={styles.photo} />} */}
-            
             <View style={styles.photoList}>
                 {vehiclePhotos.map((photo, index) => (
                     <View key={index} style={styles.photosContainer}>
@@ -67,6 +68,9 @@ export default function MyCarsScreen() {
                     </View>
                 ))}
             </View>
+            <TouchableOpacity style={styles.button} onPress={handleBack}>
+                <Text style={styles.buttonText}>Voltar</Text>
+            </TouchableOpacity>
             <TouchableOpacity style={[styles.button, !canRedirect && styles.buttonDisabled]} onPress={handleRedirect} disabled={!canRedirect}>
                 <Text style={styles.buttonText}>Continuar</Text>
             </TouchableOpacity>

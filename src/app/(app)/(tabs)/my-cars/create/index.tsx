@@ -10,7 +10,7 @@ import { useCreateVehicle } from '@/hooks/useCreateVehicle';
 const theme = Colors.light
 
 export default function CreateVehicleScreen() {
-    const { vehicle, setVehicle, changeInitialCarPhoto } = useCreateVehicle()
+    const { vehicle, setVehicle, changeInitialCarPhoto, initialCarPhoto } = useCreateVehicle()
     const router = useRouter();
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [canRedirect, setCanRedirect] = useState(false);
@@ -35,7 +35,7 @@ export default function CreateVehicleScreen() {
         router.push('/(app)/(tabs)/my-cars/create/take-photos'); // Redireciona para login
     };
 
-    const [photo, setPhoto] = useState<string>("");
+    const [photo, setPhoto] = useState<string>(initialCarPhoto);
     async function addPhoto(photoUri: string) {
         setPhoto(photoUri)
         closeCamera();
@@ -44,11 +44,12 @@ export default function CreateVehicleScreen() {
 
         changeInitialCarPhoto(photoUri)
         const data = {
-            model: "Onix RS",
+            model: "Onix LTZ",
             brand: "Chevrolet",
             year: 2024,
             color: "Preto",
-            plate: "ABC1D23"
+            plate: "ABC1D23",
+            odomether: 15000
         }
         setVehicle({ ...vehicle, ...data })
     }
