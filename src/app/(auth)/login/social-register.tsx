@@ -1,90 +1,37 @@
 import Colors from "@/constants/Colors";
-import { useLogin } from "@/contexts/LoginContext";
+import { CreateUserSocialTokenDecode, useLogin } from "@/contexts/LoginContext";
 import { FontAwesome } from "@expo/vector-icons";
 import { useState } from "react";
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
-import { jwtDecode } from "jwt-decode";
 import axios, { AxiosResponse } from "axios";
 import { axiosNoAuth } from "@/lib/axios";
 import { useRouter } from "expo-router";
 import { useAuth } from "@/hooks/useAuth";
 import { Tokens } from "@/types/auth";
 import { saveSecure } from "@/utils/secure-store";
+import { decodeJWT } from "@/utils/jwt";
 
-type CreateUserSocialTokenDecode = {
-    sub: number,
-    type: string,
-    provider: string,
-    provider_email: string,
-    name: string,
-}
+
 
 const theme = Colors.light
 export default function SocialRegisterScreen() {
     const [isCreatingAccount, setisCreatingAccount] = useState(false);
-    const { user, initialData, changeUserProperty } = useLogin();
+    const { user, initialData, changeUserProperty, handleRegisterSocialLogin } = useLogin();
     const router = useRouter()
     const { setAuthenticated } = useAuth()
 
     async function handleCreateAccount() {
         setisCreatingAccount(true);
 
-        if (!user?.email || !user?.nome || !initialData?.createusersocialtoken || !initialData?.provider) {
+        const result = await handleRegisterSocialLogin()
+        if (!result) {
             setisCreatingAccount(false);
             Alert.alert("Erro", "Dados incompletos. Por favor, verifique suas informações.");
             return;
         }
 
-        let decoded: CreateUserSocialTokenDecode | undefined;
-        try {
-            decoded = jwtDecode(initialData.createusersocialtoken) as CreateUserSocialTokenDecode;
-        } catch (err) {
-            setisCreatingAccount(false);
-            Alert.alert("Erro", "Token inválido. Por favor, tente novamente.");
-            return;
-        }
-
-        if (!decoded) {
-            setisCreatingAccount(false);
-            Alert.alert("Erro", "Token inválido. Por favor, tente novamente.");
-            return;
-        }
-
-        try {
-
-            const response: AxiosResponse<Tokens> = await axiosNoAuth.post('/social-auth/register', {
-                email: user.email,
-                name: user.nome,
-                provider: decoded.provider,
-                provider_email: decoded.provider_email,
-                id_provider: decoded.sub,
-                passwordHash: user.passwordHash
-            }, {
-                headers: {
-                    Authorization: `Bearer ${initialData.createusersocialtoken}`,
-                }
-            })
-
-            console.log("resposta", response)
-            const { accessToken, refreshToken } = response.data
-
-            await saveSecure('accessToken', accessToken)
-            await saveSecure('refreshToken', refreshToken)
-
-            setAuthenticated()
-            router.replace('/(app)/(tabs)');
-        } catch (err) {
-            if (axios.isAxiosError(err)) {
-                console.log("axios", err.response?.data ?? err.message);
-            } else if (err instanceof Error) {
-                console.log("erro", err.message);
-            } else {
-                console.log(String(err));
-            }
-
-            setisCreatingAccount(false);
-            Alert.alert("Erro", "Falha ao criar conta. Por favor, tente novamente.");
-        }
+        setAuthenticated()
+        router.replace('/(app)/(tabs)');
     }
 
     return <KeyboardAvoidingView
@@ -103,7 +50,7 @@ export default function SocialRegisterScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={user?.nome}
-                onChangeText={(value)=>changeUserProperty('nome', value)}
+                onChangeText={(value) => changeUserProperty('nome', value)}
                 editable={!isCreatingAccount}
             />
             <TextInput
@@ -113,7 +60,7 @@ export default function SocialRegisterScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 value={user?.email}
-                onChangeText={(value)=>changeUserProperty('email', value)}
+                onChangeText={(value) => changeUserProperty('email', value)}
                 editable={!isCreatingAccount}
             />
 
@@ -123,7 +70,7 @@ export default function SocialRegisterScreen() {
                 placeholderTextColor="#999"
                 secureTextEntry
                 value={user?.passwordHash}
-                onChangeText={(value)=>changeUserProperty('passwordHash', value)}
+                onChangeText={(value) => changeUserProperty('passwordHash', value)}
                 editable={!isCreatingAccount}
             />
 

@@ -34,50 +34,31 @@ export default function LoginScreen() {
     const [password, setPassword] = useState('');
     const [isLoggingIn, setIsLoggingIn] = useState(false);
     const [token, setToken] = useState<string | null>(null)
-    const [auth, setAuth] = useState<User | null>(null)
     const { changeInitialData } = useLogin()
+    const { signIn, user, loginBiometric, setAuthenticated, handleLoginWithProvider } = useAuth();
 
     async function handleGoogleSignIn() {
         try {
             await GoogleSignin.hasPlayServices() // verifica se ta disponivel
             const response = await GoogleSignin.signIn()
 
-            if (response) {
-                // console.log('Google Sign-In Response:', response.data);
-                setAuth(response.data)
+            if (response && response.data?.idToken) {
+                const result = await handleLoginWithProvider!({ provider: 'Google', token: response.data.idToken || '' });
 
-                console.log(response.data?.idToken)
-
-                try {
-                    const api_auth: AxiosResponse<Tokens> = await api.post('/social-auth/login', {
-                        provider: 'Google',
-                        token: response.data?.idToken
-                    });
-                    const { accessToken, refreshToken } = api_auth.data
-                    await saveSecure('accessToken', accessToken)
-                    await saveSecure('refreshToken', refreshToken)
-                    setAuthenticated()
+                if(result === true) {
                     router.replace("/(app)/(tabs)");
-                } catch (err: any) {
-                    if (axios.isAxiosError(err)) {
-                        const status = err.response?.status;
-
-                        if (status === 400 && err.response?.data) {
-                            const errorData = err.response.data as ResponseSocialAuthUserNotExistsAPI;
-
-                            changeInitialData({
-                                email: errorData.email,
-                                nome: errorData.nome,
-                                createusersocialtoken: errorData.createusersocialtoken,
-                                provider: "Google"
-                            });
-
-                            router.replace("/(auth)/login/social-register");
-                            return;
-                        }
-                    }
-                    Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
+                    return;
                 }
+
+                if(result) {
+                    changeInitialData(result);
+                    router.replace("/(auth)/login/social-register");
+                    return
+                }
+
+                Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
+            } else {
+                Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
             }
 
         } catch (error) {
@@ -88,8 +69,6 @@ export default function LoginScreen() {
 
 
     const router = useRouter();
-
-    const { signIn, user, loginBiometric, setAuthenticated } = useAuth();
 
     async function verifyAvaiableAuthentication() {
         const compatible = await LocalAuthentication.hasHardwareAsync();
@@ -104,6 +83,7 @@ export default function LoginScreen() {
         const isBiometricEnrolled = await LocalAuthentication.isEnrolledAsync();
 
         if (!isBiometricEnrolled) {
+            setIsLoggingIn(false)
             return Alert.alert('Login', 'Nenhuma biometria encontrada. Por favor, cadastre no dispositivo.');
         }
 
@@ -128,7 +108,6 @@ export default function LoginScreen() {
             Alert.alert('Erro', 'Biometria não reconhecida. Tente novamente.');
             return
         }
-
     }
 
     useEffect(() => {
@@ -237,12 +216,6 @@ export default function LoginScreen() {
 
 
                 </View>
-
-                {
-                    auth && (
-                        <Text style={{ marginTop: 20, textAlign: 'center' }}>Logado como {auth?.user?.email}</Text>
-                    )
-                }
             </View>
         </KeyboardAvoidingView>
     );
