@@ -1,13 +1,15 @@
 // app/(tabs)/index.tsx (Rota: /)
 
 import { useAuth } from '@/hooks/useAuth';
+import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomeScreen() {
   const router = useRouter();
 
-  const { signOut } = useAuth()
+  const { signOut, user } = useAuth()
   async function handleLogout() {
     signOut()
     alert("Deslogado.")
@@ -18,17 +20,31 @@ export default function HomeScreen() {
     router.push('/(app)/(tabs)/my-cars/create'); // Redireciona para login
   };
 
-  return (
-    <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-      <Text style={{ fontSize: 24 }}>Bem-vindo à Home!</Text>
+  const insets = useSafeAreaInsets();
 
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleLogout}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.buttonText}>Logout</Text>
-      </TouchableOpacity>
+  return (
+    <SafeAreaView
+      style={[
+        styles.container,
+        { paddingTop: insets.top, paddingBottom: insets.bottom, paddingHorizontal: 20 },
+      ]}
+    >
+      <View style={styles.header}>
+        <View style={styles.headerLeft}>
+          <Text>Bem-vindo, {user?.name}</Text>
+        </View>
+        <View style={styles.headerRight}>
+          <TouchableOpacity style={styles.headerButton} onPress={() => router.push('/(app)/notify')}>
+            <FontAwesome name="bell" size={30} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerButton} onPress={() => router.push('/(app)/profile')}>
+            <FontAwesome name="user-circle" size={30} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.headerButton} onPress={handleLogout}>
+            <FontAwesome name="angle-double-right" size={30} />
+          </TouchableOpacity>
+        </View>
+      </View>
 
       <Text>Aparentemente você não tem nenhum seguro ativo</Text>
 
@@ -39,17 +55,38 @@ export default function HomeScreen() {
       >
         <Text style={styles.buttonText}>Cadastre seu veículo</Text>
       </TouchableOpacity>
-    </View>
+    </SafeAreaView>
   );
 }
 
 
 const styles = StyleSheet.create({
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 20,
+  },
+  headerLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  headerRight: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+  headerButton: {
+    padding: 6,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   container: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
+    // justifyContent: 'center',
+    // alignItems: 'center',
+    padding: 0,
+    // backgroundColor: '#fff',
   },
   title: {
     fontSize: 24,
