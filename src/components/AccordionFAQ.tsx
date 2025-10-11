@@ -18,6 +18,7 @@ interface FAQItemProps {
   question: string;
   answer: string;
   isFirst: boolean;
+  category?: string;
 }
 const theme = Colors.light;
 

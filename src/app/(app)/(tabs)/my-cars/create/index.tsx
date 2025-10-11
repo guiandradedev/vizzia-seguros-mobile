@@ -1,101 +1,165 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
-import { useState } from 'react';
-import Camera from '@/components/Camera'; // Importe o componente Camera
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
+import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
+import { useEffect, useState } from 'react';
+import Camera from '@/components/Camera';
+import { Image } from 'expo-image';
 import { FontAwesome } from '@expo/vector-icons';
-
-interface PhotoType {
-    uri: string,
-    title: string
-}
+import { useCreateVehicle } from '@/hooks/useCreateVehicle';
 
 const theme = Colors.light
 
-export default function MyCarsScreen() {
-    const MAX_PHOTOS = 5;
-    const [photos, setPhotos] = useState<PhotoType[]>([
-        { title: "Frente", uri: "" },
-        { title: "Trás", uri: "" },
-        { title: "Lado Esquerdo", uri: "" },
-        { title: "Lado Direito", uri: "" },
-        { title: "Capô", uri: "" },
-        // {title: "", uri: ""},
-        // {title: "", uri: ""},
-        // {title: "", uri: ""},
-    ]); // Estado para armazenar URIs das fotos
+export default function CreateVehicleScreen() {
+    const { vehicle, setVehicle, changeInitialCarPhoto, initialCarPhoto } = useCreateVehicle()
+    const router = useRouter();
     const [isCameraOpen, setIsCameraOpen] = useState(false);
-    const [editingPhoto, setEditingPhoto] = useState<number>(0);
+    const [canRedirect, setCanRedirect] = useState(false);
 
-    const openCamera = (photoIndex: number) => {
+    useEffect(() => {
+        if (vehicle.model && vehicle.brand && vehicle.year && vehicle.color && vehicle.plate && vehicle.odomether) {
+            setCanRedirect(true)
+        } else {
+            setCanRedirect(false)
+        }
+    }, [vehicle])
+
+    const openCamera = () => {
         setIsCameraOpen(true);
-        setEditingPhoto(photoIndex)
     };
     const closeCamera = () => {
-        setEditingPhoto(0)
         setIsCameraOpen(false);
     };
 
-    const addPhoto = (photoUri: string) => {
-        setPhotos((prevPhotos) => {
-            const updatedPhotos = [...prevPhotos]; // Cria uma cópia do estado atual
-            updatedPhotos[editingPhoto] = { ...updatedPhotos[editingPhoto], uri: photoUri }; // Atualiza o item específico
-            return updatedPhotos; // Retorna o novo estado
-        });
-        closeCamera(); // Fecha a câmera após tirar a foto
+    const handleRedirect = () => {
+
+        router.push('/(app)/(tabs)/my-cars/create/take-photos'); // Redireciona para login
     };
+
+    const [photo, setPhoto] = useState<string>(initialCarPhoto);
+    async function addPhoto(photoUri: string) {
+        setPhoto(photoUri)
+        closeCamera();
+
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+
+        changeInitialCarPhoto(photoUri)
+        const data = {
+            model: "Onix LTZ",
+            brand: "Chevrolet",
+            year: 2024,
+            color: "Preto",
+            plate: "ABC1D23",
+            odomether: 15000
+        }
+        setVehicle({ ...vehicle, ...data })
+    }
 
     if (isCameraOpen) {
         return <View style={{ flex: 1 }}>
-            <Camera setPhoto={addPhoto} title={photos[editingPhoto].title} closeCamera={closeCamera} />
+            <Camera setPhoto={addPhoto} closeCamera={closeCamera} />
         </View>;
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Cadastro do seguro!</Text>
-            <View style={styles.photoList}>
-                {photos.map((photo, index) => (
-                    <View key={index} style={styles.photosContainer}>
-                        <Text>{photo.title}</Text>
-                        <TouchableOpacity
-                            style={styles.imageButton}
-                            onPress={() => openCamera(index)}
-                        >
-                            {photo.uri && <Image key={index} source={{ uri: photo.uri }} style={styles.photo} />}
-                            {!photo.uri && <FontAwesome size={28} name="plus" color={"#000"} />}
-                        </TouchableOpacity>
+        <ScrollView style={styles.container}>
+            <Text style={styles.title}>Cadastre um veículo!</Text>
+
+            <Text>Para começar, tire uma foto do carro.</Text>
+            <Text>A foto deve ser de boa qualidade de frente, mostrando a placa e os detalhes do veículo.</Text>
+            <TouchableOpacity
+                style={styles.imageButton}
+                onPress={openCamera}
+            >
+                {!photo ? <Text>Adicionar foto</Text> : <Text>Alterar foto</Text>}
+            </TouchableOpacity>
+
+            {photo && (
+                <View style={styles.formContainer}>
+                    <Text>Enviado</Text>
+                    <Image source={{ uri: photo }} style={styles.photo} />
+                    <Text>Confirme os dados do veículo:</Text>
+                    <View style={styles.inputContainer}>
+                        <Text>Modelo</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Modelo"
+                            value={vehicle.model}
+                            onChangeText={(text) => setVehicle({ ...vehicle, model: text })}
+                        />
                     </View>
-                ))}
-            </View>
-        </View>
+                    <View style={styles.inputContainer}>
+                        <Text>Marca</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Marca"
+                            value={vehicle.brand}
+                            onChangeText={(text) => setVehicle({ ...vehicle, brand: text })}
+                        />
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <Text>Ano</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Ano"
+                            value={vehicle.year ? vehicle.year.toString() : ''}
+                            onChangeText={(text) => setVehicle({ ...vehicle, year: parseInt(text) || 0 })}
+                            keyboardType="numeric"
+                        />
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <Text>Cor</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Cor"
+                            value={vehicle.color}
+                            onChangeText={(text) => setVehicle({ ...vehicle, color: text })}
+                        />
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <Text>Placa</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Placa"
+                            value={vehicle.plate}
+                            onChangeText={(text) => setVehicle({ ...vehicle, plate: text })}
+                        />
+                    </View>
+                    <View style={styles.inputContainer}>
+                        <Text>Odômetro</Text>
+                        <TextInput
+                            style={styles.input}
+                            placeholder="Odômetro"
+                            value={vehicle.odomether ? vehicle.odomether.toString() : ''}
+                            onChangeText={(text) => setVehicle({ ...vehicle, odomether: parseInt(text) || 0 })}
+                            keyboardType="numeric"
+                        />
+                    </View>
+                    <Text>Se algum dado estiver incorreto, você pode editar.</Text>
+                </View>
+            )}
+
+            {!photo && (
+                <View>
+                    <Text>Aguardando foto...</Text>
+                </View>
+            )}
+
+            <TouchableOpacity style={[styles.button, !canRedirect && styles.buttonDisabled]} onPress={handleRedirect} disabled={!canRedirect}>
+                <Text style={styles.buttonText}>Continuar</Text>
+            </TouchableOpacity>
+        </ScrollView>
     );
 }
+
 const styles = StyleSheet.create({
     container: {
         flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
         padding: 20,
     },
     title: {
         fontSize: 24,
         marginBottom: 30,
-    },
-    photosContainer: {
-        width: '50%', // Cada foto ocupa 50% da largura da tela
-        padding: 10, // Espaçamento entre as fotos
-        alignItems: 'center', // Centraliza o conteúdo dentro de cada item
-    },
-    imageButton: {
-        width: 150,
-        height: 150,
-        backgroundColor: theme.tabBackground,
-        padding: 8,
-        borderWidth: 1,
-        borderStyle: "dashed",
-        borderRadius: 8,
-        justifyContent: "center",
-        alignItems: "center"
+        textAlign: 'center',
     },
     button: {
         backgroundColor: '#6D94C5',
@@ -110,7 +174,12 @@ const styles = StyleSheet.create({
         },
         shadowOpacity: 0.25,
         shadowRadius: 3.84,
-        marginBottom: 10,
+        marginTop: 20,
+        alignSelf: 'center',
+    },
+    buttonDisabled: {
+        backgroundColor: '#ccc',
+        opacity: 0.6
     },
     buttonText: {
         color: 'white',
@@ -118,16 +187,37 @@ const styles = StyleSheet.create({
         fontWeight: '600',
         textAlign: 'center',
     },
-    photoList: {
+    imageButton: {
+        width: 150,
+        height: 150,
+        backgroundColor: theme.tabBackground,
+        padding: 8,
+        borderWidth: 1,
+        borderStyle: "dashed",
+        borderRadius: 8,
+        justifyContent: "center",
+        alignItems: "center",
+        alignSelf: 'center',
+        marginVertical: 20,
+    },
+    formContainer: {
         marginTop: 20,
-        flexDirection: 'row', // Alinha os itens em linha
-        flexWrap: 'wrap', // Permite que os itens quebrem para a próxima linha
-        justifyContent: 'space-between', // Espaçamento entre as fotos
     },
     photo: {
-        width: "100%",
-        height: "100%",
-        // margin: 5,r
+        width: '100%',
+        height: 200,  // Altura fixa para evitar problemas de layout
         borderRadius: 8,
+        marginVertical: 10,
+    },
+    inputContainer: {
+        marginBottom: 15,
+    },
+    input: {
+        borderWidth: 1,
+        borderColor: '#ccc',
+        borderRadius: 5,
+        padding: 10,
+        fontSize: 16,
+        backgroundColor: '#fff',
     },
 });
