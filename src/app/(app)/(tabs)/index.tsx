@@ -28,7 +28,7 @@ export default function HomeScreen() {
     <SafeAreaView
       style={[
         styles.container,
-        { paddingTop: insets.top, paddingBottom: insets.bottom, paddingHorizontal: 20 },
+        { paddingBottom: insets.bottom, paddingHorizontal: 20 },
       ]}
     >
       <View style={styles.header}>
