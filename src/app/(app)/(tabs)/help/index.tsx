@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import { View, Text, StyleSheet, ScrollView, StatusBar } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import AccordionFAQ from '@/components/AccordionFAQ';
@@ -17,12 +17,13 @@ interface FAQData {
   category: string,
 }
 
-export default function HelpScreen() {
+export default function HelpScreen({ navigation }: any) {
+  const theme = Colors.light
   const insets = useSafeAreaInsets();
   const [faq, setFaq] = useState<Record<string, FAQData[]>>({})
     useEffect(()=>{
       async function get_faq() {
-        const res: AxiosResponse<FAQData[]> = await axios.get("/faq?active=true")
+        const res: AxiosResponse<FAQData[]> = await axios.get("/faq?isActive=true")
         // Agrupa os FAQs por categoria
         const grouped = res.data.reduce((acc, item) => {
         if (!acc[item.category]) acc[item.category] = []
@@ -34,24 +35,6 @@ export default function HelpScreen() {
       }
       get_faq()
     }, [])
-
-  // const faqData = [
-  //   {
-  //     id: '1',
-  //     question: 'O que é considerado no cálculo do meu seguro?	',
-  //     answer: 'O preço é calculado com base no seu perfil de risco (idade, histórico de condução, localização), as características do bem segurado (modelo, ano) e as coberturas que você escolheu.'
-  //   },
-  //   {
-  //     id: '2',
-  //     question: 'Como aciono o meu guincho (assistência 24h)?',
-  //     answer: 'Você pode solicitar o guincho diretamente pelo nosso aplicativo (mais rápido) ou ligando para o número 0800-XXX-XXXX. Tenha em mãos sua placa e sua localização exata.'
-  //   },
-  //   {
-  //     id: '3',
-  //     question: 'Posso escolher a oficina para reparo?',
-  //     answer: 'Sim, mas recomendamos nossa Rede de Oficinas Credenciadas. Elas oferecem garantia de serviço estendida e prazos de reparo mais ágeis.'
-  //   },
-  // ];
 
   return (
     <View

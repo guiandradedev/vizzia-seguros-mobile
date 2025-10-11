@@ -11,8 +11,6 @@ export default function MyCarsScreen() {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Bem-vindo meus carros!</Text>
-
       <Text>Aparentemente você não tem nenhum seguro ativo</Text>
       
       <TouchableOpacity 
@@ -29,8 +27,8 @@ export default function MyCarsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1, 
-    justifyContent: 'center', 
-    alignItems: 'center',
+    justifyContent: 'space-between', // empurra o botão para o final
+    
     padding: 20,
   },
   title: {
@@ -50,10 +48,13 @@ const styles = StyleSheet.create({
     },
     shadowOpacity: 0.25,
     shadowRadius: 3.84,
+    width: '60%',
+    alignContent: 'center',
+    alignSelf: 'center',  
   },
   buttonText: {
     color: 'white',
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: '600',
     textAlign: 'center',
   },

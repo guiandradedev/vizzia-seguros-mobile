@@ -1,6 +1,6 @@
 import { Redirect } from 'expo-router';
 import { useAuth } from '@/hooks/useAuth';
-import { View, Text } from 'react-native';
+import { View, Text, StatusBar } from 'react-native';
 import Colors from '@/constants/Colors';
 import { useState } from 'react';
 
@@ -13,16 +13,21 @@ export default function IndexScreen() {
 
   if (isLoading) {
     return (
-      <View style={{ 
-        flex: 1, 
-        justifyContent: 'center', 
-        alignItems: 'center',
-        backgroundColor: Colors.light.background 
-      }}>
-        <Text style={{ fontSize: 18, color: Colors.light.text }}>Carregando...</Text>
-      </View>
+      <>
+        <View style={{ 
+          flex: 1, 
+          justifyContent: 'center', 
+          alignItems: 'center',
+          backgroundColor: Colors.light.background 
+        }}>
+
+          <Text style={{ fontSize: 18, color: Colors.light.text }}>Carregando...</Text>
+        </View>
+      </>
+      
     );
   }
+
 
   if (user) {
     return <Redirect href="/(app)/(tabs)" />;

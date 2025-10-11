@@ -1,6 +1,6 @@
 // constants/Colors.ts
 
-export const TintColor = '#4CAF50'; // Verde: Cor de destaque principal
+export const TintColor = '#6D94C5'; // Verde: Cor de destaque principal
 export const BackgroundColor = '#f0efeeff'; // Fundo claro para o corpo da tela
 export const TabBarColor = '#FFFFFF'; // Fundo da Navbar inferior (branco)
 export const HeaderColor = TintColor; // Fundo do Header superior
@@ -8,6 +8,7 @@ export const Border = "#e4e1d8ff"
 
 export default {
   light: {
+    appTheme: '#6D94C5',
     text: '#000',
     background: BackgroundColor,
     tint: TintColor,

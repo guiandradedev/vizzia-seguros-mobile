@@ -6,6 +6,8 @@ import Camera from '@/components/Camera';
 import { Image } from 'expo-image';
 import { FontAwesome } from '@expo/vector-icons';
 import { useCreateVehicle } from '@/hooks/useCreateVehicle';
+import { commonStyles } from '@/styles/CommonStyles';
+import FormRow from '@/components/FormRow';
 
 const theme = Colors.light
 
@@ -25,60 +27,166 @@ export default function ResumeCreateVehicleScreen() {
     }
 
     return (
-        <ScrollView style={styles.container}>
-            <Text style={styles.title}>Resumo do cadastro!</Text>
+        <View style={commonStyles.container}>
+            <ScrollView contentContainerStyle={[commonStyles.scrollContent, { flexGrow: 1 }]}
+                showsVerticalScrollIndicator={false}
+            >
+                <Text style={commonStyles.title}>Resumo do cadastro!</Text>
 
-            <Text>Quase lá! Revise as informações do veículo antes de finalizar o cadastro.</Text>
-            <View>
-                <Image source={{ uri: initialCarPhoto }} style={styles.photo} />
-                <Text>Modelo: {vehicle.model}</Text>
-                <Text>Marca: {vehicle.brand}</Text>
-                <Text>Ano: {vehicle.year}</Text>
-                <Text>Cor: {vehicle.color}</Text>
-                <Text>Placa: {vehicle.plate}</Text>
-                <Text>Odômetro: {vehicle.odomether} km</Text>
-            </View>
-            <View>
-                <Text>Fotos do veículo:</Text>
-                {
-                    vehiclePhotos.map((photo, index) => (
-                        <View key={index}>
-                            {photo.uri ? (
-                                <Image source={{ uri: photo.uri }} style={styles.photo} />
-                            ) : (
-                                <Text>{photo.title} - Não fornecida</Text>
-                            )}
-                        </View>
-                    ))
-                }
-            </View>
-            <View>
-                <Text>Condutores adicionais:</Text>
-                {
-                    conductors.length > 0 ? conductors.map((conductor, index) => (
-                        <View key={index}>
-                            <Text>Nome: {conductor.name}</Text>
-                            <Text>CNH: {conductor.document}</Text>
-                            <Text>Data de Nascimento: {conductor.birthDate.toLocaleDateString()}</Text>
-                            <Text>Telefone: {conductor.phone}</Text>
-                            <Text>Email: {conductor.email}</Text>
-                            <Text>Relacionamento: {conductor.relationship}</Text>
-                            <Text>Emissor da CNH: {conductor.licenseFirstEmission}</Text>
-                            <Text>Número da CNH: {conductor.licenseNumber}</Text>
-                            <Text>Validade da CNH: {conductor.licenseExpiry}</Text>
-                            <Image source={{ uri: conductor.licensePhoto }} style={styles.photo} />
-                        </View>
-                    )) : <Text>Nenhum condutor adicional adicionado.</Text>
-                }
-            </View>
+                <Text style={commonStyles.subtitle}>Quase lá! Revise as informações do veículo antes de finalizar o cadastro.</Text>
+                <View>
 
-            <TouchableOpacity style={styles.button} onPress={handleBack}>
-                <Text style={styles.buttonText}>Voltar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={styles.button} onPress={handleSubmit}>
-                <Text style={styles.buttonText}>Finalizar cadastro</Text>
-            </TouchableOpacity>
-        </ScrollView>
+                    <Text style={commonStyles.sectionTitle}>
+                        Informações do veículo
+                    </Text>
+
+                    <View style={[commonStyles.formContainer, { paddingLeft: 20, paddingRight: 20}]}>
+                        <FormRow>
+                            <View style={{ flex: 1 }}>
+                                <Text style={commonStyles.label}>Modelo:</Text>
+                                <Text style={commonStyles.input}>{vehicle.model}</Text> 
+                            </View>
+
+                            <View style={{ flex: 1 }}>
+                                <Text style={commonStyles.label}>Marca:</Text>
+                                <Text style={commonStyles.input}>{vehicle.brand}</Text> 
+                            </View>
+
+                        </FormRow>
+
+                        <FormRow>
+                            <View style={{ flex: 1 }}>
+                                <Text style={commonStyles.label}>Ano:</Text>
+                                <Text style={commonStyles.input}>{vehicle.year}</Text> 
+                            </View>
+
+                            <View style={{ flex: 1 }}>
+                                <Text style={commonStyles.label}>Cor:</Text>
+                                <Text style={commonStyles.input}>{vehicle.color}</Text> 
+                            </View>
+
+                        </FormRow>
+
+                        <FormRow>
+                            <View style={{ flex: 1 }}>
+                                <Text style={commonStyles.label}>Placa:</Text>
+                                <Text style={commonStyles.input}>{vehicle.plate}</Text> 
+                            </View>
+
+                            <View style={{ flex: 1 }}>
+                                <Text style={commonStyles.label}>Odômetro:</Text>
+                                <Text style={commonStyles.input}>{vehicle.odomether}</Text> 
+                            </View>
+
+                        </FormRow>
+                        
+   
+                    </View>
+                </View>
+                <View>
+                    <Text style={commonStyles.label}>Foto principal:</Text>
+                    <View style={{ alignItems: 'center' }}>
+                        <Image source={{ uri: initialCarPhoto }} style={[styles.photo, { width:'80%' }]} />
+                    </View>
+                    {
+                        vehiclePhotos.map((photo, index) => (
+                            <View key={index} >
+                                <Text style={commonStyles.label}>
+                                    {photo.title}:
+                                </Text>
+
+                            <View style={{alignItems:'center', marginBottom:30}}>
+                                {photo.uri ? (
+                                    <Image source={{ uri: photo.uri }} style={[styles.photo, { width:'80%' }]} />
+                                ) : (
+                                    <Text>Não fornecida</Text>
+                                )}
+                            </View>
+                                
+                            </View>
+                        ))
+                    }
+                </View>
+                <View>
+                    <Text style={commonStyles.sectionTitle}>Condutores adicionais:</Text>
+                    {
+                        conductors.length > 0 ? conductors.map((conductor, index) => (
+                            <View key={index}>
+                                <FormRow>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={commonStyles.label}>Nome Completo:</Text>
+                                        <Text style={commonStyles.input}>{conductor.name}</Text> 
+                                    </View>
+                                </FormRow>
+
+                                <FormRow>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={commonStyles.label}>Email:</Text>
+                                        <Text style={commonStyles.input}>{conductor.email}</Text> 
+                                    </View>
+                                </FormRow>
+
+                                <FormRow>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={commonStyles.label}>CPF:</Text>
+                                        <Text style={commonStyles.input}>{conductor.document}</Text> 
+                                    </View>
+
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={commonStyles.label}>Telefone:</Text>
+                                        <Text style={commonStyles.input}>{conductor.phone}</Text> 
+                                    </View>
+                                </FormRow>
+
+                                <FormRow>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={commonStyles.label}>CNH:</Text>
+                                        <Text style={commonStyles.input}>{conductor.licenseNumber}</Text> 
+                                    </View>
+
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={commonStyles.label}>Vencimento da CNH:</Text>
+                                        <Text style={commonStyles.input}>{conductor.licenseExpiry}</Text> 
+                                    </View>
+                                </FormRow>
+
+                                <FormRow>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={commonStyles.label}>Relacionamento:</Text>
+                                        <Text style={commonStyles.input}>{conductor.relationship}</Text> 
+                                    </View>
+
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={commonStyles.label}>Data de Nascimento:</Text>
+                                        <Text style={commonStyles.input}>{conductor.birthDate.toLocaleDateString()}</Text> 
+                                    </View>
+                                </FormRow>
+                                <Text style={commonStyles.label}>Foto da CNH:</Text>
+                                <View style={{alignItems:'center', marginBottom:30}} >
+                                    <Image source={{ uri: conductor.licensePhoto }} style={[styles.photo, { width:'80%' }]} />
+                                </View>
+                            </View>
+                        )) : <Text>Nenhum condutor adicional adicionado.</Text>
+                    }
+                </View>
+
+
+                <View style={commonStyles.footer}>
+                    <View style={commonStyles.footerRow}>
+                        <TouchableOpacity style={[commonStyles.footerButton, commonStyles.backButton]} onPress={handleBack}>
+                            <Text style={commonStyles.buttonText}>Voltar</Text>
+                        </TouchableOpacity>
+
+
+                        <TouchableOpacity style={[commonStyles.footerButton, commonStyles.buttonSecondary]} onPress={handleSubmit}>
+                            <Text style={commonStyles.buttonText}>Finalizar</Text>
+                        </TouchableOpacity>
+                    </View>
+                    
+                </View>
+            
+            </ScrollView>
+        </View>      
     );
 }
 
@@ -150,5 +258,13 @@ const styles = StyleSheet.create({
         padding: 10,
         fontSize: 16,
         backgroundColor: '#fff',
+    },
+
+
+    row: {
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        marginBottom: 15,
+        gap: 15,
     },
 });

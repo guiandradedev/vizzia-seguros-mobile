@@ -1,144 +1,103 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
 import { useEffect, useState } from 'react';
-import Camera from '@/components/Camera'; // Importe o componente Camera
-import Colors from '@/constants/Colors';
-import { FontAwesome } from '@expo/vector-icons';
 import { useCreateVehicle } from '@/hooks/useCreateVehicle';
 import { useRouter } from 'expo-router';
-
-const theme = Colors.light
+import Camera from '@/components/Camera';
+import VehiclePhoto from '@/components/VehiclePhoto';
+import PhotoButton from '@/components/PhotoButton';
+import { commonStyles } from '@/styles/CommonStyles';
 
 export default function MyCarsScreen() {
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [editingPhoto, setEditingPhoto] = useState<number>(0);
-
-    const { vehicle, vehiclePhotos, changeVehiclePhoto, initialCarPhoto } = useCreateVehicle();
+    const { vehiclePhotos, changeVehiclePhoto } = useCreateVehicle();
     const router = useRouter();
-
     const [canRedirect, setCanRedirect] = useState(false);
 
     useEffect(() => {
-        setCanRedirect(vehiclePhotos.every(photo => photo.uri))
-    }, [vehiclePhotos])
+        setCanRedirect(vehiclePhotos.every(photo => photo.uri));
+    }, [vehiclePhotos]);
 
     const openCamera = (photoIndex: number) => {
+        setEditingPhoto(photoIndex);
         setIsCameraOpen(true);
-        setEditingPhoto(photoIndex)
     };
+
     const closeCamera = () => {
-        setEditingPhoto(0)
+        setEditingPhoto(0);
         setIsCameraOpen(false);
     };
-
-    function addPhoto(photoUri: string) {
+    const addPhoto = (photoUri: string) => {
+        changeVehiclePhoto(editingPhoto, photoUri);
         closeCamera();
-        changeVehiclePhoto(editingPhoto, photoUri)
-    }
-
-    if (isCameraOpen) {
-        return <View style={{ flex: 1 }}>
-            <Camera setPhoto={addPhoto} title={vehiclePhotos[editingPhoto].title} closeCamera={closeCamera} />
-        </View>;
-    }
-
-    const handleRedirect = () => {
-
-        router.push('/(app)/(tabs)/my-cars/create/conductors'); // Redireciona para login
     };
 
-    function handleBack() {
-        router.back();
+    const handleRedirect = () => router.push('/(app)/(tabs)/my-cars/create/conductors');
+    const handleBack = () => router.back();
+
+    if (isCameraOpen) {
+        return <Camera setPhoto={addPhoto} title={vehiclePhotos[editingPhoto].title} closeCamera={closeCamera} />;
     }
 
     return (
-        <View style={styles.container}>
-            <Text style={styles.title}>Fotos do veiculo!</Text>
+        <View style={commonStyles.container}>
+            <ScrollView 
+                contentContainerStyle={[commonStyles.scrollContent, { flexGrow: 1 }]}
+                showsVerticalScrollIndicator={false}
+            >
+                <Text style={commonStyles.title}>Fotos do veículo</Text>
 
-            <View style={styles.photoList}>
-                {vehiclePhotos.map((photo, index) => (
-                    <View key={index} style={styles.photosContainer}>
-                        <Text>{photo.title}</Text>
+                <View style={styles.photoGrid}>
+                    {vehiclePhotos.map((photo, index) => (
+                    <View key={index} style={styles.photoWrapper}>
+                        {photo.uri ? (
+                        <>
+                            <Text style={commonStyles.text}>{photo.title}</Text>
+                            <VehiclePhoto photoUri={photo.uri} onEdit={() => openCamera(index)} />
+                        </>
+                        ) : (
+                        <PhotoButton title={`Adicionar ${photo.title}`} onPress={() => openCamera(index)} />
+                        )}
+                    </View>
+                    ))}
+                </View>
+
+                <View style={commonStyles.footer}>
+                    <View style={commonStyles.footerRow}>
+                        <TouchableOpacity style={[commonStyles.footerButton, commonStyles.backButton]} onPress={handleBack}>
+                            <Text style={commonStyles.buttonText}>Voltar</Text>
+                        </TouchableOpacity>
+
                         <TouchableOpacity
-                            style={styles.imageButton}
-                            onPress={() => openCamera(index)}
+                            style={[commonStyles.button, !canRedirect && commonStyles.backButton]}
+                            onPress={handleRedirect}
+                            disabled={!canRedirect}
                         >
-                            {photo.uri && <Image key={index} source={{ uri: photo.uri }} style={styles.photo} />}
-                            {!photo.uri && <FontAwesome size={28} name="plus" color={"#000"} />}
+                            <Text style={commonStyles.buttonText}>Continuar</Text>
                         </TouchableOpacity>
                     </View>
-                ))}
-            </View>
-            <TouchableOpacity style={styles.button} onPress={handleBack}>
-                <Text style={styles.buttonText}>Voltar</Text>
-            </TouchableOpacity>
-            <TouchableOpacity style={[styles.button, !canRedirect && styles.buttonDisabled]} onPress={handleRedirect} disabled={!canRedirect}>
-                <Text style={styles.buttonText}>Continuar</Text>
-            </TouchableOpacity>
+                    
+                </View>
+            </ScrollView>
+
+
+            
         </View>
     );
 }
+
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        alignItems: 'center',
-        padding: 20,
+  
+    photoList: { paddingBottom: 20 },
+    buttonRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 'auto' },
+    buttonText: { color: 'white', fontSize: 14, fontWeight: '600' },
+    photoGrid: {
+        flexDirection: 'row',
+        flexWrap: 'wrap',
+        justifyContent: 'space-between',
     },
-    title: {
-        fontSize: 24,
-        marginBottom: 30,
-    },
-    photosContainer: {
-        width: '50%', // Cada foto ocupa 50% da largura da tela
-        padding: 10, // Espaçamento entre as fotos
-        alignItems: 'center', // Centraliza o conteúdo dentro de cada item
-    },
-    imageButton: {
-        width: 150,
-        height: 150,
-        backgroundColor: theme.tabBackground,
-        padding: 8,
-        borderWidth: 1,
-        borderStyle: "dashed",
-        borderRadius: 8,
-        justifyContent: "center",
-        alignItems: "center"
-    },
-    button: {
-        backgroundColor: '#6D94C5',
-        paddingHorizontal: 30,
-        paddingVertical: 12,
-        borderRadius: 8,
-        elevation: 2,
-        shadowColor: '#000',
-        shadowOffset: {
-            width: 0,
-            height: 2,
-        },
-        shadowOpacity: 0.25,
-        shadowRadius: 3.84,
-        marginBottom: 10,
-    },
-    buttonText: {
-        color: 'white',
-        fontSize: 16,
-        fontWeight: '600',
-        textAlign: 'center',
-    },
-    photoList: {
-        marginTop: 20,
-        flexDirection: 'row', // Alinha os itens em linha
-        flexWrap: 'wrap', // Permite que os itens quebrem para a próxima linha
-        justifyContent: 'space-between', // Espaçamento entre as fotos
-    },
-    photo: {
-        width: "100%",
-        height: "100%",
-        // margin: 5,r
-        borderRadius: 8,
-    },
-    buttonDisabled: {
-        backgroundColor: '#ccc',
-        opacity: 0.5,  // Diminui a cor adicionando opacidade
+    photoWrapper: {
+        width: '48%', // duas colunas com espaçamento
+        marginBottom: 16,
     },
 });
