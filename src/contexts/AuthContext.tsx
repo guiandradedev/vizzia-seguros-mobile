@@ -13,7 +13,7 @@ import { ResponseSocialAuthUserNotExistsAPI } from './LoginContext';
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  signIn: (credentials: Credentials) => Promise<boolean>;
+  signIn: (credentials: Credentials) => Promise<boolean | null>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean,
   setAuthenticated: () => void,
@@ -89,12 +89,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
   }
 
-  async function handleRegisterSocialLogin() {
-    
-  }
-
   // Função de Login
-  const signIn = async (credentials: Credentials): Promise<boolean> => {
+  const signIn = async (credentials: Credentials): Promise<boolean | null> => {
     try {
       setIsLoading(true);
       const { accessToken, refreshToken } = await loginApi(credentials); // Chamada de API real
@@ -104,9 +100,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(true)
       return true;
     } catch (error) {
-      console.error("Login falhou:", error);
       setIsLoading(false);
-      return false;
+      if(axios.isAxiosError(error)) {
+        if(error.response?.status === 401) {
+          return false
+        }
+      }
+      return null
     }
   };
 

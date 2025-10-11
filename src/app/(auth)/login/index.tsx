@@ -136,8 +136,13 @@ export default function LoginScreen() {
 
         setIsLoggingIn(false);
 
-        if (!success) {
+        if (success == false) {
             Alert.alert('Erro', 'Credenciais inválidas. Tente novamente.');
+            return
+        }
+
+        if (success == null) {
+            Alert.alert('Erro', 'Erro na autenticação. Por favor, tente novamente mais tarde.');
             return
         }
 
