@@ -100,6 +100,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(true)
       return true;
     } catch (error) {
+      // console.error("Login falhou:", error);
       setIsLoading(false);
       if(axios.isAxiosError(error)) {
         if(error.response?.status === 401) {

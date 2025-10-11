@@ -9,12 +9,6 @@ interface UserMocked extends User {
   password: string
 }
 
-const mockUsers: UserMocked[] = users.map(u => ({
-  ...u,
-  birthday_date: u.birthday_date ? new Date(u.birthday_date) : new Date(),
-  password: (u as any).password // burlando a tipagem
-}));
-
 function delay(ms: number) {
   return new Promise((resolve) => setTimeout(resolve, ms));
 }
