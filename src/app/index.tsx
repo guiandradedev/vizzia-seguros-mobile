@@ -28,7 +28,7 @@ export default function IndexScreen() {
     return <Redirect href="/(app)/(tabs)" />;
   }
 
-  return <Redirect href="/(auth)" />;
+  return <Redirect href="/(auth)/login" />;
 }
 
 //   const [isAuthenticated, setIsAuthenticated] = useState(false);

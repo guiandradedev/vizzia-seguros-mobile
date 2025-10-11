@@ -50,7 +50,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // logoutApi()
     };
     loadUser();
-  }, []);
+  }, [isAuthenticated]);
 
   // Função de Login
   const signIn = async (credentials: Credentials): Promise<boolean> => {

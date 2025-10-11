@@ -14,8 +14,18 @@ import {
 import { Link, Redirect, useRouter } from 'expo-router';
 import { useAuth } from "@/hooks/useAuth";
 import * as LocalAuthentication from 'expo-local-authentication';
-import { getSecure } from "@/utils/secure-store";
+import { getSecure, saveSecure } from "@/utils/secure-store";
 import { FontAwesome } from "@expo/vector-icons";
+import { GoogleSignin, User, isSuccessResponse } from '@react-native-google-signin/google-signin'
+import api from "@/lib/axios";
+import { ResponseSocialAuthUserNotExistsAPI, useLogin } from "@/contexts/LoginContext";
+import axios, { AxiosResponse } from "axios";
+import { Tokens } from "@/types/auth";
+import env from "@/utils/env";
+GoogleSignin.configure({
+    iosClientId: env.GOOGLE_IOS_CLIENT_ID,
+    webClientId: env.GOOGLE_ANDROID_CLIENT_ID
+})
 
 const theme = Colors.light;
 
@@ -24,6 +34,58 @@ export default function LoginScreen() {
     const [password, setPassword] = useState('');
     const [isLoggingIn, setIsLoggingIn] = useState(false);
     const [token, setToken] = useState<string | null>(null)
+    const [auth, setAuth] = useState<User | null>(null)
+    const { changeInitialData } = useLogin()
+
+    async function handleGoogleSignIn() {
+        try {
+            await GoogleSignin.hasPlayServices() // verifica se ta disponivel
+            const response = await GoogleSignin.signIn()
+
+            if (response) {
+                // console.log('Google Sign-In Response:', response.data);
+                setAuth(response.data)
+
+                console.log(response.data?.idToken)
+
+                try {
+                    const api_auth: AxiosResponse<Tokens> = await api.post('/social-auth/login', {
+                        provider: 'Google',
+                        token: response.data?.idToken
+                    });
+                    const { accessToken, refreshToken } = api_auth.data
+                    await saveSecure('accessToken', accessToken)
+                    await saveSecure('refreshToken', refreshToken)
+                    setAuthenticated()
+                    router.replace("/(app)/(tabs)");
+                } catch (err: any) {
+                    if (axios.isAxiosError(err)) {
+                        const status = err.response?.status;
+
+                        if (status === 400 && err.response?.data) {
+                            const errorData = err.response.data as ResponseSocialAuthUserNotExistsAPI;
+
+                            changeInitialData({
+                                email: errorData.email,
+                                nome: errorData.nome,
+                                createusersocialtoken: errorData.createusersocialtoken,
+                                provider: "Google"
+                            });
+
+                            router.replace("/(auth)/login/social-register");
+                            return;
+                        }
+                    }
+                    Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
+                }
+            }
+
+        } catch (error) {
+            console.error('Google Sign-In Error:', error);
+            Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
+        }
+    }
+
 
     const router = useRouter();
 
@@ -50,9 +112,9 @@ export default function LoginScreen() {
             fallbackLabel: 'Biometria não reconhecida'
         });
 
-        if(auth.success) {
+        if (auth.success) {
             const user = await loginBiometric()
-    
+
             setIsLoggingIn(false)
             if (user) {
                 setAuthenticated()
@@ -91,7 +153,7 @@ export default function LoginScreen() {
 
         setIsLoggingIn(true);
 
-        const success = await signIn({ email, password });
+        const success = await signIn({ email: email.replace(" ", ""), password });
 
         setIsLoggingIn(false);
 
@@ -102,10 +164,6 @@ export default function LoginScreen() {
 
         router.replace('/(app)/(tabs)');
     };
-
-    const handleGoogleSignIn = () => {
-        Alert.alert('Entrar com Google', 'Funcionalidade não implementada ainda.');
-    }
 
     return (
         <KeyboardAvoidingView
@@ -179,6 +237,12 @@ export default function LoginScreen() {
 
 
                 </View>
+
+                {
+                    auth && (
+                        <Text style={{ marginTop: 20, textAlign: 'center' }}>Logado como {auth?.user?.email}</Text>
+                    )
+                }
             </View>
         </KeyboardAvoidingView>
     );

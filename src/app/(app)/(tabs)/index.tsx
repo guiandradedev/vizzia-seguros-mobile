@@ -13,7 +13,7 @@ export default function HomeScreen() {
   async function handleLogout() {
     signOut()
     alert("Deslogado.")
-    router.replace('/(auth)');
+    router.replace('/(auth)/login');
   }
 
   const handleRedirect = () => {
@@ -21,6 +21,8 @@ export default function HomeScreen() {
   };
 
   const insets = useSafeAreaInsets();
+
+  console.log(user);
 
   return (
     <SafeAreaView
