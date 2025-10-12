@@ -3,26 +3,33 @@
 import React, { createContext, useState, useEffect, ReactNode } from 'react';
 // Simulação de uma função de API
 import { loginApi, logoutApi, getStoredUser } from '../services/authService';
-import { User, Credentials } from '../types/auth'; // Tipos definidos em outro local (ex: src/types/auth.ts)
+import { User, Credentials, Tokens } from '../types/auth'; // Tipos definidos em outro local (ex: src/types/auth.ts)
 import { getSecure, saveSecure } from '@/utils/secure-store';
+import axios, { AxiosResponse } from 'axios';
+import { axiosNoAuth } from '@/lib/axios';
+import { ResponseSocialAuthUserNotExistsAPI } from './LoginContext';
 
 // 1. Definição da Interface do Contexto
 interface AuthContextType {
   user: User | null;
   isLoading: boolean;
-  signIn: (credentials: Credentials) => Promise<boolean>;
+  signIn: (credentials: Credentials) => Promise<boolean | null>;
   signOut: () => Promise<void>;
   isAuthenticated: boolean,
   setAuthenticated: () => void,
   loginBiometric: () => Promise<boolean>
+  handleLoginWithProvider?: (data: LoginWithProviderProps) => Promise<boolean | ResponseSocialAuthUserNotExistsAPI>;
 }
 
-// 2. Criação do Contexto
 export const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-// 3. Criação do Provedor (Componente)
 interface AuthProviderProps {
   children: ReactNode;
+}
+
+interface LoginWithProviderProps {
+  provider: 'Google',
+  token: string
 }
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
@@ -50,10 +57,40 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // logoutApi()
     };
     loadUser();
-  }, []);
+  }, [isAuthenticated]);
+
+  async function handleLoginWithProvider({ provider, token }: LoginWithProviderProps) {
+    try {
+      const body = { provider, token }
+      const response: AxiosResponse<Tokens> = await axiosNoAuth.post('/social-auth/login', body);
+      const { accessToken, refreshToken } = response.data
+
+      await saveSecure('accessToken', accessToken)
+      await saveSecure('refreshToken', refreshToken)
+
+      setAuthenticated()
+
+      return true
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const status = err.response?.status;
+
+        if (status === 400 && err.response?.data) {
+          const errorData = err.response.data as ResponseSocialAuthUserNotExistsAPI;
+          return {
+            email: errorData.email,
+            nome: errorData.nome,
+            createusersocialtoken: errorData.createusersocialtoken,
+            provider: errorData.provider
+          };
+        }
+      console.error("Erro na autenticação social:", err);}
+      return false
+    }
+  }
 
   // Função de Login
-  const signIn = async (credentials: Credentials): Promise<boolean> => {
+  const signIn = async (credentials: Credentials): Promise<boolean | null> => {
     try {
       setIsLoading(true);
       const { accessToken, refreshToken } = await loginApi(credentials); // Chamada de API real
@@ -63,9 +100,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       setIsAuthenticated(true)
       return true;
     } catch (error) {
-      console.error("Login falhou:", error);
+      // console.error("Login falhou:", error);
       setIsLoading(false);
-      return false;
+      if(axios.isAxiosError(error)) {
+        if(error.response?.status === 401) {
+          return false
+        }
+      }
+      return null
     }
   };
 
@@ -100,7 +142,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     signOut,
     isAuthenticated,
     setAuthenticated,
-    loginBiometric
+    loginBiometric,
+    handleLoginWithProvider
   };
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;

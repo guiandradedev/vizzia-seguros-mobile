@@ -10,7 +10,7 @@
     "newArchEnabled": true,
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.anonymous.vizziasegurosmobile"
+      "bundleIdentifier": "com.vizziasegurosmobile.ios"
     },
     "android": {
       "adaptiveIcon": {
@@ -27,7 +27,7 @@
         "android.permission.CAMERA",
         "android.permission.RECORD_AUDIO"
       ],
-      "package": "com.anonymous.vizziasegurosmobile"
+      "package": "com.vizziasegurosmobile.android"
     },
     "web": {
       "output": "static",
@@ -62,7 +62,13 @@
         }
       ],
       "expo-font",
-      "expo-secure-store"
+      "expo-secure-store",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.677080891639-cg0tp3boghouel4ufan3aef1uscp34mm"
+        }
+      ]
     ],
     "experiments": {
       "typedRoutes": true,
