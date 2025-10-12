@@ -196,7 +196,7 @@ export default function LoginScreen() {
                 </View>
 
                 <View style={styles.buttonColumn}>
-                    {/* <GoogleAuthComponent /> */}
+                    <GoogleAuthComponent />
                     {/* <TouchableOpacity
                         style={styles.socialButton}
                         onPress={handleGoogleSignIn}

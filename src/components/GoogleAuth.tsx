@@ -33,15 +33,31 @@ export default function GoogleAuthComponent() {
             if (response && response.data?.idToken) {
                 const result = await handleLoginWithProvider!({ provider: 'Google', token: response.data.idToken || '' });
 
+                console.log(result)
+
                 if (result === true) {
                     router.replace("/(app)/(tabs)");
                     return;
                 }
 
                 if (result) {
-                    changeInitialData(result);
-                    router.replace("/(auth)/login/social-register");
-                    return
+                    Alert.alert(
+                        'Conta não linkada',
+                        'Este email não está associado a nenhuma conta. Deseja criar uma nova conta? Caso deseje associar a conta, realize o login e entre em seu perfil.',
+                        [
+                            {
+                                text: 'Cadastrar',
+                                onPress: () => {
+                                    changeInitialData(result);
+                                    router.replace("/(auth)/login/social-register");
+                                }
+                            },
+                            {
+                                text: 'Logar manualmente',
+                            }
+                        ]
+                    );
+                    return;
                 }
 
                 Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');

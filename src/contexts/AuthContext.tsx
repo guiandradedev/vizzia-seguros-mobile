@@ -76,6 +76,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         const status = err.response?.status;
 
         if (status === 400 && err.response?.data) {
+          console.log(err.response.data)
           const errorData = err.response.data as ResponseSocialAuthUserNotExistsAPI;
           return {
             email: errorData.email,

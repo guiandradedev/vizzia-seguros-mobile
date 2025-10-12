@@ -41,6 +41,7 @@ interface CreateAccountContextType {
 
 import axios, { AxiosResponse } from 'axios'
 import { Tokens } from '@/types/auth';
+import { axiosNoAuth } from '@/lib/axios';
 
 export const CreateAccountContext = createContext<CreateAccountContextType | undefined>(undefined);
 
@@ -121,7 +122,7 @@ export const CreateAccountProvider: React.FC<CreateAccountProviderProps> = ({ ch
 
             console.log(JSON.stringify(data, null, 2));
 
-            const response: AxiosResponse<ResponseAPI> = await axios.post(`${process.env.EXPO_PUBLIC_API_BASE_URL}/users/create`, data);
+            const response: AxiosResponse<ResponseAPI> = await axiosNoAuth.post(`/users/create`, data);
 
             return response.data.tokens
             // Aqui é pra fazer as requisições da API do backend
