@@ -8,7 +8,8 @@ import {
     StyleSheet,
     Alert,
     KeyboardAvoidingView,
-    Platform
+    Platform,
+    TouchableOpacity
 } from 'react-native';
 import { Link, Redirect, useRouter } from 'expo-router';
 import { useAuth } from "@/hooks/useAuth";
@@ -92,6 +93,10 @@ export default function LoginScreen() {
         router.replace('/(app)/(tabs)');
     };
 
+    const navigateToRegister = () => {
+        router.push('/register'); 
+    };
+
     return (
         <KeyboardAvoidingView
             style={styles.container}
@@ -128,9 +133,11 @@ export default function LoginScreen() {
                 />
             </View>
 
-            <Link href="/(auth)/register" style={styles.link}>
-                Não tem conta? Cadastre-se
-            </Link>
+            <TouchableOpacity onPress={navigateToRegister}>
+                <Text style={styles.link}>
+                    Não tem conta? Cadastre-se
+                </Text>
+            </TouchableOpacity>
 
             {
                 token && (
@@ -178,6 +185,6 @@ const styles = StyleSheet.create({
         marginTop: 15,
         color: '#007AFF',
         textAlign: 'center',
-        fontSize: 14,
+        fontSize: 16,
     }
 });

@@ -1,13 +1,22 @@
 import React from 'react';
-import { StyleSheet, ScrollView, KeyboardAvoidingView, Platform, View, Text } from 'react-native';
+import { StyleSheet, ScrollView, KeyboardAvoidingView, Platform, View, Text, TouchableOpacity } from 'react-native';
 import RegisterPage from '../../../components/RegisterPage';
+import { useRouter } from 'expo-router'; 
 
 export default function RegisterScreen() {
+    const router = useRouter();
+
   return (
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={styles.keyboardAvoidingContainer}
     >
+    <TouchableOpacity
+        style={styles.backButton}
+        onPress={() => router.back()} // Ação para voltar
+      >
+        <Text style={styles.backButtonText}>‹</Text>
+    </TouchableOpacity>
       <ScrollView contentContainerStyle={styles.container}>
 
         <View>
@@ -44,5 +53,20 @@ const styles = StyleSheet.create({
     textAlign: 'center', 
     marginBottom: 20, 
     paddingHorizontal: 20 
+  },
+
+   backButton: {
+    position: 'absolute', // Permite posicionar livremente
+    top: 60, // Distância do topo (ajuste conforme necessário)
+    left: 20, // Distância da esquerda
+    zIndex: 1, // Garante que o botão fique sobre os outros elementos
+    padding: 10,
+    borderRadius: 20,
+  },
+  // Estilo do texto (ícone) da seta
+  backButtonText: {
+    fontSize: 38, // Tamanho do ícone
+    color: '#333', 
+    fontWeight: 'bold',
   },
 });
