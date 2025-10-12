@@ -16,16 +16,17 @@ import { useAuth } from "@/hooks/useAuth";
 import * as LocalAuthentication from 'expo-local-authentication';
 import { getSecure, saveSecure } from "@/utils/secure-store";
 import { FontAwesome } from "@expo/vector-icons";
-import { GoogleSignin, User, isSuccessResponse } from '@react-native-google-signin/google-signin'
+// import { GoogleSignin, User, isSuccessResponse } from '@react-native-google-signin/google-signin'
 import api from "@/lib/axios";
 import { ResponseSocialAuthUserNotExistsAPI, useLogin } from "@/contexts/LoginContext";
 import axios, { AxiosResponse } from "axios";
 import { Tokens } from "@/types/auth";
 import env from "@/utils/env";
-GoogleSignin.configure({
-    iosClientId: env.GOOGLE_IOS_CLIENT_ID,
-    webClientId: env.GOOGLE_ANDROID_CLIENT_ID
-})
+import GoogleAuthComponent from "@/components/GoogleAuth";
+// GoogleSignin.configure({
+//     iosClientId: env.GOOGLE_IOS_CLIENT_ID,
+//     webClientId: env.GOOGLE_ANDROID_CLIENT_ID
+// })
 
 const theme = Colors.light;
 
@@ -37,35 +38,35 @@ export default function LoginScreen() {
     const { changeInitialData } = useLogin()
     const { signIn, user, loginBiometric, setAuthenticated, handleLoginWithProvider } = useAuth();
 
-    async function handleGoogleSignIn() {
-        try {
-            await GoogleSignin.hasPlayServices() // verifica se ta disponivel
-            const response = await GoogleSignin.signIn()
+    // async function handleGoogleSignIn() {
+    //     try {
+    //         await GoogleSignin.hasPlayServices() // verifica se ta disponivel
+    //         const response = await GoogleSignin.signIn()
 
-            if (response && response.data?.idToken) {
-                const result = await handleLoginWithProvider!({ provider: 'Google', token: response.data.idToken || '' });
+    //         if (response && response.data?.idToken) {
+    //             const result = await handleLoginWithProvider!({ provider: 'Google', token: response.data.idToken || '' });
 
-                if(result === true) {
-                    router.replace("/(app)/(tabs)");
-                    return;
-                }
+    //             if(result === true) {
+    //                 router.replace("/(app)/(tabs)");
+    //                 return;
+    //             }
 
-                if(result) {
-                    changeInitialData(result);
-                    router.replace("/(auth)/login/social-register");
-                    return
-                }
+    //             if(result) {
+    //                 changeInitialData(result);
+    //                 router.replace("/(auth)/login/social-register");
+    //                 return
+    //             }
 
-                Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
-            } else {
-                Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
-            }
+    //             Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
+    //         } else {
+    //             Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
+    //         }
 
-        } catch (error) {
-            console.error('Google Sign-In Error:', error);
-            Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
-        }
-    }
+    //     } catch (error) {
+    //         console.error('Google Sign-In Error:', error);
+    //         Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
+    //     }
+    // }
 
 
     const router = useRouter();
@@ -195,7 +196,8 @@ export default function LoginScreen() {
                 </View>
 
                 <View style={styles.buttonColumn}>
-                    <TouchableOpacity
+                    {/* <GoogleAuthComponent /> */}
+                    {/* <TouchableOpacity
                         style={styles.socialButton}
                         onPress={handleGoogleSignIn}
                         accessibilityLabel="Entrar com Google"
@@ -204,7 +206,7 @@ export default function LoginScreen() {
                     >
                         <FontAwesome name="google" size={20} color="#DB4437" style={styles.socialIcon} />
                         <Text style={styles.socialText}>Entrar com Google</Text>
-                    </TouchableOpacity>
+                    </TouchableOpacity> */}
 
                     {token && (
                         <TouchableOpacity
