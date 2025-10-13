@@ -3,7 +3,7 @@
 import { useAuth } from '@/hooks/useAuth';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomePage() {
@@ -12,7 +12,7 @@ export default function HomePage() {
   const { signOut, user } = useAuth()
   async function handleLogout() {
     signOut()
-    alert("Deslogado.")
+    Alert.alert("Vizzia Seguros", "Deslogado.")
     router.replace('/(auth)/login');
   }
 

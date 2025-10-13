@@ -128,7 +128,12 @@ export const CreateAccountProvider: React.FC<CreateAccountProviderProps> = ({ ch
             // Aqui é pra fazer as requisições da API do backend
 
         } catch (error) {
-            console.error('Erro ao registrar conta:', error);
+            if(axios.isAxiosError(error) && error.response){
+                console.error('Erro na resposta da API:', error.response.data);
+            } else {
+                console.error('Erro na requisição:', error);
+            }
+            // console.error('Erro ao registrar conta:', error);
             throw new Error('Erro ao registrar conta');
         }
     };

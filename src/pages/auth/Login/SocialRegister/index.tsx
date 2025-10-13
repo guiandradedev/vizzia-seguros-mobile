@@ -1,7 +1,7 @@
 import Colors from "@/constants/Colors";
 import { CreateUserSocialTokenDecode, useLogin } from "@/contexts/LoginContext";
 import { FontAwesome } from "@expo/vector-icons";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Modal } from "react-native";
 import axios, { AxiosResponse } from "axios";
 import { axiosNoAuth } from "@/lib/axios";
@@ -20,13 +20,22 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 const theme = Colors.light
 export default function SocialRegisterPage() {
     const [isCreatingAccount, setisCreatingAccount] = useState(false);
-    const { user, initialData, changeUserProperty, handleRegisterSocialLogin } = useLogin();
+    const { user, initialData, changeUserProperty, updateAddressFields, handleRegisterSocialLogin } = useLogin();
     const router = useRouter()
     const { setAuthenticated } = useAuth()
 
     const [modalVisible, setModalVisible] = useState(false);
     const [isDatePickerBirthdateVisible, setDatePickerBirthdateVisible] = useState(false);
     const [isDatePickerCnhEmissionVisible, setDatePickerCnhEmissionVisible] = useState(false);
+    const [errors, setErrors] = useState<Record<string, boolean>>({});
+
+    // Debug: monitorar mudanças no user
+    useEffect(() => {
+        console.log('User state changed in component:', user);
+        console.log('Street value:', user?.street);
+        console.log('City value:', user?.city);
+        console.log('State value:', user?.state);
+    }, [user]);
 
     const ufs = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"];
 
@@ -34,25 +43,31 @@ export default function SocialRegisterPage() {
         setisCreatingAccount(true);
 
         // Validações dos campos obrigatórios
+        const newErrors: Record<string, boolean> = {};
+
         if (!user?.nome?.trim()) {
+            newErrors.nome = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "Nome é obrigatório.");
             return;
         }
 
         if (!user?.email?.trim()) {
+            newErrors.email = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "Email é obrigatório.");
             return;
         }
 
         if (!user?.passwordHash?.trim()) {
+            newErrors.passwordHash = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "Senha é obrigatória.");
             return;
         }
 
         if (!user?.phone?.trim()) {
+            newErrors.phone = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "Telefone é obrigatório.");
             return;
@@ -65,12 +80,14 @@ export default function SocialRegisterPage() {
         }
 
         if (!user?.cpf?.trim() || !isValidCPF(user.cpf)) {
+            newErrors.cpf = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "CPF é obrigatório e deve ser válido.");
             return;
         }
 
         if (!user?.cnh?.trim()) {
+            newErrors.cnh = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "CNH é obrigatória e deve ser válida.");
             return;
@@ -83,40 +100,48 @@ export default function SocialRegisterPage() {
         }
 
         if (!user?.cep?.trim() || !isValidCEP(user.cep)) {
+            newErrors.CEP = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "CEP é obrigatório e deve ser válido.");
             return;
         }
 
         if (!user?.street?.trim()) {
+            newErrors.street = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "Rua/Logradouro é obrigatório.");
             return;
         }
 
         if (!user?.number?.trim()) {
+            newErrors.number = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "Número é obrigatório.");
             return;
         }
 
         if (!user?.neighborhood?.trim()) {
+            newErrors.neighborhood = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "Bairro é obrigatório.");
             return;
         }
 
         if (!user?.city?.trim()) {
+            newErrors.city = true;
             setisCreatingAccount(false);
-            Alert.alert("Erro", "Cidade é obrigatória.");
+            Alert.alert("Erro", "Cidade é obrigatório.");
             return;
         }
 
         if (!user?.state?.trim()) {
+            newErrors.state = true;
             setisCreatingAccount(false);
             Alert.alert("Erro", "Estado é obrigatório.");
             return;
         }
+
+        setErrors(newErrors);
 
         const result = await handleRegisterSocialLogin()
         if (!result) {
@@ -136,45 +161,71 @@ export default function SocialRegisterPage() {
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.card}>
-                    <Text style={styles.title}>Cadastro de usuário</Text>
-                    <Text style={styles.subtitle}>Complete suas informações para finalizar seu cadastro</Text>
+                    <View>
+                        <TouchableOpacity
+                            style={styles.backButton}
+                            onPress={() => router.back()} // Ação para voltar
+                        >
+                            <Text style={styles.backButtonText}>‹</Text>
+                        </TouchableOpacity>
+                        <View>
+                            <Text style={styles.title}>Crie sua Conta</Text>
+                            <Text style={styles.subtitle}>Complete suas informações para finalizar seu cadastro</Text>
+                        </View>
+                    </View>
+                    {/* <Text style={styles.title}>Cadastro de usuário</Text>
+                    <Text style={styles.subtitle}>Complete suas informações para finalizar seu cadastro</Text> */}
 
                     {/* Dados Pessoais */}
                     <View style={styles.section}>
                         <Text style={styles.sectionTitle}>Dados Pessoais</Text>
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, errors.nome && styles.inputError]}
                             placeholder="Nome"
                             placeholderTextColor="#999"
                             value={user?.nome}
-                            onChangeText={(value) => changeUserProperty('nome', value)}
+                            onChangeText={(value) => {
+                                changeUserProperty('nome', value);
+                                setErrors(prev => ({ ...prev, nome: !value?.trim() }));
+                            }}
                             editable={!isCreatingAccount}
                         />
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, errors.email && styles.inputError]}
                             placeholder="Email"
                             placeholderTextColor="#999"
                             keyboardType="email-address"
                             autoCapitalize="none"
                             value={user?.email}
-                            onChangeText={(value) => changeUserProperty('email', value)}
+                            onChangeText={(value) => {
+                                changeUserProperty('email', value);
+                                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                                setErrors(prev => ({ ...prev, email: !emailRegex.test(value) }));
+                            }}
                             editable={!isCreatingAccount}
                         />
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, errors.passwordHash && styles.inputError]}
                             placeholder="Senha"
                             placeholderTextColor="#999"
                             secureTextEntry
                             value={user?.passwordHash}
-                            onChangeText={(value) => changeUserProperty('passwordHash', value)}
+                            onChangeText={(value) => {
+                                changeUserProperty('passwordHash', value);
+                                setErrors(prev => ({ ...prev, passwordHash: value.length < 6 }));
+                            }}
                             editable={!isCreatingAccount}
                         />
                         <View style={styles.inputContainer}>
                             <Text style={styles.label}>Telefone</Text>
                             <MaskInput
-                                style={styles.input}
+                                style={[styles.input, errors.phone && styles.inputError]}
                                 value={user?.phone || ''}
-                                onChangeText={(masked) => changeUserProperty('phone', masked)}
+                                onChangeText={(masked) => {
+                                    changeUserProperty('phone', masked);
+                                    const plainPhone = masked.replace(/\D/g, '');
+                                    setErrors(prev => ({ ...prev, phone: plainPhone.length < 10 }));
+                                }}
                                 mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
                                 placeholder="(XX) XXXXX-XXXX"
                                 placeholderTextColor="#999"
@@ -195,9 +246,16 @@ export default function SocialRegisterPage() {
                         <View style={styles.inputContainer}>
                             <Text style={styles.label}>CPF</Text>
                             <MaskInput
-                                style={styles.input}
+                                style={[styles.input, errors.cpf && styles.inputError]}
                                 value={user?.cpf || ''}
-                                onChangeText={(masked) => changeUserProperty('cpf', masked)}
+                                onChangeText={(masked) => {
+                                    changeUserProperty('cpf', masked);
+                                    // Validar CPF em tempo real
+                                    const plainCPF = masked.replace(/\D/g, '');
+                                    if (plainCPF.length === 11) {
+                                        setErrors(prev => ({ ...prev, cpf: !isValidCPF(masked) }));
+                                    }
+                                }}
                                 mask={[/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/]}
                                 placeholder="000.000.000-00"
                                 placeholderTextColor="#999"
@@ -207,9 +265,16 @@ export default function SocialRegisterPage() {
                         <View style={styles.inputContainer}>
                             <Text style={styles.label}>CNH</Text>
                             <MaskInput
-                                style={styles.input}
+                                style={[styles.input, errors.cnh && styles.inputError]}
                                 value={user?.cnh || ''}
-                                onChangeText={(masked) => changeUserProperty('cnh', masked)}
+                                onChangeText={(masked) => {
+                                    changeUserProperty('cnh', masked);
+                                    // Validar CNH em tempo real
+                                    const plainCNH = masked.replace(/\D/g, '');
+                                    if (plainCNH.length >= 9) {
+                                        setErrors(prev => ({ ...prev, cnh: !isValidCNH(masked) }));
+                                    }
+                                }}
                                 placeholder="Número da CNH"
                                 placeholderTextColor="#999"
                                 keyboardType="numeric"
@@ -229,24 +294,92 @@ export default function SocialRegisterPage() {
                         <View style={styles.inputContainer}>
                             <Text style={styles.label}>CEP</Text>
                             <MaskInput
-                                style={styles.input}
+                                style={[styles.input, errors.CEP && styles.inputError]}
                                 value={user?.cep || ''}
-                                onChangeText={(masked) => changeUserProperty('cep', masked)}
+                                onChangeText={(masked, unmasked) => {
+                                    changeUserProperty('cep', masked);
+                                }}
                                 mask={[/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/]}
                                 placeholder="00000-000"
                                 placeholderTextColor="#999"
                                 keyboardType="numeric"
+                                onBlur={async () => {
+                                    // Usar o valor atual do campo CEP (já mascarado)
+                                    const currentCep = user?.cep || '';
+                                    const plain = currentCep.replace(/\D/g, '');
+
+                                    // Validar CEP
+                                    const isValid = isValidCEP(plain);
+                                    console.log('CEP válido:', isValid);
+                                    setErrors((prev) => ({ ...prev, CEP: !isValid }));
+
+                                    if (plain.length === 8) {
+                                        try {
+                                            const response = await fetch(`https://viacep.com.br/ws/${plain}/json/`);
+                                            const data = await response.json();
+                                            console.log('ViaCEP raw response:', data);
+                                            console.log('ViaCEP data.logradouro:', data.logradouro);
+                                            console.log('ViaCEP data.bairro:', data.bairro);
+                                            console.log('ViaCEP data.localidade:', data.localidade);
+                                            console.log('ViaCEP data.uf:', data.uf);
+
+                                            if (!data.erro) {
+                                                console.log('Atualizando todos os campos de endereço de uma vez...');
+
+                                                // Atualizar todos os campos de endereço de uma vez
+                                                updateAddressFields({
+                                                    street: data.logradouro,
+                                                    neighborhood: data.bairro,
+                                                    city: data.localidade,
+                                                    state: data.uf
+                                                });
+
+                                                console.log('Campos que serão definidos:', {
+                                                    street: data.logradouro,
+                                                    neighborhood: data.bairro,
+                                                    city: data.localidade,
+                                                    state: data.uf
+                                                });
+
+                                                // Limpar erros dos campos preenchidos automaticamente
+                                                setErrors((prev) => ({
+                                                    ...prev,
+                                                    street: false,
+                                                    neighborhood: false,
+                                                    city: false,
+                                                    state: false,
+                                                }));
+                                            } else {
+                                                console.log('CEP não encontrado');
+                                                alert("CEP não encontrado.");
+                                                // Limpar campos quando CEP não é encontrado
+                                                updateAddressFields({
+                                                    street: '',
+                                                    neighborhood: '',
+                                                    city: '',
+                                                    state: ''
+                                                });
+                                            }
+                                        } catch (error) {
+                                            console.error('Erro ao buscar CEP:', error);
+                                            alert("Erro ao buscar CEP. Tente novamente.");
+                                        }
+                                    } else {
+                                        console.log('CEP não tem 8 dígitos:', plain.length);
+                                    }
+                                }}
                             />
                         </View>
+
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, errors.street && styles.inputError]}
                             placeholder="Rua / Logradouro"
                             placeholderTextColor="#999"
                             value={user?.street || ''}
                             onChangeText={(value) => changeUserProperty('street', value)}
                         />
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, errors.number && styles.inputError]}
                             placeholder="Número"
                             placeholderTextColor="#999"
                             value={user?.number || ''}
@@ -261,14 +394,14 @@ export default function SocialRegisterPage() {
                             onChangeText={(value) => changeUserProperty('complement', value)}
                         />
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, errors.neighborhood && styles.inputError]}
                             placeholder="Bairro"
                             placeholderTextColor="#999"
                             value={user?.neighborhood || ''}
                             onChangeText={(value) => changeUserProperty('neighborhood', value)}
                         />
                         <TextInput
-                            style={styles.input}
+                            style={[styles.input, errors.city && styles.inputError]}
                             placeholder="Cidade"
                             placeholderTextColor="#999"
                             value={user?.city || ''}
@@ -277,7 +410,7 @@ export default function SocialRegisterPage() {
                         <View style={styles.inputContainer}>
                             <Text style={styles.label}>Estado</Text>
                             <TouchableOpacity
-                                style={styles.pickerDisplay}
+                                style={[styles.pickerDisplay, errors.state && styles.inputError]}
                                 onPress={() => setModalVisible(true)}
                             >
                                 <Text style={styles.pickerDisplayText}>
@@ -328,7 +461,7 @@ export default function SocialRegisterPage() {
                         <Picker
                             selectedValue={user?.state || ''}
                             onValueChange={(itemValue) => {
-                                changeUserProperty('state', itemValue || null);
+                                changeUserProperty('state', itemValue || '');
                                 if (itemValue) {
                                     setModalVisible(false);
                                 }
@@ -409,6 +542,10 @@ const styles = StyleSheet.create({
         fontSize: 16,
         color: '#333',
         justifyContent: 'center',
+    },
+    inputError: {
+        borderColor: '#FF3B30',
+        borderWidth: 2,
     },
     pickerDisplay: {
         alignItems: 'center',
@@ -576,5 +713,19 @@ const styles = StyleSheet.create({
         color: '#fff',
         fontSize: 14,
         fontWeight: '600',
+    },
+    backButton: {
+        position: 'absolute', // Permite posicionar livremente
+        top: 60, // Distância do topo (ajuste conforme necessário)
+        left: 20, // Distância da esquerda
+        zIndex: 1, // Garante que o botão fique sobre os outros elementos
+        padding: 10,
+        borderRadius: 20,
+    },
+    // Estilo do texto (ícone) da seta
+    backButtonText: {
+        fontSize: 38, // Tamanho do ícone
+        color: '#333',
+        fontWeight: 'bold',
     },
 });

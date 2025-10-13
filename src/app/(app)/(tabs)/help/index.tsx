@@ -25,7 +25,7 @@ export default function HelpScreen() {
   useEffect(() => {
     async function get_faq() {
       try {
-        const res: AxiosResponse<FAQData[]> = await axios.get("/faq?active=true");
+        const res: AxiosResponse<FAQData[]> = await axios.get("/faq?isActive=true");
         // Agrupa os FAQs por categoria
         const grouped = res.data.reduce((acc, item) => {
           if (!acc[item.category]) acc[item.category] = [];
@@ -52,7 +52,7 @@ export default function HelpScreen() {
     <View
       style={[
         styles.container,
-        { backgroundColor: theme.background },
+        // { backgroundColor: theme.background },
       ]}
     >
       <View style={styles.header}>

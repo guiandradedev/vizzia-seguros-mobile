@@ -41,6 +41,7 @@ interface LoginContextType {
   changeUser: (user: User) => void;
   changeInitialData: (data: ResponseSocialAuthUserNotExistsAPI) => void;
   changeUserProperty: (property: keyof User, value: string | Date | null) => void;
+  updateAddressFields: (fields: Partial<Pick<User, 'street' | 'neighborhood' | 'city' | 'state'>>) => void;
   handleRegisterSocialLogin: () => Promise<boolean>;
 }
 
@@ -80,8 +81,28 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }
 
   function changeUserProperty(property: keyof User, value: string | Date | null) {
+    console.log(`changeUserProperty called: ${property} =`, value);
     if (user) {
-      setUser({ ...user, [property]: value });
+      const newUser = { ...user, [property]: value };
+      console.log('Old user state:', user);
+      console.log('New user state:', newUser);
+      console.log('Are they different?', user !== newUser);
+      console.log('Property value changed?', user[property] !== value);
+      setUser(newUser);
+    } else {
+      console.log('User is null, cannot update property');
+    }
+  }
+
+  function updateAddressFields(fields: Partial<Pick<User, 'street' | 'neighborhood' | 'city' | 'state'>>) {
+    console.log('updateAddressFields called with:', fields);
+    if (user) {
+      const newUser = { ...user, ...fields };
+      console.log('Old user state:', user);
+      console.log('New user state:', newUser);
+      setUser(newUser);
+    } else {
+      console.log('User is null, cannot update address fields');
     }
   }
 
@@ -142,6 +163,7 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
     user,
     changeUser,
     changeUserProperty,
+    updateAddressFields,
     changeInitialData,
     handleRegisterSocialLogin
   }

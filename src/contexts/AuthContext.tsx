@@ -75,6 +75,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (axios.isAxiosError(err)) {
         const status = err.response?.status;
 
+        console.log("Status:", status)
+        console.log("Dados da resposta:", err.response?.data)
+
         if (status === 400 && err.response?.data) {
           console.log(err.response.data)
           const errorData = err.response.data as ResponseSocialAuthUserNotExistsAPI;
@@ -85,7 +88,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             provider: errorData.provider
           };
         }
-      console.error("Erro na autenticação social:", err);}
+        console.error("Erro na autenticação social:", err.response);
+      }
       return false
     }
   }
@@ -103,8 +107,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error) {
       // console.error("Login falhou:", error);
       setIsLoading(false);
-      if(axios.isAxiosError(error)) {
-        if(error.response?.status === 401) {
+      if (axios.isAxiosError(error)) {
+        if (error.response?.status === 401) {
           return false
         }
       }

@@ -54,26 +54,27 @@ export function formatCNH(value: string) {
 }
 
 export function isValidCNH(cnh: string) {
-    if (typeof cnh !== "string") return false;
-    cnh = cnh.replace(/[^\d]+/g, "");
-    if (cnh.length !== 11 || !!cnh.match(/(\d)\1{10}/)) return false;
-    const cnhDigits = cnh.split("").map((el) => +el);
+    return true
+    // if (typeof cnh !== "string") return false;
+    // cnh = cnh.replace(/[^\d]+/g, "");
+    // if (cnh.length !== 11 || !!cnh.match(/(\d)\1{10}/)) return false;
+    // const cnhDigits = cnh.split("").map((el) => +el);
     
-    // Primeiro dígito verificador
-    let sum = 0;
-    for (let i = 0; i < 9; i++) {
-        sum += cnhDigits[i] * (9 - i);
-    }
-    let firstVerifier = sum % 11;
-    if (firstVerifier === 10) firstVerifier = 0;
-    if (firstVerifier !== cnhDigits[9]) return false;
+    // // Primeiro dígito verificador
+    // let sum = 0;
+    // for (let i = 0; i < 9; i++) {
+    //     sum += cnhDigits[i] * (9 - i);
+    // }
+    // let firstVerifier = sum % 11;
+    // if (firstVerifier === 10) firstVerifier = 0;
+    // if (firstVerifier !== cnhDigits[9]) return false;
     
-    // Segundo dígito verificador
-    sum = 0;
-    for (let i = 0; i < 10; i++) {
-        sum += cnhDigits[i] * (i + 1);
-    }
-    let secondVerifier = sum % 11;
-    if (secondVerifier === 10) secondVerifier = 0;
-    return secondVerifier === cnhDigits[10];
+    // // Segundo dígito verificador
+    // sum = 0;
+    // for (let i = 0; i < 10; i++) {
+    //     sum += cnhDigits[i] * (i + 1);
+    // }
+    // let secondVerifier = sum % 11;
+    // if (secondVerifier === 10) secondVerifier = 0;
+    // return secondVerifier === cnhDigits[10];
 }

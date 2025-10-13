@@ -50,13 +50,18 @@ export default function AddConductorsScreen() {
 
 
   const handleBack = useCallback(() => router.back(), [router]);
-  const handleRedirect = useCallback(() => router.push('/(app)/(tabs)/my-cars/create/resume'), [router]);
+  // const handleRedirect = useCallback(() => router.push('/(app)/(tabs)/my-cars/create/resume'), [router]);
 
+    function handleRedirect() {
+        alert('Cadastro finalizado com sucesso!');
+        router.push('/(app)/(tabs)/my-cars');
+    }
   const handleChangeInput = useCallback((name: keyof Conductor, value: string | number | Date) => {
     setConductor(prev => {
       const next = { ...prev } as any;
 
-      if (name === 'licenseFirstEmission' || name === 'licenseNumber' || name === 'licenseExpiry') {
+      // Only licenseFirstEmission is stored as number (year or similar).
+      if (name === 'licenseFirstEmission') {
         if (typeof value === 'string') {
           const numericValue = value.replace(/\D/g, '');
           next[name] = parseInt(numericValue, 10) || 0;
@@ -64,6 +69,7 @@ export default function AddConductorsScreen() {
         return next;
       }
 
+      // Keep licenseNumber and licenseExpiry as strings so leading zeros are preserved.
       if (name === 'document' && typeof value === 'string') {
         next[name] = formatCPF(value);
         setCpfError(null);
