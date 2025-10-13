@@ -161,16 +161,18 @@ export default function SocialRegisterPage() {
         >
             <ScrollView contentContainerStyle={styles.scrollContent}>
                 <View style={styles.card}>
-                    <View>
-                        <TouchableOpacity
-                            style={styles.backButton}
-                            onPress={() => router.back()} // Ação para voltar
-                        >
-                            <Text style={styles.backButtonText}>‹</Text>
-                        </TouchableOpacity>
-                        <View>
-                            <Text style={styles.title}>Crie sua Conta</Text>
-                            <Text style={styles.subtitle}>Complete suas informações para finalizar seu cadastro</Text>
+                    <View style={styles.cardHeader}>
+                        <View style={styles.headerContent}>
+                            {/* <TouchableOpacity
+                                style={styles.backButton}
+                                onPress={() => router.back()} // Ação para voltar
+                            >
+                                <Text style={styles.backButtonText}>‹</Text>
+                            </TouchableOpacity> */}
+                            <View style={styles.titleContainer}>
+                                <Text style={styles.title}>Crie sua Conta</Text>
+                                <Text style={styles.subtitle}>Complete suas informações para finalizar seu cadastro</Text>
+                            </View>
                         </View>
                     </View>
                     {/* <Text style={styles.title}>Cadastro de usuário</Text>
@@ -715,17 +717,23 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     backButton: {
-        position: 'absolute', // Permite posicionar livremente
-        top: 60, // Distância do topo (ajuste conforme necessário)
-        left: 20, // Distância da esquerda
-        zIndex: 1, // Garante que o botão fique sobre os outros elementos
-        padding: 10,
-        borderRadius: 20,
+        marginRight: 15,
+        padding: 5,
     },
-    // Estilo do texto (ícone) da seta
     backButtonText: {
-        fontSize: 38, // Tamanho do ícone
+        fontSize: 32,
         color: '#333',
         fontWeight: 'bold',
+    },
+    cardHeader: {
+        flex: 1,
+        marginBottom: 20,
+    },
+    headerContent: {
+        flexDirection: 'row',
+        alignItems: 'center',
+    },
+    titleContainer: {
+        flex: 1,
     },
 });

@@ -1,7 +1,7 @@
 import React, { useContext, useState } from 'react';
 import {
-  View, Text, TextInput, StyleSheet, ScrollView, Button, KeyboardAvoidingView,
-  Platform, ActivityIndicator, TextInputProps, TouchableOpacity, Modal
+  View, Text, StyleSheet, ScrollView, KeyboardAvoidingView,
+  Platform, TouchableOpacity, Modal
 } from 'react-native';
 import { CreateAccountContext } from '../contexts/CreateAccountContext';
 import MaskInput from 'react-native-mask-input';
@@ -12,6 +12,8 @@ import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useAuth } from '@/hooks/useAuth';
 import { saveSecure } from '@/utils/secure-store';
 import { useRouter } from 'expo-router';
+import Input from './Input';
+import Button from './Button';
 
 const theme = Colors.light
 
@@ -22,8 +24,6 @@ const useCreateAccount = () => {
 };
 
 const Card = ({ title, children }: { title: string; children: React.ReactNode }) => (<View style={styles.card}><Text style={styles.cardTitle}>{title}</Text>{children}</View>);
-interface FormFieldProps extends TextInputProps { label: string; hasError?: boolean; }
-const FormField = ({ label, hasError, ...props }: FormFieldProps) => (<View style={styles.inputContainer}><Text style={styles.label}>{label}</Text><TextInput style={[styles.input, hasError && styles.inputError]} placeholderTextColor="#999" {...props} /></View>);
 
 export default function RegistrationForm() {
   const { setAuthenticated } = useAuth()
@@ -80,9 +80,30 @@ export default function RegistrationForm() {
     <>
       <Card title="Dados Pessoais">
         {/* campos de dados pessoais */}
-        <FormField label="Nome Completo" value={accountData.name} onChangeText={(text) => updateAccountData('name', text)} hasError={errors.name} placeholder="Digite seu nome completo" />
-        <FormField label="Email" value={accountData.email} onChangeText={(text) => updateAccountData('email', text)} hasError={errors.email} placeholder="seu.email@exemplo.com" keyboardType="email-address" autoCapitalize="none" />
-        <FormField label="Senha" value={accountData.password} onChangeText={(text) => updateAccountData('password', text)} hasError={errors.password} placeholder="Crie uma senha segura" secureTextEntry />
+        <Input
+          label="Nome Completo"
+          value={accountData.name}
+          onChangeText={(text) => updateAccountData('name', text)}
+          error={errors.name ? "Nome é obrigatório" : undefined}
+          placeholder="Digite seu nome completo"
+        />
+        <Input
+          label="Email"
+          value={accountData.email}
+          onChangeText={(text) => updateAccountData('email', text)}
+          error={errors.email ? "Email é obrigatório" : undefined}
+          placeholder="seu.email@exemplo.com"
+          keyboardType="email-address"
+          autoCapitalize="none"
+        />
+        <Input
+          label="Senha"
+          value={accountData.password}
+          onChangeText={(text) => updateAccountData('password', text)}
+          error={errors.password ? "Senha é obrigatória" : undefined}
+          placeholder="Crie uma senha segura"
+          secureTextEntry
+        />
 
         <View>
           <Text style={styles.label}>Telefone</Text>
@@ -97,7 +118,9 @@ export default function RegistrationForm() {
             placeholderTextColor="#999"
             keyboardType="phone-pad"
           />
+          {errors.phone && <Text style={styles.errorText}>Telefone é obrigatório</Text>}
         </View>
+
         <View>
           <Text style={styles.label}>Data de Nascimento</Text>
           <TouchableOpacity onPress={() => setDatePickerBirthdateVisible(true)} style={[styles.input, { justifyContent: 'center' }]}>
@@ -118,7 +141,7 @@ export default function RegistrationForm() {
 
       <Card title="Documentos">
         {/* campos de documentos */}
-        <View style={styles.inputContainer}>
+        <View>
           <Text style={styles.label}>CPF</Text>
           <MaskInput
             style={[styles.input, errors.CPF && styles.inputError]}
@@ -136,8 +159,10 @@ export default function RegistrationForm() {
               setErrors((prev) => ({ ...prev, CPF: !isValid }));
             }}
           />
+          {errors.CPF && <Text style={styles.errorText}>CPF inválido</Text>}
         </View>
-        <View style={styles.inputContainer}>
+
+        <View>
           <Text style={styles.label}>CNH</Text>
           <MaskInput
             style={[styles.input, errors.CNH && styles.inputError]}
@@ -145,8 +170,7 @@ export default function RegistrationForm() {
             onChangeText={(masked, unmasked) => {
               updateAccountData('CNH', masked);
             }}
-            // mask={[/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/]}
-            // placeholder="000.000.000-00"
+            placeholder="Digite o número da CNH"
             placeholderTextColor="#999"
             keyboardType="numeric"
             onBlur={() => {
@@ -155,7 +179,9 @@ export default function RegistrationForm() {
               // setErrors((prev) => ({ ...prev, CNH: !isValid }));
             }}
           />
+          {errors.CNH && <Text style={styles.errorText}>CNH é obrigatória</Text>}
         </View>
+
         <View>
           <Text style={styles.label}>Data de Emissão da Primeira CNH</Text>
           <TouchableOpacity onPress={() => setDatePickerFirstCNHEmissionVisible(true)} style={[styles.input, { justifyContent: 'center' }]}>
@@ -172,23 +198,11 @@ export default function RegistrationForm() {
             onCancel={() => setDatePickerFirstCNHEmissionVisible(false)}
           />
         </View>
-        {/* <DateTimePickerModal
-                                isVisible={isDatePickerBirthdateVisible}
-                                mode="date"
-                                value={accountData.CHH_emission_date}
-                                maximumDate={new Date()}
-                                onConfirm={(date: Date) => {
-                                    setDatePickerBirthdateVisible(false);
-                                    updateAccountData('CHH_emission_date', date);
-                                }}
-                                onCancel={() => setDatePickerBirthdateVisible(false)}
-                            /> */}
-        {/* <FormField label="Data de Emissão da CNH" value={accountData.CHH_emission_date} onChangeText={(text) => updateAccountData('CHH_emission_date', text)} hasError={errors.CHH_emission_date} placeholder="DD/MM/AAAA" keyboardType="numeric" /> */}
       </Card>
 
       <Card title="Endereço">
         {/* campos de endereço */}
-        <View style={styles.inputContainer}>
+        <View>
           <Text style={styles.label}>CEP</Text>
           <MaskInput
             style={[styles.input, errors.CEP && styles.inputError]}
@@ -227,12 +241,44 @@ export default function RegistrationForm() {
               setErrors((prev) => ({ ...prev, CEP: !isValid }));
             }}
           />
+          {errors.CEP && <Text style={styles.errorText}>CEP inválido</Text>}
         </View>
-        <FormField label="Rua / Logradouro" value={accountData.address.street} onChangeText={(text) => updateAddress('street', text)} hasError={errors.street} placeholder="Ex: Av. Brasil" />
-        <FormField label="Número" value={accountData.address.number} onChangeText={(text) => updateAddress('number', text)} hasError={errors.number} placeholder="123" keyboardType="numeric" />
-        <FormField label="Complemento (Opcional)" value={accountData.address.complement || ''} onChangeText={(text) => updateAddress('complement', text)} placeholder="Apto, Bloco, etc." />
-        <FormField label="Bairro" value={accountData.address.neighborhood} onChangeText={(text) => updateAddress('neighborhood', text)} hasError={errors.neighborhood} placeholder="Centro" />
-        <FormField label="Cidade" value={accountData.address.city} onChangeText={(text) => updateAddress('city', text)} hasError={errors.city} placeholder="Ex: São Paulo" />
+        <Input
+          label="Rua / Logradouro"
+          value={accountData.address.street}
+          onChangeText={(text) => updateAddress('street', text)}
+          error={errors.street ? "Rua é obrigatória" : undefined}
+          placeholder="Ex: Av. Brasil"
+        />
+        <Input
+          label="Número"
+          value={accountData.address.number}
+          onChangeText={(text) => updateAddress('number', text)}
+          error={errors.number ? "Número é obrigatório" : undefined}
+          placeholder="123"
+          keyboardType="numeric"
+        />
+        <Input
+          label="Complemento (Opcional)"
+          value={accountData.address.complement || ''}
+          onChangeText={(text) => updateAddress('complement', text)}
+          placeholder="Apto, Bloco, etc."
+          hint="Opcional - apartamento, bloco, etc."
+        />
+        <Input
+          label="Bairro"
+          value={accountData.address.neighborhood}
+          onChangeText={(text) => updateAddress('neighborhood', text)}
+          error={errors.neighborhood ? "Bairro é obrigatório" : undefined}
+          placeholder="Centro"
+        />
+        <Input
+          label="Cidade"
+          value={accountData.address.city}
+          onChangeText={(text) => updateAddress('city', text)}
+          error={errors.city ? "Cidade é obrigatória" : undefined}
+          placeholder="Ex: São Paulo"
+        />
         <Text style={styles.label}>Estado</Text>
         <TouchableOpacity
           style={[styles.pickerDisplay, errors.state && styles.inputError]}
@@ -245,9 +291,12 @@ export default function RegistrationForm() {
         </TouchableOpacity>
       </Card>
 
-      <TouchableOpacity style={[styles.primaryButton, loading && styles.buttonDisabled]} onPress={handleRegistration} disabled={loading}>
-        {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.primaryButtonText}>Finalizar Cadastro</Text>}
-      </TouchableOpacity>
+      <Button
+        title="Finalizar Cadastro"
+        onPress={handleRegistration}
+        loading={loading}
+        disabled={loading}
+      />
 
       <Modal transparent={true} visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
         <TouchableOpacity style={styles.modalOverlay} onPress={() => setModalVisible(false)} />
@@ -336,6 +385,12 @@ const styles = StyleSheet.create({
   },
   inputError: {
     borderColor: 'red',
+  },
+  errorText: {
+    fontSize: 12,
+    color: '#EF4444',
+    marginTop: 4,
+    fontWeight: '500',
   },
   pickerDisplay: {
     alignItems: 'center',

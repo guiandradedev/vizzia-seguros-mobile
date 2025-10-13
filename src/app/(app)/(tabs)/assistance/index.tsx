@@ -1,53 +1,5 @@
-import { View, Text, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import Colors from '@/constants/Colors';
-import { useEffect } from 'react';
+import AssistancePage from "@/pages/app/Assistance";
 
-export default function HomeScreen() {
-  const insets = useSafeAreaInsets();
-  const theme = Colors.light;
-
-  return (
-    <View
-      style={[
-        styles.container,
-        // { backgroundColor: theme.background },
-      ]}
-    >
-      <View style={styles.header}>
-        <Text style={styles.headerText}>
-          Assistencia?
-        </Text>
-        <Text style={styles.headerSubTitle}>
-          Em breve mais informações.
-        </Text>
-      </View>
-
-
-
-    </View>
-  );
+export default function AssistanceScreen() {
+  return <AssistancePage />
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  headerText: {
-    fontSize: 32,
-    fontWeight: 'medium',
-    fontFamily: "Roboto-Medium",
-    marginHorizontal: 20,
-    marginBottom: 10,
-  },
-  headerSubTitle: {
-    fontSize: 16,
-    fontWeight: 'regular',
-    fontFamily: "Roboto-Regular",
-    marginHorizontal: 20,
-    marginBottom: 10,
-  },
-  header: {
-    paddingVertical: 16
-  }
-});

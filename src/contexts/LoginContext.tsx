@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, ReactNode } from 'react';
 import { jwtDecode } from "jwt-decode";
-import { AxiosResponse } from 'axios';
+import axios, { AxiosResponse } from 'axios';
 import { Tokens } from '@/types/auth';
 import { axiosNoAuth } from '@/lib/axios';
 import { saveSecure } from '@/utils/secure-store';
@@ -150,6 +150,9 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       return true
     } catch (err) {
       console.log(err)
+      if(axios.isAxiosError(err)) {
+        console.log(err.status, err.response?.data)
+      }
       return false;
     }
   }
