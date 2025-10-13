@@ -16,6 +16,18 @@ interface User {
   nome: string;
   email: string;
   passwordHash: string;
+  phone: string;
+  birthDate: Date | null;
+  cpf: string;
+  cnh: string;
+  cnhEmissionDate: Date | null;
+  cep: string;
+  street: string;
+  number: string;
+  complement: string;
+  neighborhood: string;
+  city: string;
+  state: string | null;
 }
 
 interface InitialData {
@@ -28,7 +40,7 @@ interface LoginContextType {
   user: User | null;
   changeUser: (user: User) => void;
   changeInitialData: (data: ResponseSocialAuthUserNotExistsAPI) => void;
-  changeUserProperty: (property: keyof User, value: string) => void;
+  changeUserProperty: (property: keyof User, value: string | Date | null) => void;
   handleRegisterSocialLogin: () => Promise<boolean>;
 }
 
@@ -48,10 +60,26 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
   function changeInitialData(data: ResponseSocialAuthUserNotExistsAPI) {
     setInitialData({ createusersocialtoken: data.createusersocialtoken, provider: data.provider });
-    setUser({ nome: data.nome, email: data.email, passwordHash: '' });
+    setUser({
+      nome: data.nome,
+      email: data.email,
+      passwordHash: '',
+      phone: '',
+      birthDate: null,
+      cpf: '',
+      cnh: '',
+      cnhEmissionDate: null,
+      cep: '',
+      street: '',
+      number: '',
+      complement: '',
+      neighborhood: '',
+      city: '',
+      state: null
+    });
   }
 
-  function changeUserProperty(property: keyof User, value: string) {
+  function changeUserProperty(property: keyof User, value: string | Date | null) {
     if (user) {
       setUser({ ...user, [property]: value });
     }
@@ -64,14 +92,30 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const decodedToken = jwtDecode<CreateUserSocialTokenDecode>(initialData.createusersocialtoken);
       if (!decodedToken) return false;
 
-      const response: AxiosResponse<Tokens> = await axiosNoAuth.post('/social-auth/register', {
+      const data = {
         email: user.email,
         name: user.nome,
         provider: decodedToken.provider,
         provider_email: decodedToken.provider_email,
         id_provider: decodedToken.sub,
-        passwordHash: user.passwordHash
-      }, {
+        passwordHash: user.passwordHash,
+        phone_number: user.phone.replace(/\D/g, ''),
+        type: "pessoal",
+        status: true,
+        birthDate: user.birthDate,
+        cpf: user.cpf.replace(/\D/g, ''),
+        cnhNumber: user.cnh.replace(/\D/g, ''),
+        cnhIssueDate: user.cnhEmissionDate,
+        cep: user.cep.replace(/\D/g, ''),
+        street: user.street,
+        addressNumber: user.number,
+        complement: user.complement,
+        neighborhood: user.neighborhood,
+        city: user.city,
+        state: user.state,
+      }
+      console.log(JSON.stringify(data, null, 2))
+      const response: AxiosResponse<Tokens> = await axiosNoAuth.post('/social-auth/register', data, {
         headers: {
           Authorization: `Bearer ${initialData.createusersocialtoken}`,
         }
@@ -84,6 +128,7 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       return true
     } catch (err) {
+      console.log(err)
       return false;
     }
   }

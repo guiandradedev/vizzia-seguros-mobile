@@ -61,7 +61,7 @@ export default function HelpScreen() {
           Alguma dúvida?
         </Text>
         <Text style={styles.headerSubTitle}>
-          Nulla vehicula tortor in neque scelerisque, nec porttitor nisl sollicitudin.
+          Encontre respostas para as perguntas mais frequentes ou fale conosco.
         </Text>
       </View>
 

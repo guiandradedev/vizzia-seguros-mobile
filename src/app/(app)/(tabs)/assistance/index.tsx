@@ -20,7 +20,7 @@ export default function HomeScreen() {
           Assistencia?
         </Text>
         <Text style={styles.headerSubTitle}>
-          Nulla vehicula tortor in neque scelerisque, nec porttitor nisl sollicitudin.
+          Em breve mais informações.
         </Text>
       </View>
 
