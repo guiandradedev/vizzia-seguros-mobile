@@ -8,6 +8,7 @@ export const Border = "#e4e1d8ff"
 
 export default {
   light: {
+    appTheme: '#6D94C5',
     text: '#000',
     background: BackgroundColor,
     tint: TintColor,

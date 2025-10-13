@@ -56,9 +56,9 @@ export const CreateVehicleProvider: React.FC<CreateVehicleProviderProps> = ({ ch
     const [vehiclePhotos, setVehiclePhotos] = useState<PhotoType[]>([
         { title: "Frente", uri: "" },
         { title: "Trás", uri: "" },
-        //     { title: "Lado Esquerdo", uri: "" },
-        //     { title: "Lado Direito", uri: "" },
-        //     { title: "Capô", uri: "" },
+        { title: "Lado Esquerdo", uri: "" },
+        { title: "Lado Direito", uri: "" },
+        { title: "Capô", uri: "" },
     ]);
     const [initialCarPhoto, setInitialCarPhoto] = useState('') // Foto inicial do carro que busca a placa do carro
     const [vehicle, setVehicle] = useState<Vehicle>({
