@@ -2,6 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
 import { useAuth } from '@/hooks/useAuth';
+import Header from '@/components/Header';
 
 export default function MyCarsScreen() {
   const router = useRouter();
@@ -18,14 +19,7 @@ export default function MyCarsScreen() {
         styles.container_outside,
       ]}
     >
-      <View style={styles.header}>
-        <Text style={styles.headerText}>
-          Meus Veículos
-        </Text>
-        <Text style={styles.headerSubTitle}>
-          Aqui você pode gerenciar seus veículos assegurados.
-        </Text>
-      </View>
+      <Header title="Meus Veículos" subtitle="Aqui você pode gerenciar seus veículos assegurados." />
 
       <View style={styles.container}>
         {

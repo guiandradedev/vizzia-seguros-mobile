@@ -13,7 +13,6 @@ export default function ProfileScreen() {
       style={[
         styles.container,
         { backgroundColor: theme.background },
-        { paddingTop: insets.top }
       ]}
     >
       <Header title="Perfil" subtitle="Aqui você pode gerenciar suas informações pessoais." />
