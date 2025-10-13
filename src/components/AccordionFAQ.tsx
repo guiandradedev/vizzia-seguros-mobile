@@ -1,18 +1,13 @@
 // components/FAQItem.tsx (Crie este arquivo)
 
 import React, { useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation, Platform, UIManager } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation, Platform } from 'react-native';
 // Você pode usar o FontAwesome que já tem
-import { FontAwesome } from '@expo/vector-icons'; 
+import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 
-// Habilita LayoutAnimation no Android
-if (
-  Platform.OS === 'android' &&
-  UIManager.setLayoutAnimationEnabledExperimental
-) {
-  UIManager.setLayoutAnimationEnabledExperimental(true);
-}
+// LayoutAnimation funciona automaticamente na nova arquitetura
+// Removido: UIManager.setLayoutAnimationEnabledExperimental
 
 interface FAQItemProps {
   question: string;

@@ -5,6 +5,7 @@ import {
     TouchableOpacity,
     StyleSheet,
     Alert,
+    Platform,
 } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useAuth } from "@/hooks/useAuth";
@@ -12,9 +13,11 @@ import { FontAwesome } from "@expo/vector-icons";
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import { useLogin } from "@/contexts/LoginContext";
 import env from "@/utils/env";
+
 GoogleSignin.configure({
     iosClientId: env.GOOGLE_IOS_CLIENT_ID,
-    webClientId: env.GOOGLE_ANDROID_CLIENT_ID
+    webClientId: env.GOOGLE_WEB_CLIENT_ID,
+    // offlineAccess: true, 
 })
 
 const theme = Colors.light;
@@ -62,6 +65,7 @@ export default function GoogleAuthComponent() {
 
                 Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
             } else {
+                console.log(response.data)
                 Alert.alert('Erro', 'Não foi possível fazer login com o Google. Tente novamente.');
             }
 

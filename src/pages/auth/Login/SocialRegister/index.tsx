@@ -320,16 +320,21 @@ export default function SocialRegisterPage() {
                     <TouchableOpacity style={styles.modalOverlay} onPress={() => setModalVisible(false)} />
                     <View style={styles.modalContent}>
                         <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Selecione o Estado</Text>
                             <TouchableOpacity onPress={() => setModalVisible(false)}>
-                                <Text style={styles.modalButtonText}>Confirmar</Text>
+                                <Text style={styles.modalButtonText}>Cancelar</Text>
                             </TouchableOpacity>
                         </View>
-                        <Picker selectedValue={user?.state || ''} onValueChange={(itemValue) => {
-                            changeUserProperty('state', itemValue || null);
-                            if (itemValue) {
-                                setModalVisible(false);
-                            }
-                        }}>
+                        <Picker
+                            selectedValue={user?.state || ''}
+                            onValueChange={(itemValue) => {
+                                changeUserProperty('state', itemValue || null);
+                                if (itemValue) {
+                                    setModalVisible(false);
+                                }
+                            }}
+                            style={styles.picker}
+                        >
                             <Picker.Item label="Selecione um Estado" value="" />
                             {ufs.map((uf) => (
                                 <Picker.Item key={uf} label={uf} value={uf} />
@@ -439,15 +444,26 @@ const styles = StyleSheet.create({
         height: 275,
     },
     modalHeader: {
-        alignItems: 'flex-end',
+        alignItems: 'center',
         borderBottomColor: '#E0E0E0',
         borderBottomWidth: 2,
         padding: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#333',
     },
     modalButtonText: {
         color: '#007AFF',
         fontSize: 16,
         fontWeight: '600',
+    },
+    picker: {
+        flex: 1,
+        paddingHorizontal: 20,
     },
     primaryButton: {
         backgroundColor: theme.tint || '#0A84FF',

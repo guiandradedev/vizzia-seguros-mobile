@@ -66,13 +66,23 @@
       [
         "@react-native-google-signin/google-signin",
         {
-          "iosUrlScheme": "com.googleusercontent.apps.677080891639-cg0tp3boghouel4ufan3aef1uscp34mm"
+          "iosUrlScheme": "com.googleusercontent.apps.677080891639-cg0tp3boghouel4ufan3aef1uscp34mm",
+          "android": {
+            "clientId": "677080891639-3g3baq1mi79vm7b69lopss7t1lkv1ns1.apps.googleusercontent.com",
+          "certificateHash": "SEU_SHA1_AQUI"
+          }
         }
       ]
     ],
     "experiments": {
       "typedRoutes": true,
       "reactCompiler": true
+    },
+    "extra": {
+      "API_BASE_URL": "${API_BASE_URL}",
+      "GOOGLE_IOS_CLIENT_ID": "${GOOGLE_IOS_CLIENT_ID}",
+      "GOOGLE_ANDROID_CLIENT_ID": "${GOOGLE_ANDROID_CLIENT_ID}",
+      "GOOGLE_WEB_CLIENT_ID": "${GOOGLE_WEB_CLIENT_ID}"
     }
   }
 }

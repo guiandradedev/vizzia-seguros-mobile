@@ -2,7 +2,7 @@ import { Stack } from 'expo-router';
 import { Platform, View } from 'react-native';
 
 export default function AppLayout() {
-  const topInset = Platform.OS === 'ios' ? 44 : 24;
+  const topInset = Platform.OS === 'ios' ? 44 : 64;
 
   return (
     <View style={{ flex: 1, paddingTop: topInset }}>
