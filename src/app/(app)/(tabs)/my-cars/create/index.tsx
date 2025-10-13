@@ -9,7 +9,6 @@ import VehiclePhoto from '@/components/VehiclePhoto'; // ✅ componente novo
 import { commonStyles } from '@/styles/CommonStyles'
 import FormRow from '@/components/FormRow';
 import FormField from '@/components/FormField';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const theme = Colors.light;
 
@@ -55,7 +54,7 @@ export default function CreateVehicleScreen() {
     }
 
     return (
-        <SafeAreaView
+        <View
             style={[
                 styles.safeArea,
                 { backgroundColor: theme.background }
@@ -162,7 +161,7 @@ export default function CreateVehicleScreen() {
                 </ScrollView>
             </View>
 
-        </SafeAreaView>
+        </View>
     );
 }
 

@@ -2,7 +2,6 @@ import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { commonStyles } from '@/styles/CommonStyles';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 
 export default function VehicleConductorsScreen() {
@@ -22,7 +21,7 @@ export default function VehicleConductorsScreen() {
 
   const theme = Colors.light
   return (
-    <SafeAreaView
+    <View
       style={[
         styles.safeArea,
         { backgroundColor: theme.background }
@@ -57,7 +56,7 @@ export default function VehicleConductorsScreen() {
         </View>
 
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

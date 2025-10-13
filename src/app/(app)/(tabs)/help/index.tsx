@@ -53,7 +53,6 @@ export default function HelpScreen() {
       style={[
         styles.container,
         { backgroundColor: theme.background },
-        { paddingTop: insets.top }
       ]}
     >
       <View style={styles.header}>

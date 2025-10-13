@@ -6,7 +6,6 @@ import Camera from '@/components/Camera';
 import VehiclePhoto from '@/components/VehiclePhoto';
 import PhotoButton from '@/components/PhotoButton';
 import { commonStyles } from '@/styles/CommonStyles';
-import { SafeAreaView } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 
 const theme = Colors.light;
@@ -44,7 +43,7 @@ export default function MyCarsScreen() {
     }
 
     return (
-        <SafeAreaView
+        <View
             style={[
                 styles.safeArea,
                 { backgroundColor: theme.background }
@@ -91,7 +90,7 @@ export default function MyCarsScreen() {
 
 
 
-        </SafeAreaView>
+        </View>
     );
 }
 

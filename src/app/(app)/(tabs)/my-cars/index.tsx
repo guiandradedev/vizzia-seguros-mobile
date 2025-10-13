@@ -1,7 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
-import { SafeAreaView, useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useAuth } from '@/hooks/useAuth';
 
 export default function MyCarsScreen() {
@@ -10,11 +9,11 @@ export default function MyCarsScreen() {
   const { user } = useAuth()
 
   const handleRedirect = () => {
-    router.push('/(app)/(tabs)/my-cars/create'); // Redireciona para login
+    router.push('/(app)/(tabs)/my-cars/create'); // Navegação para create
   };
 
   return (
-    <SafeAreaView
+    <View
       style={[
         styles.container_outside,
       ]}
@@ -43,7 +42,7 @@ export default function MyCarsScreen() {
           <Text style={styles.buttonText}>Cadastre seu veículo</Text>
         </TouchableOpacity>
       </View>
-    </SafeAreaView>
+    </View>
   );
 }
 

@@ -1,4 +1,3 @@
-import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -131,7 +130,7 @@ export default function AddConductorsScreen() {
   }
 
   return (
-    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+    <View style={{ flex: 1, backgroundColor: theme.background }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -302,7 +301,7 @@ export default function AddConductorsScreen() {
         </View>
 
     </KeyboardAvoidingView>
-    </SafeAreaView>
+    </View>
     
   );
 }

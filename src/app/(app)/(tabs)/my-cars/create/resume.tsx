@@ -8,7 +8,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useCreateVehicle } from '@/hooks/useCreateVehicle';
 import { commonStyles } from '@/styles/CommonStyles';
 import FormRow from '@/components/FormRow';
-import { SafeAreaView } from 'react-native-safe-area-context';
 
 const theme = Colors.light
 
@@ -28,7 +27,7 @@ export default function ResumeCreateVehicleScreen() {
     }
 
     return (
-        <SafeAreaView
+        <View
             style={[
                 styles.safeArea,
                 { backgroundColor: theme.background }
@@ -192,7 +191,7 @@ export default function ResumeCreateVehicleScreen() {
                 </View>
 
             </ScrollView>
-        </SafeAreaView>
+        </View>
     );
 }
 

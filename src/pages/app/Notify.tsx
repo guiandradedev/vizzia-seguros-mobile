@@ -1,26 +1,22 @@
 import { View, Text, StyleSheet } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import Colors from '@/constants/Colors';
 import { useEffect } from 'react';
+import Header from '@/components/Header';
 
 export default function NotifyScreen() {
-  const insets = useSafeAreaInsets();
   const theme = Colors.light;
 
   return (
     <View
       style={[
-        styles.container,
         { backgroundColor: theme.background },
-        { paddingTop: insets.top }
       ]}
     >
-      <View style={styles.header}>
-        <Text style={styles.headerText}>
-          Notificacoes
-        </Text>
-        <Text style={styles.headerSubTitle}>
-          Nulla vehicula tortor in neque scelerisque, nec porttitor nisl sollicitudin.
+      <Header title="Notificações" subtitle="Aqui você verá todas as notificações importantes." />
+
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={{ color: theme.text, fontSize: 16 }}>
+          Nenhuma notificação no momento.
         </Text>
       </View>
 
@@ -29,26 +25,3 @@ export default function NotifyScreen() {
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-  },
-  headerText: {
-    fontSize: 32,
-    fontWeight: 'medium',
-    fontFamily: "Roboto-Medium",
-    marginHorizontal: 20,
-    marginBottom: 10,
-  },
-  headerSubTitle: {
-    fontSize: 16,
-    fontWeight: 'regular',
-    fontFamily: "Roboto-Regular",
-    marginHorizontal: 20,
-    marginBottom: 10,
-  },
-  header: {
-    paddingVertical: 16
-  }
-});

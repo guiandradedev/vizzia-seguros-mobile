@@ -1,14 +1,16 @@
 import { Stack } from 'expo-router';
+import { Platform, View } from 'react-native';
 
 export default function AppLayout() {
+  const topInset = Platform.OS === 'ios' ? 44 : 24;
+
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      {/* Grupo de tabs (home, assistance, help, my-cars) */}
-      <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-      
-      {/* Páginas individuais fora das tabs */}
-      <Stack.Screen name="notify" options={{ headerShown: false }} />
-      <Stack.Screen name="profile" options={{ headerShown: false }} />
-    </Stack>
+    <View style={{ flex: 1, paddingTop: topInset }}>
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+        <Stack.Screen name="notify" options={{ headerShown: false }} />
+        <Stack.Screen name="profile" options={{ headerShown: false }} />
+      </Stack>
+    </View>
   );
 }

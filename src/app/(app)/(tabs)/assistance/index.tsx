@@ -12,7 +12,6 @@ export default function HomeScreen() {
       style={[
         styles.container,
         { backgroundColor: theme.background },
-        { paddingTop: insets.top }
       ]}
     >
       <View style={styles.header}>
