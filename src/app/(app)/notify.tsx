@@ -1,5 +1,5 @@
-import NotifyScreen from "@/pages/app/Notify";
+import NotifyPage from "@/pages/app/Notify";
 
-export default function Screen() {
-  return <NotifyScreen />
+export default function NotifyScreen() {
+  return <NotifyPage />
 }
