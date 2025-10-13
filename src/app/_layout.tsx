@@ -11,6 +11,7 @@ import {
   Roboto_500Medium,
 } from '@expo-google-fonts/roboto';
 import Colors from '@/constants/Colors';
+import { ThemeProvider } from '@/contexts/ThemeContext';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -34,12 +35,14 @@ export default function RootLayout() {
   }
 
   return (
-    <AuthProvider>
-      <Stack screenOptions={{ headerShown: false, contentStyle: {backgroundColor: theme.background}}}>
-        <Stack.Screen name="index"/>
-        <Stack.Screen name="(auth)"/>
-        <Stack.Screen name="(app)" />
-      </Stack>
-    </AuthProvider>
+    <ThemeProvider>
+      <AuthProvider>
+        <Stack screenOptions={{ headerShown: false, contentStyle: {backgroundColor: theme.background}}}>
+          <Stack.Screen name="index"/>
+          <Stack.Screen name="(auth)"/>
+          <Stack.Screen name="(app)" />
+        </Stack>
+      </AuthProvider>
+    </ThemeProvider>
   );
 }
