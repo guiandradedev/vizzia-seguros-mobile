@@ -2,11 +2,14 @@
 
 import Colors, { ColorTheme } from '@/constants/Colors';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { useColorScheme } from 'react-native';
 
 interface ThemeContextType {
   theme: 'light' | 'dark';
   colors: ColorTheme;
   toggleTheme: () => void;
+  followSystemTheme: () => void;
+  isSystemTheme: boolean;
 }
 
 interface ThemeProviderProps {
@@ -15,20 +18,29 @@ interface ThemeProviderProps {
 
 export const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
-// 4. Hook personalizado para usar o contexto
-export const useTheme = () => {
-  const context = useContext(ThemeContext);
-  if (!context) {
-    throw new Error('useTheme must be used within a ThemeProvider');
-  }
-  return context;
-};
-
 export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
-  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>('light');
+  const colorScheme = useColorScheme();
+  const [currentTheme, setCurrentTheme] = useState<'light' | 'dark'>(colorScheme ?? 'light');
+  const [isSystemTheme, setIsSystemTheme] = useState(true);
+
+  React.useEffect(() => {
+    if (isSystemTheme && colorScheme) {
+      setCurrentTheme(colorScheme);
+    }
+  }, [colorScheme, isSystemTheme]);
 
   const toggleTheme = () => {
-    setCurrentTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    if (isSystemTheme) {
+      setIsSystemTheme(false);
+      setCurrentTheme(colorScheme === 'light' ? 'dark' : 'light');
+    } else {
+      setCurrentTheme((prev) => (prev === 'light' ? 'dark' : 'light'));
+    }
+  };
+
+  const followSystemTheme = () => {
+    setIsSystemTheme(true);
+    setCurrentTheme(colorScheme ?? 'light');
   };
 
   const colors = Colors[currentTheme];
@@ -37,6 +49,8 @@ export const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
     theme: currentTheme,
     colors,
     toggleTheme,
+    followSystemTheme,
+    isSystemTheme,
   };
 
   return (

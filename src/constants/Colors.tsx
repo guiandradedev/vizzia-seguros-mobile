@@ -31,16 +31,15 @@ const light = {
 };
 
 const dark = {
-  // Você pode definir cores escuras aqui para suporte a tema escuro
-  appTheme: '#4A90E2', // Azul mais claro para tema escuro
-  text: '#fff',
-  background: '#000',
-  tint: '#4A90E2',
-  tabIconDefault: '#666',
-  tabIconSelected: '#4A90E2',
-  tabBackground: '#121212',
-  headerBackground: '#1E1E1E',
-  border: '#333', // Borda mais escura para tema escuro
+  appTheme: '#6D94C5', // Mantém a cor principal do tema claro
+  text: '#F8F9FA', // Branco quase puro para melhor legibilidade
+  background: '#121212', // Fundo principal escuro mas não preto absoluto
+  tint: '#8BB3D8', // Azul um pouco mais claro que o tema claro para destaque
+  tabIconDefault: '#9AA0A6', // Cinza médio para ícones não selecionados
+  tabIconSelected: '#8BB3D8', // Mesmo tom do tint para consistência
+  tabBackground: '#1E1E1E', // Fundo da tab bar um pouco mais claro que o principal
+  headerBackground: '#1A1A1A', // Header com fundo ligeiramente diferente
+  border: '#37474F', // Borda em cinza azulado escuro para sofisticação
 };
 
 export const themes = { light, dark };

@@ -10,6 +10,7 @@ import {
     Text,
     AccessibilityState,
 } from 'react-native';
+import { ColorTheme } from '@/constants/Colors';
 
 interface InputProps extends Omit<TextInputProps, 'style'> {
     label?: string;
@@ -23,6 +24,7 @@ interface InputProps extends Omit<TextInputProps, 'style'> {
     leftIcon?: React.ReactNode;
     rightIcon?: React.ReactNode;
     variant?: 'default' | 'outlined' | 'filled';
+    colors?: ColorTheme;
 }
 
 const Input: React.FC<InputProps> = ({
@@ -37,9 +39,92 @@ const Input: React.FC<InputProps> = ({
     leftIcon,
     rightIcon,
     variant = 'default',
+    colors,
     editable = true,
     ...textInputProps
 }) => {
+    // Cores padrão se não forem fornecidas
+    const defaultColors = {
+        text: '#111827',
+        background: '#FFFFFF',
+        border: '#D1D5DB',
+        tint: '#3B82F6',
+    };
+
+    const themeColors = colors || defaultColors;
+
+    const styles = StyleSheet.create({
+        container: {
+            marginBottom: 16,
+        },
+        label: {
+            fontSize: 14,
+            fontWeight: '600',
+            color: themeColors.text,
+            marginBottom: 8,
+        },
+        inputContainer: {
+            flexDirection: 'row',
+            alignItems: 'center',
+            position: 'relative',
+        },
+        input: {
+            flex: 1,
+            fontSize: 16,
+            color: themeColors.text,
+            paddingHorizontal: 12,
+            paddingVertical: 12,
+            borderRadius: 8,
+            borderWidth: 1,
+            borderColor: themeColors.border,
+            backgroundColor: themeColors.background,
+        },
+        // Variants
+        default: {
+            borderColor: themeColors.border,
+            backgroundColor: themeColors.background,
+        },
+        outlined: {
+            borderColor: themeColors.tint,
+            borderWidth: 2,
+            backgroundColor: themeColors.background,
+        },
+        filled: {
+            borderColor: themeColors.border,
+            backgroundColor: themeColors.background === '#FFFFFF' ? '#F9FAFB' : '#2A2A2A', // Tom mais escuro para tema escuro
+        },
+        // States
+        disabled: {
+            backgroundColor: themeColors.background === '#FFFFFF' ? '#F3F4F6' : '#1A1A1A', // Tom mais escuro para tema escuro
+            color: themeColors.text === '#111827' ? '#9CA3AF' : '#6B7280', // Tom mais claro para tema escuro
+        },
+        error: {
+            borderColor: '#EF4444',
+        },
+        errorText: {
+            fontSize: 12,
+            color: '#EF4444',
+            marginTop: 4,
+            fontWeight: '500',
+        },
+        hintText: {
+            fontSize: 12,
+            color: themeColors.text === '#111827' ? '#6B7280' : '#9CA0A4', // Tom mais claro para tema escuro
+            marginTop: 4,
+            fontWeight: '400',
+        },
+        leftIcon: {
+            position: 'absolute',
+            left: 12,
+            zIndex: 1,
+        },
+        rightIcon: {
+            position: 'absolute',
+            right: 12,
+            zIndex: 1,
+        },
+    });
+
     const containerStyles = [
         styles.container,
         containerStyle,
@@ -96,77 +181,5 @@ const Input: React.FC<InputProps> = ({
         </View>
     );
 };
-
-const styles = StyleSheet.create({
-    container: {
-        marginBottom: 16,
-    },
-    label: {
-        fontSize: 14,
-        fontWeight: '600',
-        color: '#374151',
-        marginBottom: 8,
-    },
-    inputContainer: {
-        flexDirection: 'row',
-        alignItems: 'center',
-        position: 'relative',
-    },
-    input: {
-        flex: 1,
-        fontSize: 16,
-        color: '#111827',
-        paddingHorizontal: 12,
-        paddingVertical: 12,
-        borderRadius: 8,
-        borderWidth: 1,
-        borderColor: '#D1D5DB',
-        backgroundColor: '#FFFFFF',
-    },
-    // Variants
-    default: {
-        borderColor: '#D1D5DB',
-        backgroundColor: '#FFFFFF',
-    },
-    outlined: {
-        borderColor: '#3B82F6',
-        borderWidth: 2,
-        backgroundColor: '#FFFFFF',
-    },
-    filled: {
-        borderColor: '#D1D5DB',
-        backgroundColor: '#F9FAFB',
-    },
-    // States
-    disabled: {
-        backgroundColor: '#F3F4F6',
-        color: '#9CA3AF',
-    },
-    error: {
-        borderColor: '#EF4444',
-    },
-    errorText: {
-        fontSize: 12,
-        color: '#EF4444',
-        marginTop: 4,
-        fontWeight: '500',
-    },
-    hintText: {
-        fontSize: 12,
-        color: '#6B7280',
-        marginTop: 4,
-        fontWeight: '400',
-    },
-    leftIcon: {
-        position: 'absolute',
-        left: 12,
-        zIndex: 1,
-    },
-    rightIcon: {
-        position: 'absolute',
-        right: 12,
-        zIndex: 1,
-    },
-});
 
 export default Input;

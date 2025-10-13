@@ -19,7 +19,7 @@ import GoogleAuthComponent from "./components/GoogleAuth";
 import Button from "@/components/Button";
 import Separator from "@/components/Separator";
 import Input from "@/components/Input";
-import { useTheme } from "@/contexts/ThemeContext";
+import { useTheme } from "@/hooks/useTheme";
 
 export default function LoginPage() {
     const { colors } = useTheme()
@@ -52,6 +52,7 @@ export default function LoginPage() {
             color: '#333',
             marginBottom: 12,
             textAlign: 'center',
+            tintColor: colors.tint || '#0A84FF',
         },
         subtitle: {
             fontSize: 14,
@@ -139,7 +140,7 @@ export default function LoginPage() {
     }, [email, password, signIn, router]);
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: "#fff" }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
             <KeyboardAvoidingView
                 style={styles.container}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
