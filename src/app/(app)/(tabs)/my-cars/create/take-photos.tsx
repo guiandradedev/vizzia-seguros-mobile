@@ -6,6 +6,10 @@ import Camera from '@/components/Camera';
 import VehiclePhoto from '@/components/VehiclePhoto';
 import PhotoButton from '@/components/PhotoButton';
 import { commonStyles } from '@/styles/CommonStyles';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Colors from '@/constants/Colors';
+
+const theme = Colors.light;
 
 export default function MyCarsScreen() {
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -40,8 +44,13 @@ export default function MyCarsScreen() {
     }
 
     return (
-        <View style={commonStyles.container}>
-            <ScrollView 
+        <SafeAreaView
+            style={[
+                styles.safeArea,
+                { backgroundColor: theme.background }
+            ]}
+        >
+            <ScrollView
                 contentContainerStyle={[commonStyles.scrollContent, { flexGrow: 1 }]}
                 showsVerticalScrollIndicator={false}
             >
@@ -49,22 +58,22 @@ export default function MyCarsScreen() {
 
                 <View style={styles.photoGrid}>
                     {vehiclePhotos.map((photo, index) => (
-                    <View key={index} style={styles.photoWrapper}>
-                        {photo.uri ? (
-                        <>
-                            <Text style={commonStyles.text}>{photo.title}</Text>
-                            <VehiclePhoto photoUri={photo.uri} onEdit={() => openCamera(index)} />
-                        </>
-                        ) : (
-                        <PhotoButton title={`Adicionar ${photo.title}`} onPress={() => openCamera(index)} />
-                        )}
-                    </View>
+                        <View key={index} style={styles.photoWrapper}>
+                            {photo.uri ? (
+                                <>
+                                    <Text style={commonStyles.text}>{photo.title}</Text>
+                                    <VehiclePhoto photoUri={photo.uri} onEdit={() => openCamera(index)} />
+                                </>
+                            ) : (
+                                <PhotoButton title={`Adicionar ${photo.title}`} onPress={() => openCamera(index)} />
+                            )}
+                        </View>
                     ))}
                 </View>
 
                 <View style={commonStyles.footer}>
                     <View style={commonStyles.footerRow}>
-                        <TouchableOpacity style={[commonStyles.footerButton, commonStyles.backButton]} onPress={handleBack}>
+                        <TouchableOpacity style={[commonStyles.footerButton, commonStyles.buttonSecondary]} onPress={handleBack}>
                             <Text style={commonStyles.buttonText}>Voltar</Text>
                         </TouchableOpacity>
 
@@ -76,18 +85,18 @@ export default function MyCarsScreen() {
                             <Text style={commonStyles.buttonText}>Continuar</Text>
                         </TouchableOpacity>
                     </View>
-                    
+
                 </View>
             </ScrollView>
 
 
-            
-        </View>
+
+        </SafeAreaView>
     );
 }
 
 const styles = StyleSheet.create({
-  
+
     photoList: { paddingBottom: 20 },
     buttonRow: { flexDirection: 'row', justifyContent: 'space-between', marginTop: 'auto' },
     buttonText: { color: 'white', fontSize: 14, fontWeight: '600' },
@@ -99,5 +108,8 @@ const styles = StyleSheet.create({
     photoWrapper: {
         width: '48%', // duas colunas com espaçamento
         marginBottom: 16,
+    },
+    safeArea: {
+        flex: 1,
     },
 });

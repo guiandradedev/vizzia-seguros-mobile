@@ -9,6 +9,7 @@ import VehiclePhoto from '@/components/VehiclePhoto'; // ✅ componente novo
 import { commonStyles } from '@/styles/CommonStyles'
 import FormRow from '@/components/FormRow';
 import FormField from '@/components/FormField';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const theme = Colors.light;
 
@@ -32,9 +33,9 @@ export default function CreateVehicleScreen() {
 
     async function addPhoto(photoUri: string) {
         setPhoto(photoUri);
-        closeCamera();
         await new Promise(resolve => setTimeout(resolve, 500));
         changeInitialCarPhoto(photoUri);
+        closeCamera();
 
         const data = {
             model: "Onix LTZ",
@@ -54,107 +55,119 @@ export default function CreateVehicleScreen() {
     }
 
     return (
-        <KeyboardAvoidingView
+        <SafeAreaView
+            style={[
+                styles.safeArea,
+                { backgroundColor: theme.background }
+            ]}
+        >
+        {/* <KeyboardAvoidingView
             style={{ flex: 1 }}
             behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // ajusta o deslocamento
-        >
-        <View style={ commonStyles.container }>
-            <ScrollView contentContainerStyle={[commonStyles.scrollContent, { flexGrow: 1 }]} 
-            keyboardShouldPersistTaps="handled">
-                
-                <Text style={[commonStyles.title, {marginBottom: 10}]}>Dados do veículo</Text>
+        > */}
+            <View style={commonStyles.container}>
+                <ScrollView contentContainerStyle={[commonStyles.scrollContent, { flexGrow: 1 }]}
+                    keyboardShouldPersistTaps="handled">
 
-                {!photo && (
-                    <>
-                        <Text style={commonStyles.text}>Para começar, tire uma foto do carro.</Text>
-                        <Text style={commonStyles.subtitle}>A foto deve ser de boa qualidade de frente, mostrando a placa e os detalhes do veículo.</Text>
+                    <Text style={[commonStyles.title, { marginBottom: 10 }]}>Dados do veículo</Text>
 
-                        <PhotoButton
-                            photoUri={photo}
-                            title="Adicionar foto"
-                            onPress={openCamera}
-                        />
-                    </>
-                )}
+                    {!photo && (
+                        <>
+                            <Text style={commonStyles.text}>Para começar, tire uma foto do carro.</Text>
+                            <Text style={commonStyles.subtitle}>A foto deve ser de boa qualidade de frente, mostrando a placa e os detalhes do veículo.</Text>
 
-                {photo && (
-                    <View style={commonStyles.formContainer}>
-                        {/*  VehiclePhoto */}
-                        <Text style={commonStyles.sectionTitle}>Foto</Text>
-                        <VehiclePhoto photoUri={photo} onEdit={openCamera} />
+                            <PhotoButton
+                                photoUri={photo}
+                                title="Adicionar foto"
+                                onPress={openCamera}
+                            />
+                        </>
+                    )}
 
-                        <Text style={commonStyles.sectionTitle}>Confirme os dados</Text>
-
-                        {/* Campos em duas colunas */}
+                    {photo && (
                         <View style={commonStyles.formContainer}>
-                            <FormRow>
-                                <FormField
-                                    label="Modelo"
-                                    value={vehicle.model || 'Onix LTZ'}
-                                    onChangeText={text => setVehicle({ ...vehicle, model: text })}
-                                    placeholder="Modelo"
-                                />
+                            {/*  VehiclePhoto */}
+                            <Text style={commonStyles.sectionTitle}>Foto</Text>
+                            <VehiclePhoto photoUri={photo} onEdit={openCamera} />
 
-                                <FormField
-                                    label="Marca"
-                                    value={vehicle.brand || 'Chevrolet'}
-                                    onChangeText={(text) => setVehicle({ ...vehicle, brand: text })}
-                                    placeholder="Marca"
-                                />
-                            </FormRow>
+                            <Text style={commonStyles.sectionTitle}>Confirme os dados</Text>
 
-                            <FormRow>
-                                <FormField
-                                    label="Ano"
-                                    value={(vehicle.year || 2024).toString()}
-                                    onChangeText={(text) => setVehicle({ ...vehicle, year: parseInt(text) || 0 })}
-                                    placeholder="Ano"
-                                />
+                            {/* Campos em duas colunas */}
+                            <View style={commonStyles.formContainer}>
+                                <FormRow>
+                                    <FormField
+                                        label="Modelo"
+                                        value={vehicle.model || 'Onix LTZ'}
+                                        onChangeText={text => setVehicle({ ...vehicle, model: text })}
+                                        placeholder="Modelo"
+                                    />
 
-                                <FormField
-                                    label="Cor"
-                                    value={vehicle.color || 'Preto'}
-                                    onChangeText={(text) => setVehicle({ ...vehicle, color: text})}
-                                    placeholder="Cor"
-                                />
-                            </FormRow>
+                                    <FormField
+                                        label="Marca"
+                                        value={vehicle.brand || 'Chevrolet'}
+                                        onChangeText={(text) => setVehicle({ ...vehicle, brand: text })}
+                                        placeholder="Marca"
+                                    />
+                                </FormRow>
 
-                            <FormRow>
-                                <FormField
-                                    label="Placa"
-                                    value={vehicle.plate || 'ABC1D23'}
-                                    onChangeText={(text) => setVehicle({ ...vehicle, plate: text })}
-                                    placeholder="Placa"
-                                />
+                                <FormRow>
+                                    <FormField
+                                        label="Ano"
+                                        value={(vehicle.year || 2024).toString()}
+                                        onChangeText={(text) => setVehicle({ ...vehicle, year: parseInt(text) || 0 })}
+                                        placeholder="Ano"
+                                    />
 
-                                <FormField
-                                    label="Odômetro"
-                                    value={(vehicle.odomether || 1500).toString()}
-                                    onChangeText={(text) => setVehicle({ ...vehicle, odomether: parseInt(text)})}
-                                    placeholder="Odômetro"
-                                />
-                            </FormRow>
+                                    <FormField
+                                        label="Cor"
+                                        value={vehicle.color || 'Preto'}
+                                        onChangeText={(text) => setVehicle({ ...vehicle, color: text })}
+                                        placeholder="Cor"
+                                    />
+                                </FormRow>
+
+                                <FormRow>
+                                    <FormField
+                                        label="Placa"
+                                        value={vehicle.plate || 'ABC1D23'}
+                                        onChangeText={(text) => setVehicle({ ...vehicle, plate: text })}
+                                        placeholder="Placa"
+                                    />
+
+                                    <FormField
+                                        label="Odômetro"
+                                        value={(vehicle.odomether || 1500).toString()}
+                                        onChangeText={(text) => setVehicle({ ...vehicle, odomether: parseInt(text) })}
+                                        placeholder="Odômetro"
+                                    />
+                                </FormRow>
+                            </View>
+
+                            <Text style={commonStyles.subtitle}>
+                                Se algum dado estiver incorreto, você pode editar.
+                            </Text>
                         </View>
+                    )}
 
-                        <Text style={commonStyles.subtitle}>
-                            Se algum dado estiver incorreto, você pode editar.
-                        </Text>
+                    <View style={[commonStyles.footer, { alignItems: "center" }]}>
+                        <TouchableOpacity
+                            style={[commonStyles.button, !canRedirect && commonStyles.backButton]}
+                            onPress={handleRedirect}
+                            disabled={!canRedirect}
+                        >
+                            <Text style={commonStyles.buttonText}>Continuar</Text>
+                        </TouchableOpacity>
                     </View>
-                )}
+                </ScrollView>
+            </View>
 
-                <View style={[commonStyles.footer, {alignItems:"center"}]}>
-                    <TouchableOpacity
-                        style={[commonStyles.button, !canRedirect && commonStyles.backButton]}
-                        onPress={handleRedirect}
-                        disabled={!canRedirect}
-                    >
-                        <Text style={commonStyles.buttonText}>Continuar</Text>
-                    </TouchableOpacity>
-                </View>
-            </ScrollView>
-        </View>
-
-        </KeyboardAvoidingView>
+        </SafeAreaView>
     );
 }
+
+const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
+});

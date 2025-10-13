@@ -1,7 +1,9 @@
-import { View, Text, TouchableOpacity } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { MaterialIcons } from '@expo/vector-icons';
 import { commonStyles } from '@/styles/CommonStyles';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import Colors from '@/constants/Colors';
 
 export default function VehicleConductorsScreen() {
   const router = useRouter();
@@ -18,8 +20,14 @@ export default function VehicleConductorsScreen() {
     router.back();
   }
 
+  const theme = Colors.light
   return (
-    <View style={commonStyles.container}>
+    <SafeAreaView
+      style={[
+        styles.safeArea,
+        { backgroundColor: theme.background }
+      ]}
+    >
       <View style={commonStyles.content}>
         <Text style={commonStyles.title}>Condutores adicionais</Text>
 
@@ -39,16 +47,22 @@ export default function VehicleConductorsScreen() {
 
       <View style={commonStyles.footer}>
         <View style={commonStyles.footerRow}>
-            <TouchableOpacity style={[commonStyles.footerButton, commonStyles.backButton]} onPress={handleBack}>
-                <Text style={commonStyles.buttonText}>Voltar</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={[commonStyles.footerButton, commonStyles.backButton]} onPress={handleBack}>
+            <Text style={commonStyles.buttonText}>Voltar</Text>
+          </TouchableOpacity>
 
-            <TouchableOpacity style={[commonStyles.footerButton, commonStyles.buttonSecondary]} onPress={handleSkip}>
-                <Text style={commonStyles.buttonText}>Pular</Text>
-            </TouchableOpacity>
+          <TouchableOpacity style={[commonStyles.footerButton, commonStyles.buttonSecondary]} onPress={handleSkip}>
+            <Text style={commonStyles.buttonText}>Pular</Text>
+          </TouchableOpacity>
         </View>
-        
+
       </View>
-    </View>
+    </SafeAreaView>
   );
 }
+
+const styles = StyleSheet.create({
+    safeArea: {
+        flex: 1,
+    },
+});

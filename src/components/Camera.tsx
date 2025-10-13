@@ -3,6 +3,9 @@ import { CameraCapturedPicture, CameraType, CameraView, FlashMode, useCameraPerm
 import { useState, useRef } from 'react';
 import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
+import { SafeAreaView } from 'react-native-safe-area-context';
+
+const theme = Colors.light;
 
 interface CameraProps {
     setPhoto: (photo_uri: string) => void,
@@ -16,7 +19,6 @@ export default function Camera({ setPhoto, title, closeCamera }: CameraProps) {
     const cameraRef = useRef<CameraView | null>(null); // Referência para a câmera
     const [permission, requestPermission] = useCameraPermissions();
     const [isCameraReady, setIsCameraReady] = useState(false); // Estado para verificar se a câmera está pronta
-    const theme = Colors.light;
 
     //     const [selectedLens, setSelectedLens] = useState<Lens | undefined>(
     //     Platform.OS === 'ios' ? Lens.UltraWide : undefined // Exemplo: começar com UltraWide no iOS
@@ -41,10 +43,22 @@ export default function Camera({ setPhoto, title, closeCamera }: CameraProps) {
 
     if (!permission.granted) {
         return (
-            <View style={styles.container}>
-                <Text style={styles.message}>We need your permission to show the camera</Text>
-                <Button onPress={requestPermission} title="grant permission" />
-            </View>
+            <SafeAreaView style={styles.permissionContainer}>
+                <View style={styles.permissionContent}>
+                    <FontAwesome name="camera" size={80} color="#6D94C5" style={styles.permissionIcon} />
+                    <Text style={styles.permissionTitle}>Permissão Necessária</Text>
+                    <Text style={styles.permissionMessage}>
+                        Nós precisamos da sua permissão para acessar a câmera e tirar fotos do veículo.
+                    </Text>
+                    <TouchableOpacity
+                        style={styles.permissionButton}
+                        onPress={requestPermission}
+                        activeOpacity={0.8}
+                    >
+                        <Text style={styles.permissionButtonText}>Conceder Permissão</Text>
+                    </TouchableOpacity>
+                </View>
+            </SafeAreaView>
         );
     }
 
@@ -214,5 +228,50 @@ const styles = StyleSheet.create({
         marginTop: 10,
         fontSize: 16,
         color: 'white',
+    },
+    permissionContainer: {
+        flex: 1,
+        backgroundColor: theme.background,
+        justifyContent: 'center',
+        alignItems: 'center',
+        paddingHorizontal: 20,
+    },
+    permissionContent: {
+        alignItems: 'center',
+        maxWidth: 300,
+    },
+    permissionIcon: {
+        marginBottom: 20,
+    },
+    permissionTitle: {
+        fontSize: 24,
+        fontWeight: 'bold',
+        color: theme.text,
+        textAlign: 'center',
+        marginBottom: 10,
+    },
+    permissionMessage: {
+        fontSize: 16,
+        color: theme.text,
+        textAlign: 'center',
+        marginBottom: 30,
+        lineHeight: 24,
+    },
+    permissionButton: {
+        backgroundColor: '#6D94C5',
+        paddingHorizontal: 30,
+        paddingVertical: 15,
+        borderRadius: 10,
+        elevation: 2,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 2 },
+        shadowOpacity: 0.25,
+        shadowRadius: 3.84,
+    },
+    permissionButtonText: {
+        color: 'white',
+        fontSize: 16,
+        fontWeight: '600',
+        textAlign: 'center',
     },
 });

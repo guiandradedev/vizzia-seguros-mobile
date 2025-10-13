@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, ScrollView, Alert, KeyboardAvoidingView, Platform } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
 import React, { useCallback, useEffect, useState } from 'react';
@@ -14,6 +14,7 @@ import FormField from '@/components/FormField';
 import FormRow from '@/components/FormRow';
 import PhotoButton from '@/components/PhotoButton';
 import VehiclePhoto from '@/components/VehiclePhoto';
+import { KeyboardAvoidingView, Platform, ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
 
 const theme = Colors.light;
 
@@ -119,8 +120,9 @@ export default function AddConductorsScreen() {
   if (isCameraOpen) {
     return (
       <Camera
-        setPhoto={(uri: string) => {
+        setPhoto={async (uri: string) => {
           setConductor(prev => ({ ...prev, licensePhoto: uri }));
+          await new Promise(resolve => setTimeout(resolve, 500));
           setIsCameraOpen(false);
         }}
         closeCamera={() => setIsCameraOpen(false)}
@@ -129,12 +131,12 @@ export default function AddConductorsScreen() {
   }
 
   return (
-
-    <KeyboardAvoidingView
+    <SafeAreaView style={{ flex: 1, backgroundColor: theme.background }}>
+      <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
         keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // ajusta o deslocamento
-    >
+      >
         <View style={commonStyles.container}>
             <ScrollView contentContainerStyle={[commonStyles.scrollContent, { paddingBottom: 140 }]}>
                 <Text style={commonStyles.title}>Adicionar condutores</Text>
@@ -300,6 +302,7 @@ export default function AddConductorsScreen() {
         </View>
 
     </KeyboardAvoidingView>
+    </SafeAreaView>
     
   );
 }

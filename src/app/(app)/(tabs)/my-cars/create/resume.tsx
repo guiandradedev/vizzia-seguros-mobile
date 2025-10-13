@@ -8,6 +8,7 @@ import { FontAwesome } from '@expo/vector-icons';
 import { useCreateVehicle } from '@/hooks/useCreateVehicle';
 import { commonStyles } from '@/styles/CommonStyles';
 import FormRow from '@/components/FormRow';
+import { SafeAreaView } from 'react-native-safe-area-context';
 
 const theme = Colors.light
 
@@ -23,11 +24,16 @@ export default function ResumeCreateVehicleScreen() {
 
     function handleSubmit() {
         alert('Cadastro finalizado com sucesso!');
-        router.push('/(app)/(tabs)/my-cars'); 
+        router.push('/(app)/(tabs)/my-cars');
     }
 
     return (
-        <View style={commonStyles.container}>
+        <SafeAreaView
+            style={[
+                styles.safeArea,
+                { backgroundColor: theme.background }
+            ]}
+        >
             <ScrollView contentContainerStyle={[commonStyles.scrollContent, { flexGrow: 1 }]}
                 showsVerticalScrollIndicator={false}
             >
@@ -40,16 +46,16 @@ export default function ResumeCreateVehicleScreen() {
                         Informações do veículo
                     </Text>
 
-                    <View style={[commonStyles.formContainer, { paddingLeft: 20, paddingRight: 20}]}>
+                    <View style={[commonStyles.formContainer, { paddingLeft: 20, paddingRight: 20 }]}>
                         <FormRow>
                             <View style={{ flex: 1 }}>
                                 <Text style={commonStyles.label}>Modelo:</Text>
-                                <Text style={commonStyles.input}>{vehicle.model}</Text> 
+                                <Text style={commonStyles.input}>{vehicle.model}</Text>
                             </View>
 
                             <View style={{ flex: 1 }}>
                                 <Text style={commonStyles.label}>Marca:</Text>
-                                <Text style={commonStyles.input}>{vehicle.brand}</Text> 
+                                <Text style={commonStyles.input}>{vehicle.brand}</Text>
                             </View>
 
                         </FormRow>
@@ -57,12 +63,12 @@ export default function ResumeCreateVehicleScreen() {
                         <FormRow>
                             <View style={{ flex: 1 }}>
                                 <Text style={commonStyles.label}>Ano:</Text>
-                                <Text style={commonStyles.input}>{vehicle.year}</Text> 
+                                <Text style={commonStyles.input}>{vehicle.year}</Text>
                             </View>
 
                             <View style={{ flex: 1 }}>
                                 <Text style={commonStyles.label}>Cor:</Text>
-                                <Text style={commonStyles.input}>{vehicle.color}</Text> 
+                                <Text style={commonStyles.input}>{vehicle.color}</Text>
                             </View>
 
                         </FormRow>
@@ -70,23 +76,23 @@ export default function ResumeCreateVehicleScreen() {
                         <FormRow>
                             <View style={{ flex: 1 }}>
                                 <Text style={commonStyles.label}>Placa:</Text>
-                                <Text style={commonStyles.input}>{vehicle.plate}</Text> 
+                                <Text style={commonStyles.input}>{vehicle.plate}</Text>
                             </View>
 
                             <View style={{ flex: 1 }}>
                                 <Text style={commonStyles.label}>Odômetro:</Text>
-                                <Text style={commonStyles.input}>{vehicle.odomether}</Text> 
+                                <Text style={commonStyles.input}>{vehicle.odomether}</Text>
                             </View>
 
                         </FormRow>
-                        
-   
+
+
                     </View>
                 </View>
                 <View>
                     <Text style={commonStyles.label}>Foto principal:</Text>
                     <View style={{ alignItems: 'center' }}>
-                        <Image source={{ uri: initialCarPhoto }} style={[styles.photo, { width:'80%' }]} />
+                        <Image source={{ uri: initialCarPhoto }} style={[styles.photo, { width: '80%' }]} />
                     </View>
                     {
                         vehiclePhotos.map((photo, index) => (
@@ -95,14 +101,14 @@ export default function ResumeCreateVehicleScreen() {
                                     {photo.title}:
                                 </Text>
 
-                            <View style={{alignItems:'center', marginBottom:30}}>
-                                {photo.uri ? (
-                                    <Image source={{ uri: photo.uri }} style={[styles.photo, { width:'80%' }]} />
-                                ) : (
-                                    <Text>Não fornecida</Text>
-                                )}
-                            </View>
-                                
+                                <View style={{ alignItems: 'center', marginBottom: 30 }}>
+                                    {photo.uri ? (
+                                        <Image source={{ uri: photo.uri }} style={[styles.photo, { width: '80%' }]} />
+                                    ) : (
+                                        <Text>Não fornecida</Text>
+                                    )}
+                                </View>
+
                             </View>
                         ))
                     }
@@ -115,55 +121,55 @@ export default function ResumeCreateVehicleScreen() {
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Nome Completo:</Text>
-                                        <Text style={commonStyles.input}>{conductor.name}</Text> 
+                                        <Text style={commonStyles.input}>{conductor.name}</Text>
                                     </View>
                                 </FormRow>
 
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Email:</Text>
-                                        <Text style={commonStyles.input}>{conductor.email}</Text> 
+                                        <Text style={commonStyles.input}>{conductor.email}</Text>
                                     </View>
                                 </FormRow>
 
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>CPF:</Text>
-                                        <Text style={commonStyles.input}>{conductor.document}</Text> 
+                                        <Text style={commonStyles.input}>{conductor.document}</Text>
                                     </View>
 
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Telefone:</Text>
-                                        <Text style={commonStyles.input}>{conductor.phone}</Text> 
+                                        <Text style={commonStyles.input}>{conductor.phone}</Text>
                                     </View>
                                 </FormRow>
 
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>CNH:</Text>
-                                        <Text style={commonStyles.input}>{conductor.licenseNumber}</Text> 
+                                        <Text style={commonStyles.input}>{conductor.licenseNumber}</Text>
                                     </View>
 
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Vencimento da CNH:</Text>
-                                        <Text style={commonStyles.input}>{conductor.licenseExpiry}</Text> 
+                                        <Text style={commonStyles.input}>{conductor.licenseExpiry}</Text>
                                     </View>
                                 </FormRow>
 
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Relacionamento:</Text>
-                                        <Text style={commonStyles.input}>{conductor.relationship}</Text> 
+                                        <Text style={commonStyles.input}>{conductor.relationship}</Text>
                                     </View>
 
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Data de Nascimento:</Text>
-                                        <Text style={commonStyles.input}>{conductor.birthDate.toLocaleDateString()}</Text> 
+                                        <Text style={commonStyles.input}>{conductor.birthDate.toLocaleDateString()}</Text>
                                     </View>
                                 </FormRow>
                                 <Text style={commonStyles.label}>Foto da CNH:</Text>
-                                <View style={{alignItems:'center', marginBottom:30}} >
-                                    <Image source={{ uri: conductor.licensePhoto }} style={[styles.photo, { width:'80%' }]} />
+                                <View style={{ alignItems: 'center', marginBottom: 30 }} >
+                                    <Image source={{ uri: conductor.licensePhoto }} style={[styles.photo, { width: '80%' }]} />
                                 </View>
                             </View>
                         )) : <Text>Nenhum condutor adicional adicionado.</Text>
@@ -182,11 +188,11 @@ export default function ResumeCreateVehicleScreen() {
                             <Text style={commonStyles.buttonText}>Finalizar</Text>
                         </TouchableOpacity>
                     </View>
-                    
+
                 </View>
-            
+
             </ScrollView>
-        </View>      
+        </SafeAreaView>
     );
 }
 
@@ -266,5 +272,8 @@ const styles = StyleSheet.create({
         justifyContent: 'space-between',
         marginBottom: 15,
         gap: 15,
+    },
+    safeArea: {
+        flex: 1,
     },
 });

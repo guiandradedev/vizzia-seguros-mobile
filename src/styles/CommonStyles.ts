@@ -6,7 +6,8 @@ export const commonStyles = StyleSheet.create({
   // Container geral da tela
   container: {
     flex: 1,
-    backgroundColor: '#f5f5f5',
+    // backgroundColor: '#f5f5f5',
+    // marginBottom: -20
   },
 
   scrollContent: {
