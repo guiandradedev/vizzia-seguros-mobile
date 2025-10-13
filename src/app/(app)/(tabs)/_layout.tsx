@@ -24,7 +24,7 @@ export default function TabLayout() {
 
                     },
 
-                    headerShown: true,
+                    headerShown: false,
                     headerStyle: { backgroundColor: theme.background }
                 }}
             >

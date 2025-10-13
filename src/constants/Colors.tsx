@@ -16,7 +16,7 @@ export default {
     tabIconSelected: TintColor,
     tabBackground: TabBarColor,
     headerBackground: HeaderColor,
-    border: Border
+    border: Border,
   },
   dark: {
     // Você pode definir cores escuras aqui para suporte a tema escuro
