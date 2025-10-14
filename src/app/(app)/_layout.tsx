@@ -5,10 +5,8 @@ import { Platform, View } from 'react-native';
 export default function AppLayout() {
   const topInset = Platform.OS === 'ios' ? 44 : 64;
 
-  const theme = Colors.light
-
   return (
-    <View style={{ flex: 1, paddingTop: topInset, backgroundColor: theme.background }}>
+    <View style={{ flex: 1, paddingTop: topInset, backgroundColor: Colors.background }}>
       <Stack screenOptions={{ headerShown: false }}>
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="notify" options={{ headerShown: false }} />

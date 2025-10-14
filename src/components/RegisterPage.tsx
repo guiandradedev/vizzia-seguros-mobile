@@ -15,8 +15,6 @@ import { useRouter } from 'expo-router';
 import Input from './Input';
 import Button from './Button';
 
-const theme = Colors.light
-
 const useCreateAccount = () => {
   const context = useContext(CreateAccountContext);
   if (!context) throw new Error('useCreateAccount must be used within a CreateAccountProvider');
@@ -296,6 +294,7 @@ export default function RegistrationForm() {
         onPress={handleRegistration}
         loading={loading}
         disabled={loading}
+        style={{ marginHorizontal: 14}}
       />
 
       <Modal transparent={true} visible={modalVisible} animationType="slide" onRequestClose={() => setModalVisible(false)}>
@@ -326,22 +325,6 @@ const styles = StyleSheet.create({
   },
   container: {
     paddingBottom: 40,
-  },
-
-  headerTitle: {
-    color: '#1E1E1E',
-    fontSize: 28,
-    fontWeight: 'bold',
-    textAlign: 'center',
-    marginTop: 20,
-    paddingHorizontal: 20,
-  },
-  headerSubtitle: {
-    color: '#666',
-    fontSize: 16,
-    textAlign: 'center',
-    marginBottom: 20,
-    paddingHorizontal: 20,
   },
 
   card: {
@@ -446,22 +429,5 @@ const styles = StyleSheet.create({
   buttonContainer: {
     marginHorizontal: 20,
     marginTop: 20,
-  },
-  primaryButton: {
-    backgroundColor: theme.tint || '#0A84FF',
-    paddingVertical: 14,
-    marginHorizontal: 14,
-    borderRadius: 10,
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginTop: 6,
-  },
-  buttonDisabled: {
-    opacity: 0.7,
-  },
-  primaryButtonText: {
-    color: '#fff',
-    fontWeight: '600',
-    fontSize: 16,
   },
 });

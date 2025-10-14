@@ -10,8 +10,6 @@ import { commonStyles } from '@/styles/CommonStyles'
 import FormRow from '@/components/FormRow';
 import FormField from '@/components/FormField';
 
-const theme = Colors.light;
-
 export default function CreateVehicleScreen() {
     const { vehicle, setVehicle, changeInitialCarPhoto, initialCarPhoto } = useCreateVehicle();
     const router = useRouter();
@@ -57,7 +55,7 @@ export default function CreateVehicleScreen() {
         <View
             style={[
                 styles.safeArea,
-                { backgroundColor: theme.background }
+                { backgroundColor: Colors.background }
             ]}
         >
         {/* <KeyboardAvoidingView

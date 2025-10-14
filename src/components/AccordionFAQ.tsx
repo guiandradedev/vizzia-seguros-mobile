@@ -15,8 +15,6 @@ interface FAQItemProps {
   isFirst: boolean;
   category?: string;
 }
-const theme = Colors.light;
-
 export default function AccordionFAQ({ question, answer, isFirst }: FAQItemProps) {
   const [isExpanded, setIsExpanded] = useState(false);
   
@@ -59,12 +57,12 @@ const styles = StyleSheet.create({
   container: {
     paddingVertical: 10,
     borderBottomWidth: 1,
-    borderBottomColor: theme.border,
+    borderBottomColor: Colors.border,
     marginHorizontal: 15, 
   },
   firstItem: {
     borderTopWidth: 1,
-    borderTopColor: theme.border,
+    borderTopColor: Colors.border,
   },
   header: {
     flexDirection: 'row',

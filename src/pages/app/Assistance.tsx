@@ -5,8 +5,6 @@ import { useEffect } from 'react';
 
 export default function AssistancePage() {
   const insets = useSafeAreaInsets();
-  const theme = Colors.light;
-
   return (
     <View
       style={[

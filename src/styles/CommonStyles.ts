@@ -99,7 +99,7 @@ export const commonStyles = StyleSheet.create({
     backgroundColor: '#ccc',
   },
   buttonSecondary: {
-    backgroundColor: Colors.light.appTheme,
+    backgroundColor: Colors.primary,
   },
 
   text: { fontSize: 15, color: '#333', lineHeight: 22, textAlign: 'center' },

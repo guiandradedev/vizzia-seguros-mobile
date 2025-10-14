@@ -8,8 +8,6 @@ import PhotoButton from '@/components/PhotoButton';
 import { commonStyles } from '@/styles/CommonStyles';
 import Colors from '@/constants/Colors';
 
-const theme = Colors.light;
-
 export default function MyCarsScreen() {
     const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [editingPhoto, setEditingPhoto] = useState<number>(0);
@@ -46,7 +44,7 @@ export default function MyCarsScreen() {
         <View
             style={[
                 styles.safeArea,
-                { backgroundColor: theme.background }
+                { backgroundColor: Colors.background }
             ]}
         >
             <ScrollView

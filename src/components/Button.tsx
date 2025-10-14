@@ -10,6 +10,7 @@ import {
     AccessibilityState,
 } from 'react-native';
 import { FontAwesome } from '@expo/vector-icons';
+import { PrimaryColors, SemanticColors, Grays } from '@/constants/Colors';
 
 type ButtonVariant = 'primary' | 'secondary' | 'outline' | 'ghost' | 'danger';
 type ButtonSize = 'small' | 'medium' | 'large';
@@ -51,26 +52,21 @@ const Button: React.FC<ButtonProps> = ({
 
     const textStyles = [
         styles.text,
-        getVariantTextStyle(variant),
-        getSizeTextStyle(size),
+        styles[`${variant}Text`],
+        styles[`${size}Text`],
         textStyle,
     ];
 
     const renderContent = () => {
         if (loading) {
-            return (
-                <ActivityIndicator
-                    size="small"
-                    color={getIconColor(variant)}
-                />
-            );
+            return <ActivityIndicator size="small" color="#FFFFFF" />;
         }
 
         const iconElement = icon && (
             <FontAwesome
                 name={icon}
-                size={getIconSize(size)}
-                color={getIconColor(variant)}
+                size={size === 'small' ? 14 : size === 'large' ? 20 : 16}
+                color="#FFFFFF"
                 style={iconPosition === 'left' ? styles.iconLeft : styles.iconRight}
             />
         );
@@ -98,50 +94,6 @@ const Button: React.FC<ButtonProps> = ({
     );
 };
 
-// Utils
-
-const getIconSize = (size: ButtonSize): number => {
-    switch (size) {
-        case 'small': return 14;
-        case 'large': return 20;
-        default: return 16;
-    }
-};
-
-const getIconColor = (variant: ButtonVariant): string => {
-    switch (variant) {
-        case 'outline':
-        case 'ghost':
-            return '#007AFF';
-        default:
-            return '#FFFFFF';
-    }
-};
-
-const getVariantTextStyle = (variant: ButtonVariant): TextStyle => {
-    switch (variant) {
-        case 'primary':
-        case 'secondary':
-        case 'danger':
-            return styles.primaryText;
-        case 'outline':
-            return styles.outlineText;
-        case 'ghost':
-            return styles.ghostText;
-    }
-};
-
-const getSizeTextStyle = (size: ButtonSize): TextStyle => {
-    switch (size) {
-        case 'small':
-            return styles.smallText;
-        case 'large':
-            return styles.largeText;
-        default:
-            return styles.mediumText;
-    }
-};
-
 const styles = StyleSheet.create({
     button: {
         borderRadius: 8,
@@ -152,21 +104,21 @@ const styles = StyleSheet.create({
 
     // Variants
     primary: {
-        backgroundColor: '#007AFF',
+        backgroundColor: PrimaryColors.blue,
     },
     secondary: {
-        backgroundColor: '#6B7280',
+        backgroundColor: Grays[600],
     },
     outline: {
         backgroundColor: 'transparent',
         borderWidth: 1,
-        borderColor: '#007AFF',
+        borderColor: PrimaryColors.blue,
     },
     ghost: {
         backgroundColor: 'transparent',
     },
     danger: {
-        backgroundColor: '#EF4444',
+        backgroundColor: SemanticColors.error,
     },
 
     // Sizes
@@ -191,8 +143,10 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     primaryText: { color: '#FFFFFF' },
-    outlineText: { color: '#007AFF' },
-    ghostText: { color: '#007AFF' },
+    secondaryText: { color: '#FFFFFF' },
+    outlineText: { color: PrimaryColors.blue },
+    ghostText: { color: PrimaryColors.blue },
+    dangerText: { color: '#FFFFFF' },
 
     smallText: { fontSize: 14 },
     mediumText: { fontSize: 16 },

@@ -9,8 +9,6 @@ import { useCreateVehicle } from '@/hooks/useCreateVehicle';
 import { commonStyles } from '@/styles/CommonStyles';
 import FormRow from '@/components/FormRow';
 
-const theme = Colors.light
-
 export default function ResumeCreateVehicleScreen() {
     const router = useRouter();
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -30,7 +28,7 @@ export default function ResumeCreateVehicleScreen() {
         <View
             style={[
                 styles.safeArea,
-                { backgroundColor: theme.background }
+                { backgroundColor: Colors.background }
             ]}
         >
             <ScrollView contentContainerStyle={[commonStyles.scrollContent, { flexGrow: 1 }]}
@@ -234,7 +232,7 @@ const styles = StyleSheet.create({
     imageButton: {
         width: 150,
         height: 150,
-        backgroundColor: theme.tabBackground,
+        backgroundColor: Colors.tabBackground,
         padding: 8,
         borderWidth: 1,
         borderStyle: "dashed",

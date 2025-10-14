@@ -2,8 +2,6 @@ import { View, Text, TouchableOpacity, Image, StyleSheet } from 'react-native';
 import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 
-const theme = Colors.light;
-
 interface PhotoButtonProps {
   photoUri?: string;
   title?: string;
@@ -46,7 +44,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: theme.tabBackground,
+    backgroundColor: Colors.tabBackground,
   },
   photo: {
     width: '100%',

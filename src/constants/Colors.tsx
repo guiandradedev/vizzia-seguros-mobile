@@ -1,47 +1,101 @@
 // constants/Colors.ts
 
-export const TintColor = '#6D94C5'; // Verde: Cor de destaque principal
-export const BackgroundColor = '#f0efeeff'; // Fundo claro para o corpo da tela
-export const TabBarColor = '#FFFFFF'; // Fundo da Navbar inferior (branco)
-export const HeaderColor = TintColor; // Fundo do Header superior
-export const Border = "#e4e1d8ff"
+// Paleta de cores primárias
+export const PrimaryColors = {
+  blue: '#6D94C5',
+  teal: '#2DD4BF',
+  purple: '#A855F7',
+  emerald: '#10B981',
+} as const;
+
+// Tons de cinza
+export const Grays = {
+  50: '#F8FAFC',
+  100: '#F1F5F9',
+  200: '#E2E8F0',
+  300: '#CBD5E1',
+  400: '#94A3B8',
+  500: '#64748B',
+  600: '#475569',
+  700: '#334155',
+  800: '#1E293B',
+  900: '#0F172A',
+} as const;
+
+// Cores semânticas
+export const SemanticColors = {
+  success: '#10B981',
+  warning: '#F59E0B',
+  error: '#EF4444',
+  info: '#3B82F6',
+} as const;
 
 export interface ColorTheme {
-  appTheme: string;
+  // Cores principais
+  primary: string;
+  secondary: string;
+
+  // Texto
   text: string;
+  textSecondary: string;
+
+  // Fundo
   background: string;
+  backgroundSecondary: string;
+
+  // Bordas
+  border: string;
+
+  // Estados interativos
   tint: string;
+
+  // Estados semânticos
+  success: string;
+  warning: string;
+  error: string;
+  info: string;
+
+  // Tab bar
   tabIconDefault: string;
   tabIconSelected: string;
   tabBackground: string;
+
+  // Header
   headerBackground: string;
-  border: string;
 }
 
-const light = {
-  appTheme: '#6D94C5',
-  text: '#000',
-  background: BackgroundColor,
-  tint: TintColor,
-  tabIconDefault: '#ccc',
-  tabIconSelected: TintColor,
-  tabBackground: TabBarColor,
-  headerBackground: HeaderColor,
-  border: Border,
+const light: ColorTheme = {
+  // Cores principais
+  primary: PrimaryColors.blue,
+  secondary: PrimaryColors.teal,
+
+  // Texto
+  text: Grays[900],
+  textSecondary: Grays[600],
+
+  // Fundo
+  background: Grays[50],
+  backgroundSecondary: '#FFFFFF',
+
+  // Bordas
+  border: Grays[200],
+
+  // Estados interativos
+  tint: PrimaryColors.blue,
+
+  // Estados semânticos
+  success: SemanticColors.success,
+  warning: SemanticColors.warning,
+  error: SemanticColors.error,
+  info: SemanticColors.info,
+
+  // Tab bar
+  tabIconDefault: Grays[400],
+  tabIconSelected: PrimaryColors.blue,
+  tabBackground: '#FFFFFF',
+
+  // Header
+  headerBackground: PrimaryColors.blue,
 };
 
-const dark = {
-  appTheme: '#6D94C5', // Mantém a cor principal do tema claro
-  text: '#F8F9FA', // Branco quase puro para melhor legibilidade
-  background: '#121212', // Fundo principal escuro mas não preto absoluto
-  tint: '#8BB3D8', // Azul um pouco mais claro que o tema claro para destaque
-  tabIconDefault: '#9AA0A6', // Cinza médio para ícones não selecionados
-  tabIconSelected: '#8BB3D8', // Mesmo tom do tint para consistência
-  tabBackground: '#1E1E1E', // Fundo da tab bar um pouco mais claro que o principal
-  headerBackground: '#1A1A1A', // Header com fundo ligeiramente diferente
-  border: '#37474F', // Borda em cinza azulado escuro para sofisticação
-};
-
-export const themes = { light, dark };
-
-export default themes
+export default light;

@@ -5,8 +5,6 @@ import { MaterialIcons } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { useState } from 'react';
 
-const theme = Colors.light;
-
 interface VehiclePhotoProps {
   photoUri: string;
   onEdit: () => void;

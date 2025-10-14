@@ -10,7 +10,7 @@ import {
     Text,
     AccessibilityState,
 } from 'react-native';
-import { ColorTheme } from '@/constants/Colors';
+import { ColorTheme, Grays, PrimaryColors, SemanticColors } from '@/constants/Colors';
 
 interface InputProps extends Omit<TextInputProps, 'style'> {
     label?: string;
@@ -45,10 +45,22 @@ const Input: React.FC<InputProps> = ({
 }) => {
     // Cores padrão se não forem fornecidas
     const defaultColors = {
-        text: '#111827',
-        background: '#FFFFFF',
-        border: '#D1D5DB',
-        tint: '#3B82F6',
+        text: Grays[900],
+        textSecondary: Grays[600],
+        background: Grays[50],
+        backgroundSecondary: '#FFFFFF',
+        border: Grays[200],
+        tint: PrimaryColors.blue,
+        success: SemanticColors.success,
+        warning: SemanticColors.warning,
+        error: SemanticColors.error,
+        info: SemanticColors.info,
+        tabIconDefault: Grays[400],
+        tabIconSelected: PrimaryColors.blue,
+        tabBackground: '#FFFFFF',
+        headerBackground: PrimaryColors.blue,
+        primary: PrimaryColors.blue,
+        secondary: PrimaryColors.teal,
     };
 
     const themeColors = colors || defaultColors;
@@ -91,25 +103,25 @@ const Input: React.FC<InputProps> = ({
         },
         filled: {
             borderColor: themeColors.border,
-            backgroundColor: themeColors.background === '#FFFFFF' ? '#F9FAFB' : '#2A2A2A', // Tom mais escuro para tema escuro
+            backgroundColor: Grays[100],
         },
         // States
         disabled: {
-            backgroundColor: themeColors.background === '#FFFFFF' ? '#F3F4F6' : '#1A1A1A', // Tom mais escuro para tema escuro
-            color: themeColors.text === '#111827' ? '#9CA3AF' : '#6B7280', // Tom mais claro para tema escuro
+            backgroundColor: Grays[100],
+            color: Grays[500],
         },
         error: {
-            borderColor: '#EF4444',
+            borderColor: themeColors.error,
         },
         errorText: {
             fontSize: 12,
-            color: '#EF4444',
+            color: themeColors.error,
             marginTop: 4,
             fontWeight: '500',
         },
         hintText: {
             fontSize: 12,
-            color: themeColors.text === '#111827' ? '#6B7280' : '#9CA0A4', // Tom mais claro para tema escuro
+            color: themeColors.textSecondary,
             marginTop: 4,
             fontWeight: '400',
         },
@@ -162,7 +174,7 @@ const Input: React.FC<InputProps> = ({
                         inputStyle,
                     ]}
                     editable={editable}
-                    placeholderTextColor={error ? '#EF4444' : '#999'}
+                    placeholderTextColor={error ? themeColors.error : Grays[400]}
                     accessibilityState={{ disabled: !editable } as AccessibilityState}
                     {...textInputProps}
                 />

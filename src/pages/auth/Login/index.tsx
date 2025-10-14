@@ -19,10 +19,8 @@ import GoogleAuthComponent from "./components/GoogleAuth";
 import Button from "@/components/Button";
 import Separator from "@/components/Separator";
 import Input from "@/components/Input";
-import { useTheme } from "@/hooks/useTheme";
 
 export default function LoginPage() {
-    const { colors } = useTheme()
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [isLoggingIn, setIsLoggingIn] = useState(false);
@@ -30,51 +28,6 @@ export default function LoginPage() {
     const { signIn, user, loginBiometric, setAuthenticated } = useAuth();
 
     const router = useRouter();
-
-    const styles = StyleSheet.create({
-        container: {
-            flex: 1,
-            justifyContent: 'center',
-            padding: 30,
-            alignItems: 'center',
-            paddingHorizontal: 20,
-        },
-        card: {
-            padding: 10,
-            width: '100%',
-            maxWidth: 420,
-            paddingHorizontal: 20,
-            paddingVertical: 18,
-        },
-        title: {
-            fontSize: 28,
-            fontWeight: 'bold',
-            color: '#333',
-            marginBottom: 12,
-            textAlign: 'center',
-            tintColor: colors.tint || '#0A84FF',
-        },
-        subtitle: {
-            fontSize: 14,
-            color: '#666',
-            textAlign: 'center',
-            marginBottom: 18,
-        },
-        secondaryButton: {
-            marginTop: 12,
-            alignItems: 'center',
-        },
-        secondaryButtonText: {
-            color: colors.tint || '#0A84FF',
-            fontSize: 14,
-        },
-        buttonColumn: {
-            flexDirection: 'column',
-            width: '100%',
-            marginTop: 10,
-            marginBottom: 20,
-        }
-    });
 
     const handleAuthentication = useCallback(async () => {
         setIsLoggingIn(true);
@@ -140,59 +93,104 @@ export default function LoginPage() {
     }, [email, password, signIn, router]);
 
     return (
-        <SafeAreaView style={{ flex: 1, backgroundColor: colors.background }}>
+        <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>
             <KeyboardAvoidingView
                 style={styles.container}
                 behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
             >
-            <View style={styles.card}>
-                <Text style={[styles.title, { color: colors.text }]}>Bem-vindo de volta</Text>
+                <View style={styles.card}>
+                    <Text style={[styles.title, { color: Colors.text }]}>Bem-vindo de volta</Text>
 
-                <Text style={[styles.subtitle, { color: colors.text }]}>Faça login para acessar seus veículos e condutores</Text>
+                    <Text style={[styles.subtitle, { color: Colors.text }]}>Faça login para acessar seus veículos e condutores</Text>
 
-                <Input 
-                    label="Email"
-                    placeholder="Email"
-                    placeholderTextColor="#999"
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                    autoComplete="email"
-                    textContentType="emailAddress"
-                    value={email}
-                    onChangeText={setEmail}
-                    editable={!isLoggingIn}
-                    leftIcon={<FontAwesome name="envelope" size={16} color="#666" />}
-                />
+                    <Input
+                        label="Email"
+                        placeholder="Email"
+                        placeholderTextColor="#999"
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                        autoComplete="email"
+                        textContentType="emailAddress"
+                        value={email}
+                        onChangeText={setEmail}
+                        editable={!isLoggingIn}
+                        leftIcon={<FontAwesome name="envelope" size={16} color="#666" />}
+                    />
 
-                <Input 
-                    label="Senha"
-                    placeholder="Senha"
-                    placeholderTextColor="#999"
-                    secureTextEntry
-                    autoComplete="password"
-                    textContentType="password"
-                    value={password}
-                    onChangeText={setPassword}
-                    editable={!isLoggingIn}
-                    leftIcon={<FontAwesome name="lock" size={16} color="#666" />}
-                />
+                    <Input
+                        label="Senha"
+                        placeholder="Senha"
+                        placeholderTextColor="#999"
+                        secureTextEntry
+                        autoComplete="password"
+                        textContentType="password"
+                        value={password}
+                        onChangeText={setPassword}
+                        editable={!isLoggingIn}
+                        leftIcon={<FontAwesome name="lock" size={16} color="#666" />}
+                    />
 
-                <Button title="Entrar" onPress={handleLogin} loading={isLoggingIn} />
+                    <Button title="Entrar" onPress={handleLogin} loading={isLoggingIn} />
 
-                <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push('/(auth)/register')}>
-                    <Text style={styles.secondaryButtonText}>Não tem conta? Cadastre-se</Text>
-                </TouchableOpacity>
+                    <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push('/(auth)/register')}>
+                        <Text style={styles.secondaryButtonText}>Não tem conta? Cadastre-se</Text>
+                    </TouchableOpacity>
 
-                <Separator colors={colors} text="ou então"/>
+                    <Separator text="ou então" />
 
-                <View style={styles.buttonColumn}>
-                    <GoogleAuthComponent />
-                    {token && (
-                        <Button icon="unlock-alt" onPress={handleAuthentication} title="Desbloquear com biometria" disabled={isLoggingIn} />
-                    )}
+                    <View style={styles.buttonColumn}>
+                        <GoogleAuthComponent />
+                        {token && (
+                            <Button icon="unlock-alt" onPress={handleAuthentication} title="Desbloquear com biometria" disabled={isLoggingIn} />
+                        )}
+                    </View>
                 </View>
-            </View>
-        </KeyboardAvoidingView>
+            </KeyboardAvoidingView>
         </SafeAreaView>
     );
 }
+
+const styles = StyleSheet.create({
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        padding: 30,
+        alignItems: 'center',
+        paddingHorizontal: 20,
+    },
+    card: {
+        padding: 10,
+        width: '100%',
+        maxWidth: 420,
+        paddingHorizontal: 20,
+        paddingVertical: 18,
+    },
+    title: {
+        fontSize: 28,
+        fontWeight: 'bold',
+        color: '#333',
+        marginBottom: 12,
+        textAlign: 'center',
+        tintColor: Colors.tint || '#0A84FF',
+    },
+    subtitle: {
+        fontSize: 14,
+        color: '#666',
+        textAlign: 'center',
+        marginBottom: 18,
+    },
+    secondaryButton: {
+        marginTop: 12,
+        alignItems: 'center',
+    },
+    secondaryButtonText: {
+        color: Colors.tint || '#0A84FF',
+        fontSize: 14,
+    },
+    buttonColumn: {
+        flexDirection: 'column',
+        width: '100%',
+        marginTop: 10,
+        marginBottom: 20,
+    }
+});

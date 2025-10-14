@@ -15,9 +15,6 @@ import { Picker } from '@react-native-picker/picker';
 import { isValidCEP, isValidCPF, isValidCNH } from '@/utils/formatters';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-
-
-const theme = Colors.light
 export default function SocialRegisterPage() {
     const [isCreatingAccount, setisCreatingAccount] = useState(false);
     const { user, initialData, changeUserProperty, updateAddressFields, handleRegisterSocialLogin } = useLogin();
@@ -605,7 +602,7 @@ const styles = StyleSheet.create({
         paddingHorizontal: 20,
     },
     primaryButton: {
-        backgroundColor: theme.tint || '#0A84FF',
+        backgroundColor: Colors.tint || '#0A84FF',
         paddingVertical: 14,
         borderRadius: 10,
         alignItems: 'center',
@@ -659,7 +656,7 @@ const styles = StyleSheet.create({
     separatorLine: {
         flex: 1,
         height: 1,
-        backgroundColor: theme.border || '#E0E0E0',
+        backgroundColor: Colors.border || '#E0E0E0',
     },
     separatorText: {
         marginHorizontal: 12,
@@ -681,7 +678,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#fff',
         borderWidth: 1,
-        borderColor: theme.border || '#E0E0E0',
+        borderColor: Colors.border || '#E0E0E0',
         paddingVertical: 12,
         borderRadius: 10,
         elevation: 1,
@@ -704,7 +701,7 @@ const styles = StyleSheet.create({
         flexDirection: 'row',
         alignItems: 'center',
         justifyContent: 'center',
-        backgroundColor: Colors.light.tint || '#0A84FF',
+        backgroundColor: Colors.tint || '#0A84FF',
         paddingVertical: 12,
         borderRadius: 10,
     },

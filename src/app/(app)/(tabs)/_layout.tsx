@@ -3,7 +3,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 
 export default function TabLayout() {
-    const theme = Colors.light;
 
     return (
         <Tabs
@@ -13,14 +12,14 @@ export default function TabLayout() {
                     height: 93,
                     paddingTop: 10,
                     paddingBottom: 10,
-                    backgroundColor: theme.background,
+                    backgroundColor: Colors.background,
                     // borderWidth: 2,
-                    borderColor: theme.border,
+                    borderColor: Colors.border,
                     borderStyle: 'solid',
                     borderTopWidth: 2,
                 },
                 headerShown: false,
-                headerStyle: { backgroundColor: theme.background }
+                headerStyle: { backgroundColor: Colors.background }
             }}
         >
             <Tabs.Screen

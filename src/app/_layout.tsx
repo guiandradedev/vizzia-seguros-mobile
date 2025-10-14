@@ -11,12 +11,11 @@ import {
   Roboto_500Medium,
 } from '@expo-google-fonts/roboto';
 import Colors from '@/constants/Colors';
-import { ThemeProvider } from '@/contexts/ThemeContext';
 
 SplashScreen.preventAutoHideAsync();
 
 export default function RootLayout() {
-  const theme = Colors.light;
+  const theme = Colors;
 
   const [fontsLoaded, fontError] = useFonts({
     'Roboto-Regular': Roboto_400Regular,
@@ -35,7 +34,6 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider>
       <AuthProvider>
         <Stack screenOptions={{ headerShown: false, contentStyle: {backgroundColor: theme.background}}}>
           <Stack.Screen name="index"/>
@@ -43,6 +41,5 @@ export default function RootLayout() {
           <Stack.Screen name="(app)" />
         </Stack>
       </AuthProvider>
-    </ThemeProvider>
   );
 }

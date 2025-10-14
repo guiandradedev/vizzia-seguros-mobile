@@ -1,12 +1,11 @@
-import { ColorTheme } from "@/constants/Colors";
 import { View, Text, StyleSheet } from "react-native";
+import Colors from "@/constants/Colors";
 
 interface SeparatorProps {
-    colors: ColorTheme
     text: string;
 }
 
-export default function Separator({ colors, text }: SeparatorProps) {
+export default function Separator({ text }: SeparatorProps) {
     const styles = StyleSheet.create({
         separator: {
             flexDirection: 'row',
@@ -16,7 +15,7 @@ export default function Separator({ colors, text }: SeparatorProps) {
         separatorLine: {
             flex: 1,
             height: 1,
-            backgroundColor: colors.border,
+            backgroundColor: Colors.border,
         },
         separatorText: {
             marginHorizontal: 12,

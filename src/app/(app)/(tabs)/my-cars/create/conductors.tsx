@@ -19,12 +19,11 @@ export default function VehicleConductorsScreen() {
     router.back();
   }
 
-  const theme = Colors.light
   return (
     <View
       style={[
         styles.safeArea,
-        { backgroundColor: theme.background }
+        { backgroundColor: Colors.background }
       ]}
     >
       <View style={commonStyles.content}>

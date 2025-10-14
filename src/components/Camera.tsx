@@ -5,8 +5,6 @@ import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
-const theme = Colors.light;
-
 interface CameraProps {
     setPhoto: (photo_uri: string) => void,
     title?: string,
@@ -231,7 +229,7 @@ const styles = StyleSheet.create({
     },
     permissionContainer: {
         flex: 1,
-        backgroundColor: theme.background,
+        backgroundColor: Colors.background,
         justifyContent: 'center',
         alignItems: 'center',
         paddingHorizontal: 20,
@@ -246,13 +244,13 @@ const styles = StyleSheet.create({
     permissionTitle: {
         fontSize: 24,
         fontWeight: 'bold',
-        color: theme.text,
+        color: Colors.text,
         textAlign: 'center',
         marginBottom: 10,
     },
     permissionMessage: {
         fontSize: 16,
-        color: theme.text,
+        color: Colors.text,
         textAlign: 'center',
         marginBottom: 30,
         lineHeight: 24,

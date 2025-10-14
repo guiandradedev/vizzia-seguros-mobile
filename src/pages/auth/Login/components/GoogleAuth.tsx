@@ -20,8 +20,6 @@ GoogleSignin.configure({
     // offlineAccess: true, 
 })
 
-const theme = Colors.light;
-
 export default function GoogleAuthComponent() {
     const [isLoggingIn, setIsLoggingIn] = useState(false);
     const { changeInitialData } = useLogin()
@@ -103,7 +101,7 @@ const styles = StyleSheet.create({
         justifyContent: 'center',
         backgroundColor: '#fff',
         borderWidth: 1,
-        borderColor: theme.border || '#E0E0E0',
+        borderColor: Colors.border || '#E0E0E0',
         paddingVertical: 12,
         borderRadius: 10,
         elevation: 1,

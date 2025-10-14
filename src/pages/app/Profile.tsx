@@ -5,20 +5,17 @@ import { useEffect } from 'react';
 import Header from '@/components/Header';
 
 export default function ProfileScreen() {
-  const insets = useSafeAreaInsets();
-  const theme = Colors.light;
-
   return (
     <View
       style={[
         styles.container,
-        { backgroundColor: theme.background },
+        { backgroundColor: Colors.background },
       ]}
     >
       <Header title="Perfil" subtitle="Aqui você pode gerenciar suas informações pessoais." />
 
       <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
-        <Text style={{ color: theme.text, fontSize: 16 }}>
+        <Text style={{ color: Colors.text, fontSize: 16 }}>
           Nenhuma informação de perfil disponível.
         </Text>
       </View>

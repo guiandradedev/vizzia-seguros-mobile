@@ -15,8 +15,6 @@ import PhotoButton from '@/components/PhotoButton';
 import VehiclePhoto from '@/components/VehiclePhoto';
 import { KeyboardAvoidingView, Platform, ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
 
-const theme = Colors.light;
-
 export default function AddConductorsScreen() {
   const router = useRouter();
   const { addConductor, conductors, maxConductors } = useCreateVehicle();
@@ -136,7 +134,7 @@ export default function AddConductorsScreen() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: theme.background }}>
+    <View style={{ flex: 1, backgroundColor: Colors.background }}>
       <KeyboardAvoidingView
         style={{ flex: 1 }}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

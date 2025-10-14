@@ -14,10 +14,10 @@ export default function IndexScreen() {
           flex: 1, 
           justifyContent: 'center', 
           alignItems: 'center',
-          backgroundColor: Colors.light.background 
+          backgroundColor: Colors.background 
         }}>
 
-          <Text style={{ fontSize: 18, color: Colors.light.text }}>Carregando...</Text>
+          <Text style={{ fontSize: 18, color: Colors.text }}>Carregando...</Text>
         </View>
       </>
       
