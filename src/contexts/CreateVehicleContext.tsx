@@ -27,17 +27,49 @@ interface PhotoType {
 export const fuelTypes = ["Gasolina", "Álcool", "Diesel", "Elétrico","Flex", "Híbrido"] as const;
 export type FuelTypes = typeof fuelTypes[number];
 
-export const carBrands = ['Acura','Audi','BMW','Chevrolet','Citroen','Fiat','Ford','Honda','Hyundai','KIA','Land Rover','Lexus','Mazda','Mercedes','Mitsubishi','Nissan','Peugeot','Porsche','Renault','Suzuki','Toyota','Volkswagen','Volvo'] as const
-export type CarBrands = typeof carBrands[number];
+// Cada marca agora tem um código associado (ex: Volkswagen -> 59)
+export const carBrands = [
+    { code: 1, name: 'Acura' },
+    { code: 6, name: 'Audi' },
+    { code: 7, name: 'BMW' },
+    { code: 23, name: 'Chevrolet' },
+    { code: 13, name: 'Citroen' },
+    { code: 21, name: 'Fiat' },
+    { code: 22, name: 'Ford' },
+    { code: 25, name: 'Honda' },
+    { code: 26, name: 'Hyundai' },
+    { code: 31, name: 'KIA' },
+    { code: 33, name: 'Land Rover' },
+    { code: 34, name: 'Lexus' },
+    { code: 38, name: 'Mazda' },
+    { code: 39, name: 'Mercedes' },
+    { code: 41, name: 'Mitsubishi' },
+    { code: 43, name: 'Nissan' },
+    { code: 44, name: 'Peugeot' },
+    { code: 47, name: 'Porsche' },
+    { code: 48, name: 'Renault' },
+    { code: 55, name: 'Suzuki' },
+    { code: 56, name: 'Toyota' },
+    { code: 59, name: 'Volkswagen' },
+    { code: 58, name: 'Volvo' }
+] as const;
+
+export type CarBrand = typeof carBrands[number];
+export type CarBrandName = CarBrand['name'];
+export type CarBrandCode = CarBrand['code'];
+export const vehicleUses = ['Particular', 'Comercial'] as const;
+export type VehicleUses = typeof vehicleUses[number];
 
 interface Vehicle {
     model: string,
-    brand: string,
+    // Agora armazenamos o código da marca no veículo (ex: Volkswagen -> 59)
+    brand: CarBrandCode,
     year: number,
     color: string,
     odomether: number,
     plate: string,
-    fuel: string
+    fuel: FuelTypes,
+    usage: VehicleUses
 }
 
 export interface Conductor {
@@ -66,15 +98,7 @@ export const CreateVehicleProvider: React.FC<CreateVehicleProviderProps> = ({ ch
         { title: "Capô", uri: "" },
     ]);
     const [initialCarPhoto, setInitialCarPhoto] = useState('') // Foto inicial do carro que busca a placa do carro
-    const [vehicle, setVehicle] = useState<Vehicle>({
-        model: "",
-        brand: "",
-        year: 0,
-        color: "",
-        odomether: 0,
-        plate: "",
-        fuel: ""
-    })
+    const [vehicle, setVehicle] = useState<Vehicle>({} as Vehicle)
     const [conductors, setConductors] = useState<Conductor[]>([])
 
     // Funções Modificadoras de Estado

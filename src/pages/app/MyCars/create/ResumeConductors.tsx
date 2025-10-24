@@ -1,15 +1,13 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native';
-import { useRouter } from 'expo-router';
+import FormRow from '@/components/FormRow';
 import Colors from '@/constants/Colors';
-import { useEffect, useState } from 'react';
-import Camera from '@/components/Camera';
-import { Image } from 'expo-image';
-import { FontAwesome } from '@expo/vector-icons';
 import { useCreateVehicle } from '@/hooks/useCreateVehicle';
 import { commonStyles } from '@/styles/CommonStyles';
-import FormRow from '@/components/FormRow';
+import { Image } from 'expo-image';
+import { useRouter } from 'expo-router';
+import { useState } from 'react';
+import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
-export default function ResumeCreateVehicleScreen() {
+export default function ResumeConductors() {
     const router = useRouter();
     const [isCameraOpen, setIsCameraOpen] = useState(false);
 

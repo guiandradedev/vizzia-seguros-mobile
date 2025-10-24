@@ -2,6 +2,7 @@ import Camera from '@/components/Camera';
 import PhotoButton from '@/components/PhotoButton';
 import VehiclePhoto from '@/components/VehiclePhoto'; // ✅ componente novo
 import Colors from '@/constants/Colors';
+import { carBrands } from '@/contexts/CreateVehicleContext';
 import { useCreateVehicle } from '@/hooks/useCreateVehicle';
 import { axiosIA } from '@/lib/axios';
 import { commonStyles } from '@/styles/CommonStyles';
@@ -18,15 +19,33 @@ export default function CreateVehiclePage() {
     const [canRedirect, setCanRedirect] = useState(false);
     const [photo, setPhoto] = useState<string>(initialCarPhoto);
 
+    // consider vehicle detected when any of the key fields from IA are present
+    const isVehicleDetected = !!(vehicle.brand || vehicle.plate || vehicle.color || vehicle.model);
+
     useEffect(() => {
-        setCanRedirect(!!(vehicle.model && vehicle.brand && vehicle.year && vehicle.color && vehicle.plate && vehicle.odomether));
+        // strict validation: all required fields must be present and valid
+        const modelValid = typeof vehicle.model === 'string' && vehicle.model.trim().length > 0;
+        const brandValid = typeof vehicle.brand === 'number' && vehicle.brand > 0;
+        const yearValid = typeof vehicle.year === 'number' && !isNaN(vehicle.year) && vehicle.year > 1900;
+        const colorValid = typeof vehicle.color === 'string' && vehicle.color.trim().length > 0;
+        const plateValid = typeof vehicle.plate === 'string' && vehicle.plate.trim().length > 0;
+        const odometherValid = typeof vehicle.odomether === 'number' && !isNaN(vehicle.odomether);
+        const fuelValid = !!vehicle.fuel;
+        const usageValid = !!vehicle.usage;
+
+        const ok = modelValid && brandValid && yearValid && colorValid && plateValid && odometherValid && fuelValid && usageValid;
+        setCanRedirect(ok);
     }, [vehicle]);
 
     const openCamera = () => setIsCameraOpen(true);
     const closeCamera = () => setIsCameraOpen(false);
 
     const handleRedirect = () => {
-        router.push('/(app)/(tabs)/my-cars/create/take-photos');
+        if (!canRedirect) {
+            Alert.alert('Atenção', 'Preencha todos os campos obrigatórios antes de continuar.');
+            return;
+        }
+        router.push('/(app)/(tabs)/my-cars/create/resume-vehicle');
     };
 
     async function addPhoto(photoUri: string) {
@@ -41,7 +60,7 @@ export default function CreateVehiclePage() {
             name: 'vehicle_photo.jpg',
             type: 'image/jpeg'
         } as any);
-        try {
+            try {
             console.log("Enviando imagem para IA...")
             const response = await axiosIA.post('/process_image', formData, {
                 headers: {
@@ -53,22 +72,34 @@ export default function CreateVehiclePage() {
                     return data;
                 },
             });
-            const { brand, color, plate} = response.data
+            const { brand, color, plate } = response.data;
+            // try to map brand name returned by IA to our brand codes
+            const foundBrand = carBrands.find(b => b.name.toLowerCase() === (brand.name || '').toLowerCase());
+            const brandCode = foundBrand ? foundBrand.code : (vehicle.brand || 0);
             const data = {
                 model: "",
-                brand: brand.name,
-                // year: 2024/,
+                brand: brandCode,
+                year: 2025,
                 color: color.text,
                 plate: plate.text,
-                // odomether: 15000
+                odomether: 0
             };
             setVehicle({ ...vehicle, ...data });
             console.log(response.data)
         } catch (error) {
-            Alert.alert("Erro", "Não foi possível obter os dados do veículo a partir da imagem. Por favor, preencha os dados manualmente.");
             if (axios.isAxiosError(error)) {
+                console.log("Erro ao enviar imagem para IA axios statusssr:", error);
+                if(error.response?.status === 400) {
+                    Alert.alert("Erro", error.response.data.error || "Imagem inválida. Por favor, tente novamente com uma imagem clara do veículo.");
+                    return;
+                }
+                if(error.response?.status === 422) {
+                    Alert.alert("Erro", error.response.data.error || "Imagem inválida. Por favor, tente novamente com uma imagem clara do veículo.");
+                    return;
+                }
                 console.error("Erro ao enviar imagem para IA axios:", error.response?.data);
             } else {
+                Alert.alert("Erro", "Não foi possível obter os dados do veículo a partir da imagem. Por favor, tente novamente.");
                 console.error("Erro ao enviar imagem para IA:", error);
             }
         }
@@ -93,7 +124,7 @@ export default function CreateVehiclePage() {
 
                     <Text style={[commonStyles.title, { marginBottom: 10 }]}>Dados do veículo</Text>
 
-                    {!photo && (
+                    {(!photo || !isVehicleDetected) && (
                         <>
                             <Text style={commonStyles.text}>Para começar, tire uma foto do carro.</Text>
                             <Text style={commonStyles.subtitle}>A foto deve ser de boa qualidade de frente, mostrando a placa e os detalhes do veículo.</Text>
@@ -106,7 +137,7 @@ export default function CreateVehiclePage() {
                         </>
                     )}
 
-                    {photo && (
+                    {photo && isVehicleDetected && (
                         <View style={commonStyles.formContainer}>
                             {/*  VehiclePhoto */}
                             <Text style={commonStyles.sectionTitle}>Foto</Text>

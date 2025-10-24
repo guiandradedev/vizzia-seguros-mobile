@@ -1,5 +1,5 @@
 import env from '@/utils/env';
-import { getSecure } from '@/utils/secure-store';
+import { getSecure, saveSecure } from '@/utils/secure-store';
 import Axios from 'axios';
 
 export const axiosNoAuth = Axios.create({
@@ -42,25 +42,26 @@ axios.interceptors.response.use(
         const originalRequest = error.config;
 
         console.log("INTERCEPTOR ERROR", error.response?.status);
+        console.log("URL:", originalRequest.url);
 
         if (error.response && error.response.status === 401 && originalRequest && !originalRequest._retry) {
-            // originalRequest._retry = true;
+            originalRequest._retry = true;
 
-            // const token = await getSecure("refreshToken");
-            // // console.log("REFRESH TOKEN:", token);
-            // if (token) {
-            //     return axios.post('/auth/refresh-token', { refreshToken: token })
-            //         .then(res => {
-            //             console.log("TOKEN ATUALIZADO:", res.data);
-            //             saveSecure('accessToken', res.data.accessToken);
-            //             saveSecure('refreshToken', res.data.refreshToken);
-            //             originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
+            const token = await getSecure("refreshToken");
+            console.log("REFRESH TOKEN:", token);
+            if (token) {
+                return axios.post('/auth/refresh-token', { refreshToken: token })
+                    .then(res => {
+                        console.log("TOKEN ATUALIZADO:", res.data);
+                        saveSecure('accessToken', res.data.accessToken);
+                        saveSecure('refreshToken', res.data.refreshToken);
+                        originalRequest.headers.Authorization = `Bearer ${res.data.accessToken}`;
 
-            //             return axios(originalRequest);
-            //         });
-            // } else {
-            //     return Promise.reject(error);
-            // }
+                        return axios(originalRequest);
+                    });
+            } else {
+                return Promise.reject(error);
+            }
         }
         return Promise.reject(error);
     }
