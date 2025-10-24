@@ -1,9 +1,9 @@
-import React, { createContext, useContext, useState, ReactNode } from 'react';
-import { jwtDecode } from "jwt-decode";
-import axios, { AxiosResponse } from 'axios';
-import { Tokens } from '@/types/auth';
 import { axiosNoAuth } from '@/lib/axios';
+import { Tokens } from '@/types/auth';
 import { saveSecure } from '@/utils/secure-store';
+import axios, { AxiosResponse } from 'axios';
+import { jwtDecode } from "jwt-decode";
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 
 export interface ResponseSocialAuthUserNotExistsAPI {
   email: string,
@@ -81,13 +81,8 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }
 
   function changeUserProperty(property: keyof User, value: string | Date | null) {
-    console.log(`changeUserProperty called: ${property} =`, value);
     if (user) {
       const newUser = { ...user, [property]: value };
-      console.log('Old user state:', user);
-      console.log('New user state:', newUser);
-      console.log('Are they different?', user !== newUser);
-      console.log('Property value changed?', user[property] !== value);
       setUser(newUser);
     } else {
       console.log('User is null, cannot update property');
@@ -95,11 +90,8 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
   }
 
   function updateAddressFields(fields: Partial<Pick<User, 'street' | 'neighborhood' | 'city' | 'state'>>) {
-    console.log('updateAddressFields called with:', fields);
     if (user) {
       const newUser = { ...user, ...fields };
-      console.log('Old user state:', user);
-      console.log('New user state:', newUser);
       setUser(newUser);
     } else {
       console.log('User is null, cannot update address fields');
@@ -135,7 +127,6 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         city: user.city,
         state: user.state,
       }
-      console.log(JSON.stringify(data, null, 2))
       const response: AxiosResponse<Tokens> = await axiosNoAuth.post('/social-auth/register', data, {
         headers: {
           Authorization: `Bearer ${initialData.createusersocialtoken}`,
@@ -149,7 +140,6 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
 
       return true
     } catch (err) {
-      console.log(err)
       if(axios.isAxiosError(err)) {
         console.log(err.status, err.response?.data)
       }

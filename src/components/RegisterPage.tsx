@@ -38,6 +38,10 @@ export default function RegistrationForm() {
     const newErrors: { [key: string]: boolean } = {};
     if (!accountData.name) newErrors.name = true;
     if (!accountData.email) newErrors.email = true;
+    else {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+      if (!emailRegex.test(String(accountData.email))) newErrors.email = true;
+    }
     if (!accountData.password) newErrors.password = true;
     if (!accountData.CPF) newErrors.CPF = true;
     if (accountData.CPF) {
@@ -88,8 +92,16 @@ export default function RegistrationForm() {
         <Input
           label="Email"
           value={accountData.email}
-          onChangeText={(text) => updateAccountData('email', text)}
-          error={errors.email ? "Email é obrigatório" : undefined}
+          onChangeText={(text) => {
+            // sanitize: remove spaces and force lowercase
+            const cleaned = String(text).replace(/\s+/g, '').toLowerCase();
+            updateAccountData('email', cleaned);
+          }}
+          onBlur={() => {
+            const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
+            setErrors((prev) => ({ ...prev, email: !emailRegex.test(String(accountData.email)) }));
+          }}
+          error={errors.email ? "Email inválido" : undefined}
           placeholder="seu.email@exemplo.com"
           keyboardType="email-address"
           autoCapitalize="none"

@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router';
 import Colors from '@/constants/Colors';
 import React, { useCallback, useEffect, useState } from 'react';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import MaskInput from 'react-native-mask-input';
 import * as ImagePicker from 'expo-image-picker';
 import Camera from '@/components/Camera';
 import { useCreateVehicle } from '@/hooks/useCreateVehicle';
@@ -48,12 +49,12 @@ export default function AddConductorsScreen() {
 
 
   const handleBack = useCallback(() => router.back(), [router]);
-  // const handleRedirect = useCallback(() => router.push('/(app)/(tabs)/my-cars/create/resume'), [router]);
+  const handleRedirect = useCallback(() => router.push('/(app)/(tabs)/my-cars/create/resume'), [router]);
 
-    function handleRedirect() {
-        alert('Cadastro finalizado com sucesso!');
-        router.push('/(app)/(tabs)/my-cars');
-    }
+    // function handleRedirect() {
+    //     alert('Cadastro finalizado com sucesso!');
+    //     router.push('/(app)/(tabs)/my-cars');
+    // }
   const handleChangeInput = useCallback((name: keyof Conductor, value: string | number | Date) => {
     setConductor(prev => {
       const next = { ...prev } as any;
@@ -191,24 +192,29 @@ export default function AddConductorsScreen() {
                     />
                 </FormRow>
 
-                <FormRow>
-                    <FormField
-                    label="Número da CNH"
-                    value={String(conductor.licenseNumber || '')}
-                    onChangeText={text => handleChangeInput('licenseNumber', text)}
-                    placeholder="00000000000"
-                    keyboardType="numeric"
-                    maxLength={11}
-                    />
-                    <FormField
-                    label="Validade da CNH"
-                    value={conductor.licenseExpiry}
-                    onChangeText={text => handleChangeInput('licenseExpiry', text)}
-                    placeholder="DD/MM/AAAA"
-                    keyboardType="numeric"
-                    maxLength={10}
-                    />
-                </FormRow>
+        <FormRow>
+          <FormField
+          label="Número da CNH"
+          value={String(conductor.licenseNumber || '')}
+          onChangeText={text => handleChangeInput('licenseNumber', text)}
+          placeholder="00000000000"
+          keyboardType="numeric"
+          maxLength={11}
+          />
+          <View style={{ flex: 1 }}>
+            <Text style={commonStyles.label}>Validade da CNH</Text>
+            <MaskInput
+              style={[commonStyles.input]}
+              value={conductor.licenseExpiry}
+              onChangeText={(masked, unmasked) => handleChangeInput('licenseExpiry', masked)}
+              placeholder="DD/MM/AAAA"
+              placeholderTextColor="#999"
+              keyboardType="numeric"
+              mask={[/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
+              maxLength={10}
+            />
+          </View>
+        </FormRow>
 
                 <FormRow>
                     <FormField

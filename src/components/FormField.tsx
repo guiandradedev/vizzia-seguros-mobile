@@ -1,8 +1,8 @@
 // /components/FormField.js
 
-import React from 'react';
-import { View, Text, TextInput, StyleSheet, TextInputProps } from 'react-native'; 
 import { commonStyles } from '@/styles/CommonStyles';
+import React from 'react';
+import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native';
 
 // interface para definir as props do componente
 interface FormFieldProps extends TextInputProps {
@@ -16,7 +16,7 @@ export default function FormField({ label, error, ...props }: FormFieldProps) {
         <View style={styles.container}>
             <Text style={styles.label}>{label}</Text>
             <TextInput
-                style={[commonStyles.input, error ? styles.inputError : null]}
+                style={[commonStyles.input, error ? commonStyles.inputError : null]}
                 placeholderTextColor="#999"
                 {...props} // Agora o TypeScript sabe que 'props' são de um TextInput
             />
@@ -37,15 +37,7 @@ const styles = StyleSheet.create({
         fontWeight: '600',
     },
     input: {
-        borderWidth: 1,
-        borderColor: '#ccc',
-        borderRadius: 8,
-        padding: 12,
-        fontSize: 14,
-        backgroundColor: '#fff',
-    },
-    inputError: {
-        borderColor: 'red',
+        // kept for backwards-compatibility if needed, but primary input styles are in commonStyles
     },
     errorText: {
         color: 'red',

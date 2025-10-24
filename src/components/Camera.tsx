@@ -1,8 +1,8 @@
-import { View, Text, TouchableOpacity, StyleSheet, Image, Button, ActivityIndicator, Platform } from 'react-native';
-import { CameraCapturedPicture, CameraType, CameraView, FlashMode, useCameraPermissions } from 'expo-camera';
-import { useState, useRef } from 'react';
-import { FontAwesome } from '@expo/vector-icons';
 import Colors from '@/constants/Colors';
+import { FontAwesome } from '@expo/vector-icons';
+import { CameraCapturedPicture, CameraType, CameraView, FlashMode, useCameraPermissions } from 'expo-camera';
+import { useRef, useState } from 'react';
+import { ActivityIndicator, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 
 interface CameraProps {
@@ -76,7 +76,6 @@ export default function Camera({ setPhoto, title, closeCamera }: CameraProps) {
             if (current === 'on') return 'off';
             return 'auto';
         });
-        console.log(flash)
     }
 
 

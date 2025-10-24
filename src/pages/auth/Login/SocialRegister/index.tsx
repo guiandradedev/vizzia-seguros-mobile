@@ -1,18 +1,12 @@
 import Colors from "@/constants/Colors";
-import { CreateUserSocialTokenDecode, useLogin } from "@/contexts/LoginContext";
-import { FontAwesome } from "@expo/vector-icons";
-import { useState, useEffect } from "react";
-import { ActivityIndicator, Alert, KeyboardAvoidingView, Platform, StyleSheet, Text, TextInput, TouchableOpacity, View, ScrollView, Modal } from "react-native";
-import axios, { AxiosResponse } from "axios";
-import { axiosNoAuth } from "@/lib/axios";
-import { useRouter } from "expo-router";
+import { useLogin } from "@/contexts/LoginContext";
 import { useAuth } from "@/hooks/useAuth";
-import { Tokens } from "@/types/auth";
-import { saveSecure } from "@/utils/secure-store";
-import { decodeJWT } from "@/utils/jwt";
-import MaskInput from 'react-native-mask-input';
+import { isValidCEP, isValidCNH, isValidCPF } from '@/utils/formatters';
 import { Picker } from '@react-native-picker/picker';
-import { isValidCEP, isValidCPF, isValidCNH } from '@/utils/formatters';
+import { useRouter } from "expo-router";
+import { useState } from "react";
+import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
+import MaskInput from 'react-native-mask-input';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
 export default function SocialRegisterPage() {
@@ -25,14 +19,6 @@ export default function SocialRegisterPage() {
     const [isDatePickerBirthdateVisible, setDatePickerBirthdateVisible] = useState(false);
     const [isDatePickerCnhEmissionVisible, setDatePickerCnhEmissionVisible] = useState(false);
     const [errors, setErrors] = useState<Record<string, boolean>>({});
-
-    // Debug: monitorar mudanças no user
-    useEffect(() => {
-        console.log('User state changed in component:', user);
-        console.log('Street value:', user?.street);
-        console.log('City value:', user?.city);
-        console.log('State value:', user?.state);
-    }, [user]);
 
     const ufs = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"];
 
@@ -309,31 +295,17 @@ export default function SocialRegisterPage() {
 
                                     // Validar CEP
                                     const isValid = isValidCEP(plain);
-                                    console.log('CEP válido:', isValid);
                                     setErrors((prev) => ({ ...prev, CEP: !isValid }));
 
                                     if (plain.length === 8) {
                                         try {
                                             const response = await fetch(`https://viacep.com.br/ws/${plain}/json/`);
                                             const data = await response.json();
-                                            console.log('ViaCEP raw response:', data);
-                                            console.log('ViaCEP data.logradouro:', data.logradouro);
-                                            console.log('ViaCEP data.bairro:', data.bairro);
-                                            console.log('ViaCEP data.localidade:', data.localidade);
-                                            console.log('ViaCEP data.uf:', data.uf);
 
                                             if (!data.erro) {
-                                                console.log('Atualizando todos os campos de endereço de uma vez...');
 
                                                 // Atualizar todos os campos de endereço de uma vez
                                                 updateAddressFields({
-                                                    street: data.logradouro,
-                                                    neighborhood: data.bairro,
-                                                    city: data.localidade,
-                                                    state: data.uf
-                                                });
-
-                                                console.log('Campos que serão definidos:', {
                                                     street: data.logradouro,
                                                     neighborhood: data.bairro,
                                                     city: data.localidade,
@@ -349,7 +321,6 @@ export default function SocialRegisterPage() {
                                                     state: false,
                                                 }));
                                             } else {
-                                                console.log('CEP não encontrado');
                                                 alert("CEP não encontrado.");
                                                 // Limpar campos quando CEP não é encontrado
                                                 updateAddressFields({

@@ -8,6 +8,7 @@ export default ({ config }: { config: any }) => {
             GOOGLE_IOS_CLIENT_ID: process.env.GOOGLE_IOS_CLIENT_ID,
             GOOGLE_ANDROID_CLIENT_ID: process.env.GOOGLE_ANDROID_CLIENT_ID,
             GOOGLE_WEB_CLIENT_ID: process.env.GOOGLE_WEB_CLIENT_ID,
+            IA_BASE_URL: process.env.IA_BASE_URL,
         },
     };
 };

@@ -1,9 +1,13 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
-import Colors from '@/constants/Colors';
-import { useAuth } from '@/hooks/useAuth';
-import Header from '@/components/Header';
 import Button from '@/components/Button';
+import Header from '@/components/Header';
+import { useAuth } from '@/hooks/useAuth';
+import api from '@/lib/axios';
+import { Vehicle } from '@/types/auth';
+import axios, { AxiosResponse } from 'axios';
+import { useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { StyleSheet, Text, View } from 'react-native';
+import VehicleComponent from './components/Vehicle';
 
 export default function MyCarsListPage() {
   const router = useRouter();
@@ -13,6 +17,33 @@ export default function MyCarsListPage() {
   const handleRedirect = () => {
     router.push('/(app)/(tabs)/my-cars/create'); // Navegação para create
   };
+
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+
+  useEffect(() => {
+    async function getVehicles() {
+      try {
+
+        const response: AxiosResponse<Vehicle[]> = await api.get('/vehicle');
+
+        setVehicles(response.data)
+      } catch(err) {
+        if(axios.isAxiosError(err)) {
+          const status = err.response?.status;
+          if(status === 404) {
+            setVehicles([])
+            return;
+          }
+          console.log('Erro na requisição:', err.response?.data);
+        } else {
+          console.log('Erro ao buscar veículos:', err);
+        }
+      }
+    }
+    
+    getVehicles();
+    // Aqui você pode carregar os veículos do usuário, se necessário
+  }, []);
 
   return (
     <View
@@ -24,11 +55,17 @@ export default function MyCarsListPage() {
 
       <View style={styles.container}>
         {
-          user?.vehicles.length == 0 &&
+          vehicles.length == 0 &&
           <Text>Você ainda não possui veículos cadastrados.</Text>
         }
 
-        <Button title="Cadastrar veículo" onPress={handleRedirect} />
+        {
+          vehicles.map((vehicle) => (
+            <VehicleComponent key={vehicle.id} vehicle={vehicle} />
+          ))
+        }
+
+        <Button title="Solicitar Seguro" onPress={handleRedirect} />
       </View>
     </View>
   );

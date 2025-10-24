@@ -1,12 +1,12 @@
 // src/providers/AuthContext.tsx
 
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, ReactNode, useEffect, useState } from 'react';
 // Simulação de uma função de API
-import { loginApi, logoutApi, getStoredUser } from '../services/authService';
-import { User, Credentials, Tokens } from '../types/auth'; // Tipos definidos em outro local (ex: src/types/auth.ts)
+import { axiosNoAuth } from '@/lib/axios';
 import { getSecure, saveSecure } from '@/utils/secure-store';
 import axios, { AxiosResponse } from 'axios';
-import { axiosNoAuth } from '@/lib/axios';
+import { getStoredUser, loginApi, logoutApi } from '../services/authService';
+import { Credentials, Tokens, User } from '../types/auth'; // Tipos definidos em outro local (ex: src/types/auth.ts)
 import { ResponseSocialAuthUserNotExistsAPI } from './LoginContext';
 
 // 1. Definição da Interface do Contexto
@@ -65,6 +65,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const response: AxiosResponse<Tokens> = await axiosNoAuth.post('/social-auth/login', body);
       const { accessToken, refreshToken } = response.data
 
+      // console.log("Tokens recebidos:", response.data)
+      // console.log("Access Token:", accessToken)
+      // console.log("Refresh Token:", refreshToken)
+
       await saveSecure('accessToken', accessToken)
       await saveSecure('refreshToken', refreshToken)
 
@@ -79,7 +83,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         console.log("Dados da resposta:", err.response?.data)
 
         if (status === 400 && err.response?.data) {
-          console.log(err.response.data)
           const errorData = err.response.data as ResponseSocialAuthUserNotExistsAPI;
           return {
             email: errorData.email,
@@ -122,7 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   async function loginBiometric(): Promise<boolean> {
     const tokenExists = await getSecure('accessToken')
-    console.log("token valido", tokenExists)
+    console.log("Login com biometria token", tokenExists)
     const storedUser = await getStoredUser(); // Simula a verificação de token/usuário no AsyncStorage
     setUser(storedUser)
     return !!storedUser

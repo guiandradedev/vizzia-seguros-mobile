@@ -1,6 +1,6 @@
 // src/providers/CreateVehicleContext.tsx
 
-import React, { createContext, useState, useEffect, ReactNode } from 'react';
+import React, { createContext, ReactNode, useState } from 'react';
 
 interface CreateVehicleContextType {
     vehicle: Vehicle,
@@ -24,6 +24,11 @@ interface PhotoType {
     uri: string,
     title: string
 }
+export const fuelTypes = ["Gasolina", "Álcool", "Diesel", "Elétrico","Flex", "Híbrido"] as const;
+export type FuelTypes = typeof fuelTypes[number];
+
+export const carBrands = ['Acura','Audi','BMW','Chevrolet','Citroen','Fiat','Ford','Honda','Hyundai','KIA','Land Rover','Lexus','Mazda','Mercedes','Mitsubishi','Nissan','Peugeot','Porsche','Renault','Suzuki','Toyota','Volkswagen','Volvo'] as const
+export type CarBrands = typeof carBrands[number];
 
 interface Vehicle {
     model: string,
@@ -31,7 +36,8 @@ interface Vehicle {
     year: number,
     color: string,
     odomether: number,
-    plate: string
+    plate: string,
+    fuel: string
 }
 
 export interface Conductor {
@@ -46,7 +52,6 @@ export interface Conductor {
     document: string, // cpf
     birthDate: Date,
 }
-
 
 export const CreateVehicleProvider: React.FC<CreateVehicleProviderProps> = ({ children }) => {
     // Constantes
@@ -67,7 +72,8 @@ export const CreateVehicleProvider: React.FC<CreateVehicleProviderProps> = ({ ch
         year: 0,
         color: "",
         odomether: 0,
-        plate: ""
+        plate: "",
+        fuel: ""
     })
     const [conductors, setConductors] = useState<Conductor[]>([])
 

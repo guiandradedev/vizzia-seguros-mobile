@@ -25,7 +25,7 @@ export const commonStyles = StyleSheet.create({
   subtitle: {
     fontSize: 12,
     color: '#666',
-    marginBottom: 30,
+    marginBottom: 20,
     marginTop:10,
     textAlign: 'center',
   },
@@ -46,6 +46,10 @@ export const commonStyles = StyleSheet.create({
   
   input: { 
     borderWidth: 1, borderColor: '#ccc', borderRadius: 8, padding: 10, fontSize: 12, backgroundColor: '#fff' 
+  },
+  inputError: {
+    borderColor: '#FF3B30',
+    borderWidth: 2,
   },
 
   // Botões

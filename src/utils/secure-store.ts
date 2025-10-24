@@ -4,6 +4,7 @@ import * as SecureStore from 'expo-secure-store';
 export async function saveSecure(key: string, value: string) {
   try {
     await SecureStore.setItemAsync(key, value);
+    console.log(`saveSecure called for key: ${key}`);
   } catch (error) {
     console.error('Erro ao salvar token:', error);
   }
@@ -13,6 +14,7 @@ export async function saveSecure(key: string, value: string) {
 export async function getSecure(key: string) {
   try {
     const token = await SecureStore.getItemAsync(key);
+    console.log(`getSecure called for key: ${key}, returned value:`, token);
     return token || null
   } catch (error) {
     return null;

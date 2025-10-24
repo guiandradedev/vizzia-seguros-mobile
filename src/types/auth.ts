@@ -1,11 +1,11 @@
 export interface Vehicle {
-  // id: number;
-  // model: string;
-  // brand: string;
-  // year: number;
-  // license_plate: string;
-  // renavam: string;
-  // user_id: number;
+  id: number;
+  plate: string;
+  model: string;
+  brand: string;
+  year: number;
+  color: string;
+  odometer: string;
 }
 
 export interface User {
