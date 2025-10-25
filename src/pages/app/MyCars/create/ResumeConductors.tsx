@@ -43,12 +43,12 @@ export default function ResumeConductors() {
 
                     <View style={[commonStyles.formContainer, { paddingLeft: 20, paddingRight: 20 }]}>
                         <FormRow>
-                            <View style={{ flex: 1 }}>
+                                <View style={{ flex: 1 }}>
                                 <Text style={commonStyles.label}>Modelo:</Text>
-                                <Text style={commonStyles.input}>{vehicle.model}</Text>
+                                <Text style={commonStyles.input}>{vehicle.model_name ?? vehicle.model}</Text>
                             </View>
 
-                            <View style={{ flex: 1 }}>
+                                <View style={{ flex: 1 }}>
                                 <Text style={commonStyles.label}>Marca:</Text>
                                 <Text style={commonStyles.input}>{vehicle.brand}</Text>
                             </View>

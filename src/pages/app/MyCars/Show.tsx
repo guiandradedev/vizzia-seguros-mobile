@@ -1,10 +1,10 @@
-import { View, Text, StyleSheet, ActivityIndicator, ScrollView, TouchableOpacity } from 'react-native';
-import { useLocalSearchParams, useRouter } from 'expo-router';
 import Header from '@/components/Header';
-import { useEffect, useState } from 'react';
 import api from '@/lib/axios';
-import axios from 'axios';
 import { Vehicle } from '@/types/auth';
+import axios from 'axios';
+import { useLocalSearchParams, useRouter } from 'expo-router';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function ShowVehiclePage() {
   const { id } = useLocalSearchParams() as { id?: string };
@@ -49,8 +49,8 @@ export default function ShowVehiclePage() {
         )}
 
         {vehicle && (
-          <View style={styles.card}>
-            <Text style={styles.title}>{vehicle.brand} {vehicle.model}</Text>
+            <View style={styles.card}>
+            <Text style={styles.title}>{vehicle.brand} { (vehicle as any).model_name ?? vehicle.model }</Text>
             <Text style={styles.info}>Ano: {vehicle.year}</Text>
             <Text style={styles.info}>Cor: {vehicle.color}</Text>
             <Text style={styles.info}>Placa: {vehicle.plate}</Text>

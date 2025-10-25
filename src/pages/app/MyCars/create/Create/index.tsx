@@ -8,7 +8,7 @@ import { axiosIA } from '@/lib/axios';
 import { commonStyles } from '@/styles/CommonStyles';
 import axios from 'axios';
 import { useRouter } from 'expo-router';
-import { useEffect, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import VehicleDetailsForm from './components/VehicleDetailsForm';
 
@@ -16,14 +16,13 @@ export default function CreateVehiclePage() {
     const { vehicle, setVehicle, changeInitialCarPhoto, initialCarPhoto } = useCreateVehicle();
     const router = useRouter();
     const [isCameraOpen, setIsCameraOpen] = useState(false);
-    const [canRedirect, setCanRedirect] = useState(false);
     const [photo, setPhoto] = useState<string>(initialCarPhoto);
 
-    // consider vehicle detected when any of the key fields from IA are present
-    const isVehicleDetected = !!(vehicle.brand || vehicle.plate || vehicle.color || vehicle.model);
+    // detect if the IA already filled some vehicle fields
+    const isVehicleDetected = useMemo(() => !!(vehicle.brand || vehicle.plate || vehicle.color || vehicle.model), [vehicle.brand, vehicle.plate, vehicle.color, vehicle.model]);
 
-    useEffect(() => {
-        // strict validation: all required fields must be present and valid
+    // compute redirect readiness derived from vehicle validity (no local state)
+    const canRedirect = useMemo(() => {
         const modelValid = typeof vehicle.model === 'string' && vehicle.model.trim().length > 0;
         const brandValid = typeof vehicle.brand === 'number' && vehicle.brand > 0;
         const yearValid = typeof vehicle.year === 'number' && !isNaN(vehicle.year) && vehicle.year > 1900;
@@ -32,25 +31,24 @@ export default function CreateVehiclePage() {
         const odometherValid = typeof vehicle.odomether === 'number' && !isNaN(vehicle.odomether);
         const fuelValid = !!vehicle.fuel;
         const usageValid = !!vehicle.usage;
-
-        const ok = modelValid && brandValid && yearValid && colorValid && plateValid && odometherValid && fuelValid && usageValid;
-        setCanRedirect(ok);
+        return modelValid && brandValid && yearValid && colorValid && plateValid && odometherValid && fuelValid && usageValid;
     }, [vehicle]);
 
-    const openCamera = () => setIsCameraOpen(true);
-    const closeCamera = () => setIsCameraOpen(false);
+    const openCamera = useCallback(() => setIsCameraOpen(true), []);
+    const closeCamera = useCallback(() => setIsCameraOpen(false), []);
 
-    const handleRedirect = () => {
+    const handleRedirect = useCallback(() => {
         if (!canRedirect) {
             Alert.alert('Atenção', 'Preencha todos os campos obrigatórios antes de continuar.');
             return;
         }
         router.push('/(app)/(tabs)/my-cars/create/resume-vehicle');
-    };
+    }, [canRedirect, router]);
 
-    async function addPhoto(photoUri: string) {
+    const addPhoto = useCallback(async (photoUri: string) => {
         setPhoto(photoUri);
-        await new Promise(resolve => setTimeout(resolve, 500));
+        // small delay so UI updates smoothly
+        await new Promise(resolve => setTimeout(resolve, 350));
         changeInitialCarPhoto(photoUri);
         closeCamera();
 
@@ -60,50 +58,45 @@ export default function CreateVehiclePage() {
             name: 'vehicle_photo.jpg',
             type: 'image/jpeg'
         } as any);
-            try {
-            console.log("Enviando imagem para IA...")
+
+        try {
             const response = await axiosIA.post('/process_image', formData, {
                 headers: {
-                    'Content-Type': undefined, // força o axios a definir o correto
+                    'Content-Type': undefined,
                     Accept: 'application/json',
                 },
                 transformRequest: (data, headers) => {
-                    delete headers['Content-Type']; // remove o default herdado
+                    delete headers['Content-Type'];
                     return data;
                 },
             });
-            const { brand, color, plate } = response.data;
-            // try to map brand name returned by IA to our brand codes
-            const foundBrand = carBrands.find(b => b.name.toLowerCase() === (brand.name || '').toLowerCase());
+
+            const { brand, color, plate } = response.data || {};
+            const foundBrand = carBrands.find(b => b.name.toLowerCase() === (brand?.name || '').toLowerCase());
             const brandCode = foundBrand ? foundBrand.code : (vehicle.brand || 0);
             const data = {
-                model: "",
+                model: '',
                 brand: brandCode,
-                year: 2025,
-                color: color.text,
-                plate: plate.text,
-                odomether: 0
+                year: new Date().getFullYear(),
+                color: color?.text || vehicle.color,
+                plate: plate?.text || vehicle.plate,
+                odomether: vehicle.odomether || 0,
             };
             setVehicle({ ...vehicle, ...data });
-            console.log(response.data)
+
         } catch (error) {
             if (axios.isAxiosError(error)) {
-                console.log("Erro ao enviar imagem para IA axios statusssr:", error);
-                if(error.response?.status === 400) {
-                    Alert.alert("Erro", error.response.data.error || "Imagem inválida. Por favor, tente novamente com uma imagem clara do veículo.");
+                if (error.response?.status === 400 || error.response?.status === 422) {
+                    Alert.alert('Erro', error.response?.data?.error || 'Imagem inválida. Por favor, tente novamente com uma imagem clara do veículo.');
                     return;
                 }
-                if(error.response?.status === 422) {
-                    Alert.alert("Erro", error.response.data.error || "Imagem inválida. Por favor, tente novamente com uma imagem clara do veículo.");
-                    return;
-                }
-                console.error("Erro ao enviar imagem para IA axios:", error.response?.data);
+                console.error('IA error response:', error.response?.data);
             } else {
-                Alert.alert("Erro", "Não foi possível obter os dados do veículo a partir da imagem. Por favor, tente novamente.");
-                console.error("Erro ao enviar imagem para IA:", error);
+                console.error('Unknown error while sending image to IA:', error);
             }
+            Alert.alert('Erro', 'Não foi possível processar a imagem. Por favor, tente novamente.');
         }
-    }
+    }, [changeInitialCarPhoto, closeCamera, setVehicle, vehicle]);
 
     if (isCameraOpen) {
         return <View style={{ flex: 1 }}>

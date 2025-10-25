@@ -62,8 +62,11 @@ export type VehicleUses = typeof vehicleUses[number];
 
 interface Vehicle {
     model: string,
+    // nome do modelo retornado pela API (para exibição). Se presente, preferir este campo.
+    model_name?: string,
     // Agora armazenamos o código da marca no veículo (ex: Volkswagen -> 59)
     brand: CarBrandCode,
+    // brand_name: CarBrandName,
     year: number,
     color: string,
     odomether: number,

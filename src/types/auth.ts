@@ -2,6 +2,8 @@ export interface Vehicle {
   id: number;
   plate: string;
   model: string;
+  // optional human-readable model name returned by local flow/API
+  model_name?: string;
   brand: string;
   year: number;
   color: string;

@@ -1,6 +1,6 @@
 import { Vehicle } from "@/types/auth";
-import { StyleSheet, Text, View, Image, TouchableOpacity } from "react-native";
 import { useRouter } from 'expo-router';
+import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 
 interface VehicleProps {
   vehicle: Vehicle;
@@ -21,7 +21,7 @@ export default function VehicleComponent({ vehicle }: VehicleProps) {
   <Image source={{ uri: 'https://via.placeholder.com/144x96.png?text=Car' }} style={styles.image} />
 
         <View style={styles.content}>
-          <Text style={styles.title}>{vehicle.brand} {vehicle.model}</Text>
+          <Text style={styles.title}>{vehicle.brand} {vehicle.model_name ?? vehicle.model}</Text>
           <Text style={styles.info}>Ano: {vehicle.year} • Cor: {vehicle.color}</Text>
           <Text style={styles.plate}>Placa: {vehicle.plate}</Text>
         </View>

@@ -1,14 +1,15 @@
-import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useRouter } from 'expo-router';
-import { MaterialIcons } from '@expo/vector-icons';
-import { commonStyles } from '@/styles/CommonStyles';
+import Button from '@/components/Button';
 import Colors from '@/constants/Colors';
+import { commonStyles } from '@/styles/CommonStyles';
+import { MaterialIcons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 
 export default function VehicleConductorsScreen() {
   const router = useRouter();
 
   const handleSkip = () => {
-    router.push('/(app)/(tabs)/my-cars/create/resume');
+    router.push('/(app)/(tabs)/my-cars/create/take-photos');
   };
 
   const handleContinue = () => {
@@ -45,13 +46,9 @@ export default function VehicleConductorsScreen() {
 
       <View style={commonStyles.footer}>
         <View style={commonStyles.footerRow}>
-          <TouchableOpacity style={[commonStyles.footerButton, commonStyles.backButton]} onPress={handleBack}>
-            <Text style={commonStyles.buttonText}>Voltar</Text>
-          </TouchableOpacity>
-
-          <TouchableOpacity style={[commonStyles.footerButton, commonStyles.buttonSecondary]} onPress={handleSkip}>
-            <Text style={commonStyles.buttonText}>Pular</Text>
-          </TouchableOpacity>
+          <Button onPress={handleBack} title="Voltar" variant="outline" />
+          <Button onPress={handleSkip} title="Pular" variant="outline" />
+          <Button onPress={handleContinue} title="Continuar" variant="primary" />
         </View>
 
       </View>

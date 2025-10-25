@@ -1,20 +1,21 @@
-import { useRouter } from 'expo-router';
-import Colors from '@/constants/Colors';
-import React, { useCallback, useEffect, useState } from 'react';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
-import MaskInput from 'react-native-mask-input';
-import * as ImagePicker from 'expo-image-picker';
 import Camera from '@/components/Camera';
-import { useCreateVehicle } from '@/hooks/useCreateVehicle';
+import Colors from '@/constants/Colors';
 import { Conductor } from '@/contexts/CreateVehicleContext';
+import { useCreateVehicle } from '@/hooks/useCreateVehicle';
 import { formatCPF, formatPhone, isValidCPF, isValidEmail } from '@/utils/formatters';
+import * as ImagePicker from 'expo-image-picker';
+import { useRouter } from 'expo-router';
+import React, { useCallback, useEffect, useState } from 'react';
+import MaskInput from 'react-native-mask-input';
+import DateTimePickerModal from 'react-native-modal-datetime-picker';
 
-import { commonStyles } from '@/styles/CommonStyles';
+import Button from '@/components/Button';
 import FormField from '@/components/FormField';
 import FormRow from '@/components/FormRow';
 import PhotoButton from '@/components/PhotoButton';
 import VehiclePhoto from '@/components/VehiclePhoto';
-import { KeyboardAvoidingView, Platform, ScrollView, View, Text, TouchableOpacity, Alert } from 'react-native';
+import { commonStyles } from '@/styles/CommonStyles';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
 
 export default function AddConductorsScreen() {
   const router = useRouter();
@@ -49,7 +50,7 @@ export default function AddConductorsScreen() {
 
 
   const handleBack = useCallback(() => router.back(), [router]);
-  const handleRedirect = useCallback(() => router.push('/(app)/(tabs)/my-cars/create/resume'), [router]);
+  const handleRedirect = useCallback(() => router.push('/(app)/(tabs)/my-cars/create/resume-conductors'), [router]);
 
     // function handleRedirect() {
     //     alert('Cadastro finalizado com sucesso!');
@@ -76,7 +77,7 @@ export default function AddConductorsScreen() {
       }
 
       if (name === 'email' && typeof value === 'string') {
-        next[name] = value;
+        next[name] = value.replace(" ", "");
         setEmailError(null);
         return next;
       }
@@ -291,20 +292,10 @@ export default function AddConductorsScreen() {
 
                 {/* Footer */}
                 <View style={[commonStyles.footer]}>
-                    <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                        <TouchableOpacity style={[commonStyles.button, !canRedirect && commonStyles.backButton]} onPress={handleAddConductor} disabled={!canRedirect} >
-                            <Text style={commonStyles.buttonText}>Adicionar</Text>
-                        </TouchableOpacity>
-                    </View>
-                    
-
                     <View style={commonStyles.footerRow}>
-                        <TouchableOpacity style={[commonStyles.footerButton, commonStyles.backButton]} onPress={handleBack}>
-                            <Text style={commonStyles.buttonText}>Voltar</Text>
-                        </TouchableOpacity>
-                        <TouchableOpacity style={[commonStyles.footerButton, commonStyles.buttonSecondary]} onPress={handleRedirect}>
-                            <Text style={commonStyles.buttonText}>Pular</Text>
-                        </TouchableOpacity>
+                      <Button onPress={handleBack} title="Voltar" variant="outline"/>
+                      <Button onPress={handleAddConductor} title="Adicionar" variant="primary" disabled={!canRedirect}/>
+                      <Button onPress={handleRedirect} title="Continuar" variant="primary" disabled={conductors.length === 0}/>
                     </View>
                 </View>
             </ScrollView>     
