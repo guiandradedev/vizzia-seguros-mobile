@@ -35,6 +35,7 @@ export default function ResumeVehicle() {
       return;
     }
     try {
+        Alert.alert("Iniciando o cadastro do veículo, aguarde um momento.");
         const formData = new FormData();
         formData.append('file', {
             uri: initialCarPhoto,

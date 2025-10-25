@@ -1,3 +1,4 @@
+import Button from '@/components/Button';
 import FormRow from '@/components/FormRow';
 import Colors from '@/constants/Colors';
 import { useCreateVehicle } from '@/hooks/useCreateVehicle';
@@ -5,21 +6,21 @@ import { commonStyles } from '@/styles/CommonStyles';
 import { Image } from 'expo-image';
 import { useRouter } from 'expo-router';
 import { useState } from 'react';
-import { ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 
 export default function ResumeConductors() {
     const router = useRouter();
     const [isCameraOpen, setIsCameraOpen] = useState(false);
 
-    const { vehicle, vehiclePhotos, initialCarPhoto, conductors } = useCreateVehicle()
+    const { vehicle, conductors } = useCreateVehicle()
 
     function handleBack() {
         router.back();
     }
 
-    function handleSubmit() {
-        alert('Cadastro finalizado com sucesso!');
-        router.push('/(app)/(tabs)/my-cars');
+    function handleRedirect() {
+        // Salvar na API os condutores extra
+        router.push('/(app)/(tabs)/my-cars/create/take-photos');
     }
 
     return (
@@ -34,84 +35,16 @@ export default function ResumeConductors() {
             >
                 <Text style={commonStyles.title}>Resumo do cadastro!</Text>
 
-                <Text style={commonStyles.subtitle}>Quase lá! Revise as informações do veículo antes de finalizar o cadastro.</Text>
-                <View>
-
-                    <Text style={commonStyles.sectionTitle}>
-                        Informações do veículo
-                    </Text>
-
-                    <View style={[commonStyles.formContainer, { paddingLeft: 20, paddingRight: 20 }]}>
-                        <FormRow>
-                                <View style={{ flex: 1 }}>
-                                <Text style={commonStyles.label}>Modelo:</Text>
-                                <Text style={commonStyles.input}>{vehicle.model_name ?? vehicle.model}</Text>
-                            </View>
-
-                                <View style={{ flex: 1 }}>
-                                <Text style={commonStyles.label}>Marca:</Text>
-                                <Text style={commonStyles.input}>{vehicle.brand}</Text>
-                            </View>
-
-                        </FormRow>
-
-                        <FormRow>
-                            <View style={{ flex: 1 }}>
-                                <Text style={commonStyles.label}>Ano:</Text>
-                                <Text style={commonStyles.input}>{vehicle.year}</Text>
-                            </View>
-
-                            <View style={{ flex: 1 }}>
-                                <Text style={commonStyles.label}>Cor:</Text>
-                                <Text style={commonStyles.input}>{vehicle.color}</Text>
-                            </View>
-
-                        </FormRow>
-
-                        <FormRow>
-                            <View style={{ flex: 1 }}>
-                                <Text style={commonStyles.label}>Placa:</Text>
-                                <Text style={commonStyles.input}>{vehicle.plate}</Text>
-                            </View>
-
-                            <View style={{ flex: 1 }}>
-                                <Text style={commonStyles.label}>Odômetro:</Text>
-                                <Text style={commonStyles.input}>{vehicle.odomether}</Text>
-                            </View>
-
-                        </FormRow>
-
-
-                    </View>
-                </View>
-                <View>
-                    <Text style={commonStyles.label}>Foto principal:</Text>
-                    <View style={{ alignItems: 'center' }}>
-                        <Image source={{ uri: initialCarPhoto }} style={[styles.photo, { width: '80%' }]} />
-                    </View>
-                    {
-                        vehiclePhotos.map((photo, index) => (
-                            <View key={index} >
-                                <Text style={commonStyles.label}>
-                                    {photo.title}:
-                                </Text>
-
-                                <View style={{ alignItems: 'center', marginBottom: 30 }}>
-                                    {photo.uri ? (
-                                        <Image source={{ uri: photo.uri }} style={[styles.photo, { width: '80%' }]} />
-                                    ) : (
-                                        <Text>Não fornecida</Text>
-                                    )}
-                                </View>
-
-                            </View>
-                        ))
-                    }
-                </View>
+                <Text style={commonStyles.subtitle}>Quase lá! Revise as informações de condutores adicionais antes de finalizar o cadastro.</Text>
                 <View>
                     <Text style={commonStyles.sectionTitle}>Condutores adicionais:</Text>
                     {
-                        conductors.length > 0 ? conductors.map((conductor, index) => (
+                        conductors.length === 0 && (
+                            <Text>Nenhum condutor adicional adicionado.</Text>
+                        )
+                    }
+                    {
+                        conductors.length > 0 && conductors.map((conductor, index) => (
                             <View key={index}>
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
@@ -167,21 +100,15 @@ export default function ResumeConductors() {
                                     <Image source={{ uri: conductor.licensePhoto }} style={[styles.photo, { width: '80%' }]} />
                                 </View>
                             </View>
-                        )) : <Text>Nenhum condutor adicional adicionado.</Text>
+                        ))
                     }
                 </View>
 
 
                 <View style={commonStyles.footer}>
                     <View style={commonStyles.footerRow}>
-                        <TouchableOpacity style={[commonStyles.footerButton, commonStyles.backButton]} onPress={handleBack}>
-                            <Text style={commonStyles.buttonText}>Voltar</Text>
-                        </TouchableOpacity>
-
-
-                        <TouchableOpacity style={[commonStyles.footerButton, commonStyles.buttonSecondary]} onPress={handleSubmit}>
-                            <Text style={commonStyles.buttonText}>Finalizar</Text>
-                        </TouchableOpacity>
+                        <Button onPress={handleBack} title="Voltar" variant="outline" />
+                        <Button onPress={handleRedirect} title="Finalizar" variant="primary" />
                     </View>
 
                 </View>
