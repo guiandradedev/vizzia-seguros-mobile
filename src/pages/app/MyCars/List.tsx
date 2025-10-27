@@ -60,9 +60,13 @@ export default function MyCarsListPage() {
         }
 
         {
-          vehicles.map((vehicle) => (
-            <VehicleComponent key={vehicle.id} vehicle={vehicle} />
-          ))
+          vehicles.length > 0 && (
+            <View>
+              {vehicles.map((vehicle) => (
+                <VehicleComponent key={vehicle.id} vehicle={vehicle} />
+              ))}
+            </View>
+          )
         }
 
         <Button title="Solicitar Seguro" onPress={handleRedirect} />

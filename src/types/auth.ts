@@ -8,6 +8,7 @@ export interface Vehicle {
   year: number;
   color: string;
   odometer: string;
+  finished: boolean
 }
 
 export interface User {

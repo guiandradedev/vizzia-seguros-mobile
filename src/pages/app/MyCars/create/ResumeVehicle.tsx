@@ -7,10 +7,11 @@ import axios from 'axios';
 import { useRouter } from 'expo-router';
 import React, { useMemo } from 'react';
 import { Alert, Image, ScrollView, StyleSheet, Text, View } from 'react-native';
+import api from '@/lib/axios';
 
 export default function ResumeVehicle() {
   const router = useRouter();
-  const { vehicle, vehiclePhotos, initialCarPhoto } = useCreateVehicle();
+  const { vehicle, setVehicle, vehiclePhotos, initialCarPhoto } = useCreateVehicle();
 
   const canRedirect = useMemo(() => {
     const modelValid = typeof vehicle.model === 'string' && vehicle.model.trim().length > 0;
@@ -37,25 +38,39 @@ export default function ResumeVehicle() {
     try {
         Alert.alert("Iniciando o cadastro do veículo, aguarde um momento.");
         const formData = new FormData();
-        formData.append('file', {
+        formData.append('photos', {
             uri: initialCarPhoto,
             name: 'initial_photo.jpg',
             type: 'image/jpeg'
         } as any);
+        const photoData = {
+          file: "initial_photo.jpg",
+          type: "initial"
+        }
+        // formData.append('photos', photoData as any);
+
         const currentBrandName: string | undefined = carBrands.find((item: CarBrand) => item.code === vehicle.brand)?.name;
-        formData.append('plate', vehicle.plate);
-        formData.append('brand', currentBrandName!);
-        formData.append('model', vehicle.model);
-        formData.append('year', String(vehicle.year));
-        formData.append('color', vehicle.color);
-        formData.append('odometer', String(vehicle.odomether));
+        formData.append('plate', vehicle.plate); //
+        formData.append('brand', currentBrandName!); //
+        formData.append('model', vehicle.model); //
+        formData.append('year', String(vehicle.year)); //
+        formData.append('color', vehicle.color); //
+        formData.append('odometer', String(vehicle.odomether)); //
 
         const fuelIndex = fuelTypes.findIndex((ft: FuelTypes) => ft === vehicle.fuel);
         const fuel_code = fuelIndex >= 0 ? fuelIndex + 1 : null;
         formData.append('motorization', fuel_code!.toString());
 
-        // const response = await api.post('/vehicle', formData)
-        // console.log(response.data);
+        console.log(JSON.stringify(formData))
+
+        const response = await api.post('/vehicle', formData, {
+          headers: { 'Content-Type': 'multipart/form-data' }
+        })
+
+        const { id } = response.data;
+        setVehicle({ ...vehicle, id });
+        console.log(id)
+        console.log(response.data);
         router.push('/(app)/(tabs)/my-cars/create/conductors');
     } catch (error) {
         if(axios.isAxiosError(error)) {

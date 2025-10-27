@@ -26,6 +26,11 @@ export default function VehicleComponent({ vehicle }: VehicleProps) {
           <Text style={styles.plate}>Placa: {vehicle.plate}</Text>
         </View>
 
+        {
+          vehicle.finished === false && (
+            <View style={styles.statusDot} accessible accessibilityLabel="Cadastro incompleto" />
+          )
+        }
         <View style={styles.chevron}>
           <Text style={{ color: '#888' }}>{'>'}</Text>
         </View>
@@ -79,5 +84,14 @@ const styles = StyleSheet.create({
     width: 24,
     alignItems: 'center',
     justifyContent: 'center'
+  }
+  ,
+  statusDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 10,
+    backgroundColor: '#e33',
+    marginRight: 8,
+    alignSelf: 'center'
   }
 });

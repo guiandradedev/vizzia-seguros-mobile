@@ -24,8 +24,8 @@ export default function AddConductorsScreen() {
   const emptyConductor: Conductor = {
     name: '',
     licenseNumber: '',
-    licenseExpiry: '',
-    licenseFirstEmission: 0,
+    licenseExpiry: null,
+    licenseFirstEmission: null,
     licensePhoto: '',
     relationship: '',
     phone: '',
@@ -36,38 +36,40 @@ export default function AddConductorsScreen() {
 
   const [conductor, setConductor] = useState<Conductor>(emptyConductor);
   const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [isExpiryPickerVisible, setExpiryPickerVisible] = useState(false);
+  const [isIssuePickerVisible, setIssuePickerVisible] = useState(false);
   const [cpfError, setCpfError] = useState<string | null>(null);
   const [emailError, setEmailError] = useState<string | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [canRedirect, setCanRedirect] = useState(false);
 
-   useEffect(() => {
-        setCanRedirect(!!(conductor.birthDate && conductor.document &&
-            conductor.email && conductor.licenseExpiry && conductor.licenseFirstEmission &&
-            conductor.licenseNumber, conductor.licensePhoto, conductor.name, conductor.phone &&
-            conductor.relationship));
-    }, [conductor]);
+  useEffect(() => {
+    setCanRedirect(!!(conductor.birthDate && conductor.document &&
+      conductor.email && conductor.licenseExpiry && conductor.licenseFirstEmission &&
+      conductor.licenseNumber, conductor.licensePhoto, conductor.name, conductor.phone &&
+      conductor.relationship));
+  }, [conductor]);
 
 
   const handleBack = useCallback(() => router.back(), [router]);
   const handleRedirect = useCallback(() => router.push('/(app)/(tabs)/my-cars/create/resume-conductors'), [router]);
 
-    // function handleRedirect() {
-    //     alert('Cadastro finalizado com sucesso!');
-    //     router.push('/(app)/(tabs)/my-cars');
-    // }
+  // function handleRedirect() {
+  //     alert('Cadastro finalizado com sucesso!');
+  //     router.push('/(app)/(tabs)/my-cars');
+  // }
   const handleChangeInput = useCallback((name: keyof Conductor, value: string | number | Date) => {
     setConductor(prev => {
       const next = { ...prev } as any;
 
-      // Only licenseFirstEmission is stored as number (year or similar).
-      if (name === 'licenseFirstEmission') {
-        if (typeof value === 'string') {
-          const numericValue = value.replace(/\D/g, '');
-          next[name] = parseInt(numericValue, 10) || 0;
-        } else if (typeof value === 'number') next[name] = value;
-        return next;
-      }
+      // // Only licenseFirstEmission is stored as number (year or similar).
+      // if (name === 'licenseFirstEmission') {
+      //   if (typeof value === 'string') {
+      //     const numericValue = value.replace(/\D/g, '');
+      //     next[name] = parseInt(numericValue, 10) || 0;
+      //   } else if (typeof value === 'number') next[name] = value;
+      //   return next;
+      // }
 
       // Keep licenseNumber and licenseExpiry as strings so leading zeros are preserved.
       if (name === 'document' && typeof value === 'string') {
@@ -82,11 +84,12 @@ export default function AddConductorsScreen() {
         return next;
       }
 
-      if (name === 'birthDate') {
-        const date = value instanceof Date ? value : new Date(String(value));
-        if (!isNaN(date.getTime())) next[name] = date;
-        return next;
-      }
+          if (name === 'birthDate' || name === 'licenseExpiry' || name === 'licenseFirstEmission') {
+            const date = value instanceof Date ? value : new Date(String(value));
+            if (!isNaN(date.getTime())) next[name] = date;
+            else next[name] = null;
+            return next;
+          }
 
       next[name] = value as any;
       return next;
@@ -143,166 +146,196 @@ export default function AddConductorsScreen() {
         keyboardVerticalOffset={Platform.OS === 'ios' ? 100 : 0} // ajusta o deslocamento
       >
         <View style={commonStyles.container}>
-            <ScrollView contentContainerStyle={[commonStyles.scrollContent, { paddingBottom: 140 }]}>
-                <Text style={commonStyles.title}>Adicionar condutores</Text>
-                <Text style={commonStyles.subtitle}>
-                Você pode adicionar até {maxConductors} condutores adicionais para este veículo.
-                Condutores adicionados: {conductors.length}
-                </Text>
+          <ScrollView contentContainerStyle={[commonStyles.scrollContent, { paddingBottom: 140 }]}>
+            <Text style={commonStyles.title}>Adicionar condutores</Text>
+            <Text style={commonStyles.subtitle}>
+              Você pode adicionar até {maxConductors} condutores adicionais para este veículo.
+              Condutores adicionados: {conductors.length}
+            </Text>
 
-                <View style={commonStyles.formContainer}>
-                <FormRow>
-                    <FormField
-                    label="Nome Completo"
-                    value={conductor.name}
-                    onChangeText={text => handleChangeInput('name', text)}
-                    placeholder="Nome do condutor"
-                    />
-                </FormRow>
+            <View style={commonStyles.formContainer}>
+              <FormRow>
+                <FormField
+                  label="Nome Completo"
+                  value={conductor.name}
+                  onChangeText={text => handleChangeInput('name', text)}
+                  placeholder="Nome do condutor"
+                />
+              </FormRow>
 
-                <FormRow>
-                    <FormField
-                    label="Email"
-                    value={conductor.email}
-                    onChangeText={text => handleChangeInput('email', text)}
-                    placeholder="email@exemplo.com"
-                    keyboardType="email-address"
-                    onBlur={() => conductor.email && !isValidEmail(conductor.email) && setEmailError('Email inválido')}
-                    error={emailError}
-                    />
-                </FormRow>
+              <FormRow>
+                <FormField
+                  label="Email"
+                  value={conductor.email}
+                  onChangeText={text => handleChangeInput('email', text)}
+                  placeholder="email@exemplo.com"
+                  keyboardType="email-address"
+                  onBlur={() => conductor.email && !isValidEmail(conductor.email) && setEmailError('Email inválido')}
+                  error={emailError}
+                />
+              </FormRow>
 
-                <FormRow>
-                    <FormField
-                    label="CPF"
-                    value={conductor.document}
-                    onChangeText={text => handleChangeInput('document', text)}
-                    placeholder="000.000.000-00"
-                    keyboardType="numeric"
-                    maxLength={14}
-                    onBlur={() => !isValidCPF(conductor.document) && setCpfError('CPF inválido')}
-                    error={cpfError}
-                    />
-                    <FormField
-                    label="Telefone"
-                    value={conductor.phone}
-                    onChangeText={text => handleChangeInput('phone', formatPhone(text))}
-                    placeholder="(00) 90000-0000"
-                    keyboardType="phone-pad"
-                    maxLength={15}
-                    />
-                </FormRow>
+              <FormRow>
+                <FormField
+                  label="CPF"
+                  value={conductor.document}
+                  onChangeText={text => handleChangeInput('document', text)}
+                  placeholder="000.000.000-00"
+                  keyboardType="numeric"
+                  maxLength={14}
+                  onBlur={() => !isValidCPF(conductor.document) && setCpfError('CPF inválido')}
+                  error={cpfError}
+                />
+                <FormField
+                  label="Telefone"
+                  value={conductor.phone}
+                  onChangeText={text => handleChangeInput('phone', formatPhone(text))}
+                  placeholder="(00) 90000-0000"
+                  keyboardType="phone-pad"
+                  maxLength={15}
+                />
+              </FormRow>
 
-        <FormRow>
-          <FormField
-          label="Número da CNH"
-          value={String(conductor.licenseNumber || '')}
-          onChangeText={text => handleChangeInput('licenseNumber', text)}
-          placeholder="00000000000"
-          keyboardType="numeric"
-          maxLength={11}
-          />
-          <View style={{ flex: 1 }}>
-            <Text style={commonStyles.label}>Validade da CNH</Text>
-            <MaskInput
-              style={[commonStyles.input]}
-              value={conductor.licenseExpiry}
-              onChangeText={(masked, unmasked) => handleChangeInput('licenseExpiry', masked)}
-              placeholder="DD/MM/AAAA"
-              placeholderTextColor="#999"
-              keyboardType="numeric"
-              mask={[/\d/, /\d/, '/', /\d/, /\d/, '/', /\d/, /\d/, /\d/, /\d/]}
-              maxLength={10}
-            />
-          </View>
-        </FormRow>
-
-                <FormRow>
-                    <FormField
-                    label="Relacionamento"
-                    value={conductor.relationship}
-                    onChangeText={text => handleChangeInput('relationship', text)}
-                    placeholder="Ex: Cônjuge"
-                    />
-                    <View>
-                    <Text style={commonStyles.label}>Data de Nascimento</Text>
-                    <TouchableOpacity
-                        style={[commonStyles.input]}
-                        onPress={() => setDatePickerVisible(true)}
-                    >
-                        <Text>{conductor.birthDate ? conductor.birthDate.toLocaleDateString() : 'Selecione a data'}</Text>
-                    </TouchableOpacity>
-                    <DateTimePickerModal
-                        isVisible={isDatePickerVisible}
-                        mode="date"
-                        maximumDate={new Date()}
-                        onConfirm={date => {
-                        setDatePickerVisible(false);
-                        handleChangeInput('birthDate', date);
-                        }}
-                        onCancel={() => setDatePickerVisible(false)}
-                    />
-                    </View>
-                </FormRow>
-
-                {/* Foto da CNH */}
-                <View style={commonStyles.inputContainer}>
-                    <Text style={commonStyles.label}>Foto da CNH</Text>
-                    {conductor.licensePhoto ? (
-                    <VehiclePhoto photoUri={conductor.licensePhoto} onEdit={openCamera} />
-                    ) : (
-                    <View style={{ alignItems: 'center', marginTop: 10 }}>
-                        <View style={{ width: 150, alignItems: 'center' }}>
-                        <PhotoButton
-                            photoUri={conductor.licensePhoto}
-                            title="Adicionar foto"
-                            onPress={openCamera}
-                        />
-                        
-                        </View>
-                    </View>
-                    )}
-
-
-                    <View style={{ alignItems: 'center', marginBottom: 20 }}>
-                        <TouchableOpacity
-                                style={[commonStyles.buttonSmall, { marginTop: 0, alignItems:'center' }]}
-                                onPress={async () => {
-                                const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-                                if (status !== 'granted') {
-                                    Alert.alert('Permissão necessária', 'Permita acesso à galeria para selecionar uma foto.');
-                                    return;
-                                }
-                                const result = await ImagePicker.launchImageLibraryAsync({
-                                    allowsEditing: true,
-                                    quality: 0.8,
-                                });
-                                if (!result.canceled) {
-                                    const uri =
-                                    (result.assets && result.assets[0] && result.assets[0].uri) || (result as any).uri;
-                                    setConductor(prev => ({ ...prev, licensePhoto: uri }));
-                                }
-                                }}
-                            >
-                                <Text style={commonStyles.buttonText}>Galeria</Text>
-                        </TouchableOpacity>
-                    </View>
+              <FormRow>
+                <FormField
+                  label="Número da CNH"
+                  value={String(conductor.licenseNumber || '')}
+                  onChangeText={text => handleChangeInput('licenseNumber', text)}
+                  placeholder="00000000000"
+                  keyboardType="numeric"
+                  maxLength={11}
+                />
+                <View style={{ flex: 1 }}>
+                  <Text style={commonStyles.label}>Validade da CNH</Text>
+                  <TouchableOpacity
+                    style={[commonStyles.input]}
+                    onPress={() => setExpiryPickerVisible(true)}
+                  >
+                    <Text>{conductor.licenseExpiry ? (conductor.licenseExpiry as Date).toLocaleDateString() : 'Selecione a data'}</Text>
+                  </TouchableOpacity>
+                  <DateTimePickerModal
+                    isVisible={isExpiryPickerVisible}
+                    mode="date"
+                    minimumDate={new Date(1900, 0, 1)}
+                    maximumDate={new Date()}
+                    onConfirm={date => {
+                      setExpiryPickerVisible(false);
+                      handleChangeInput('licenseExpiry', date);
+                    }}
+                    onCancel={() => setExpiryPickerVisible(false)}
+                  />
                 </View>
+              </FormRow>
+
+              <FormRow>
+                <FormField
+                  label="Relacionamento"
+                  value={conductor.relationship}
+                  onChangeText={text => handleChangeInput('relationship', text)}
+                  placeholder="Ex: Cônjuge"
+                />
+                <View>
+                  <Text style={commonStyles.label}>Data de Nascimento</Text>
+                  <TouchableOpacity
+                    style={[commonStyles.input]}
+                    onPress={() => setDatePickerVisible(true)}
+                  >
+                    <Text>{conductor.birthDate ? conductor.birthDate.toLocaleDateString() : 'Selecione a data'}</Text>
+                  </TouchableOpacity>
+                  <DateTimePickerModal
+                    isVisible={isDatePickerVisible}
+                    mode="date"
+                    maximumDate={new Date()}
+                    onConfirm={date => {
+                      setDatePickerVisible(false);
+                      handleChangeInput('birthDate', date);
+                    }}
+                    onCancel={() => setDatePickerVisible(false)}
+                  />
+                </View>
+              </FormRow>
+              <FormRow>
+                <View style={{ flex: 1 }}>
+                  <Text style={commonStyles.label}>Primeira emissão de CNH</Text>
+                  <TouchableOpacity
+                    style={[commonStyles.input]}
+                    onPress={() => setIssuePickerVisible(true)}
+                  >
+                    <Text>{conductor.licenseFirstEmission ? (conductor.licenseFirstEmission as Date).toLocaleDateString() : 'Selecione a data'}</Text>
+                  </TouchableOpacity>
+                  <DateTimePickerModal
+                    isVisible={isIssuePickerVisible}
+                    mode="date"
+                    minimumDate={new Date(1900, 0, 1)}
+                    maximumDate={new Date()}
+                    onConfirm={date => {
+                      setIssuePickerVisible(false);
+                      handleChangeInput('licenseFirstEmission', date);
+                    }}
+                    onCancel={() => setIssuePickerVisible(false)}
+                  />
+                </View>
+                
+              </FormRow>
+
+              {/* Foto da CNH */}
+              <View style={commonStyles.inputContainer}>
+                <Text style={commonStyles.label}>Foto da CNH</Text>
+                {conductor.licensePhoto ? (
+                  <VehiclePhoto photoUri={conductor.licensePhoto} onEdit={openCamera} />
+                ) : (
+                  <View style={{ alignItems: 'center', marginTop: 10 }}>
+                    <View style={{ width: 150, alignItems: 'center' }}>
+                      <PhotoButton
+                        photoUri={conductor.licensePhoto}
+                        title="Adicionar foto"
+                        onPress={openCamera}
+                      />
+
+                    </View>
+                  </View>
+                )}
+
+
+                <View style={{ alignItems: 'center', marginBottom: 20 }}>
+                  <TouchableOpacity
+                    style={[commonStyles.buttonSmall, { marginTop: 0, alignItems: 'center' }]}
+                    onPress={async () => {
+                      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
+                      if (status !== 'granted') {
+                        Alert.alert('Permissão necessária', 'Permita acesso à galeria para selecionar uma foto.');
+                        return;
+                      }
+                      const result = await ImagePicker.launchImageLibraryAsync({
+                        allowsEditing: true,
+                        quality: 0.8,
+                      });
+                      if (!result.canceled) {
+                        const uri =
+                          (result.assets && result.assets[0] && result.assets[0].uri) || (result as any).uri;
+                        setConductor(prev => ({ ...prev, licensePhoto: uri }));
+                      }
+                    }}
+                  >
+                    <Text style={commonStyles.buttonText}>Galeria</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
             </View>
 
-                {/* Footer */}
-                <View style={[commonStyles.footer]}>
-                    <View style={commonStyles.footerRow}>
-                      <Button onPress={handleBack} title="Voltar" variant="outline"/>
-                      <Button onPress={handleAddConductor} title="Adicionar" variant="primary" disabled={!canRedirect}/>
-                      <Button onPress={handleRedirect} title="Continuar" variant="primary" disabled={conductors.length === 0}/>
-                    </View>
-                </View>
-            </ScrollView>     
+            {/* Footer */}
+            <View style={[commonStyles.footer]}>
+              <View style={commonStyles.footerRow}>
+                <Button onPress={handleBack} title="Voltar" variant="outline" />
+                <Button onPress={handleAddConductor} title="Adicionar" variant="primary" disabled={!canRedirect} />
+                <Button onPress={handleRedirect} title="Continuar" variant="primary" disabled={conductors.length === 0} />
+              </View>
+            </View>
+          </ScrollView>
         </View>
 
-    </KeyboardAvoidingView>
+      </KeyboardAvoidingView>
     </View>
-    
+
   );
 }

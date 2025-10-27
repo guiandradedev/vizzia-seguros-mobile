@@ -11,6 +11,8 @@ interface CreateVehicleContextType {
     changeVehiclePhoto: (photoIndex: number, uri: string) => void,
     conductors: Conductor[],
     addConductor: (conductor: Conductor) => void,
+    removeConductor: (index: number) => void,
+    updateConductor: (index: number, conductor: Conductor) => void,
     maxConductors: number
 }
 
@@ -61,11 +63,14 @@ export const vehicleUses = ['Particular', 'Comercial'] as const;
 export type VehicleUses = typeof vehicleUses[number];
 
 interface Vehicle {
+    id?: number;
     model: string,
     // nome do modelo retornado pela API (para exibição). Se presente, preferir este campo.
     model_name?: string,
     // Agora armazenamos o código da marca no veículo (ex: Volkswagen -> 59)
     brand: CarBrandCode,
+    // código do modelo retornado pela API (ex: '6090'). Mantemos tanto código quanto nome para compatibilidade.
+    model_code?: string,
     // brand_name: CarBrandName,
     year: number,
     color: string,
@@ -78,8 +83,8 @@ interface Vehicle {
 export interface Conductor {
     name: string;
     licenseNumber: string;
-    licenseExpiry: string;
-    licenseFirstEmission: number; // ano de primeira emissao
+    licenseExpiry: Date | null;
+    licenseFirstEmission: Date | null; // ano/mes da primeira emissao
     licensePhoto?: string // foto da cnh
     relationship: string;
     phone: string;
@@ -118,6 +123,16 @@ export const CreateVehicleProvider: React.FC<CreateVehicleProviderProps> = ({ ch
     function addConductor(conductor: Conductor): void {
         setConductors(prevConductors => [...prevConductors, conductor]);
     }
+    function removeConductor(index: number): void {
+        setConductors(prev => prev.filter((_, i) => i !== index));
+    }
+    function updateConductor(index: number, conductor: Conductor): void {
+        setConductors(prev => {
+            const copy = [...prev];
+            if (index >= 0 && index < copy.length) copy[index] = conductor;
+            return copy;
+        });
+    }
     function changeInitialCarPhoto(uri: string): void {
         setInitialCarPhoto(uri);
     }
@@ -131,6 +146,8 @@ export const CreateVehicleProvider: React.FC<CreateVehicleProviderProps> = ({ ch
         changeVehiclePhoto,
         conductors,
         addConductor,
+        removeConductor,
+        updateConductor,
         maxConductors
     };
 

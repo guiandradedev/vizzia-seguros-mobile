@@ -72,8 +72,8 @@ export default function VehicleDetailsForm() {
         loadModelsFromApi();
     }, [currentBrandName, vehicle.year, vehicle.fuel]);
 
-    // Resolve o nome do modelo atual a partir do código salvo em vehicle.model
-    const currentModelName: string | undefined = modelOptions.find(item => item.code === vehicle.model)?.name;
+    // Resolve o nome do modelo atual a partir do campo model_name (preferível) ou usando model_code
+    const currentModelName: string | undefined = (vehicle as any).model_name ?? modelOptions.find(item => item.code === (vehicle as any).model_code)?.name;
 
     function handleChangePlate(text: string) {
         // Normaliza entrada para maiúsculas e sem espaços
@@ -120,7 +120,8 @@ export default function VehicleDetailsForm() {
                                 Alert.alert('Atenção', 'Preencha Marca, Ano e Combustível antes de selecionar o Modelo.');
                                 return;
                             }
-                            setSelectedModel(vehicle.model || '');
+                            // selectedModel stores the model code (string). Use the stored model_code if available.
+                            setSelectedModel((vehicle as any).model_code || '');
                             setModelModalVisible(true);
                         }}
                     >
@@ -297,9 +298,10 @@ export default function VehicleDetailsForm() {
                 onConfirm={() => {
                     if (selectedModel) {
                         const found = modelOptions.find(m => m.code === selectedModel);
-                        setVehicle({ ...vehicle, model: selectedModel || '', model_name: found ? found.name : '' });
+                        // Save human-readable name in `model` and `model_name`, keep model_code for API needs
+                        setVehicle({ ...vehicle, model: found ? found.name : selectedModel, model_name: found ? found.name : selectedModel, model_code: found ? found.code : selectedModel });
                     } else {
-                        setVehicle({ ...vehicle, model: '' });
+                        setVehicle({ ...vehicle, model: '', model_name: undefined, model_code: undefined });
                     }
                 }}
             >
@@ -319,7 +321,7 @@ export default function VehicleDetailsForm() {
                     </ScrollView>
                 ) : (
                     <Picker
-                        selectedValue={selectedModel ?? vehicle.model ?? ''}
+                        selectedValue={selectedModel ?? (vehicle as any).model_code ?? ''}
                         onValueChange={(v) => setSelectedModel(String(v))}
                         style={[styles.pickerLarge, { backgroundColor: '#fff', color: '#000' }]}
                         itemStyle={[styles.pickerItemLarge, { color: '#000' }]}
