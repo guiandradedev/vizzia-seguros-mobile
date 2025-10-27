@@ -1,5 +1,6 @@
 import Colors from '@/constants/Colors';
 import { useCreateVehicle } from '@/hooks/useCreateVehicle';
+import axios from '@/lib/axios';
 import { commonStyles } from '@/styles/CommonStyles';
 import axiosLib from 'axios';
 import { Image } from 'expo-image';
@@ -9,7 +10,7 @@ import { ActivityIndicator, Alert, ScrollView, StyleSheet, Text, TouchableOpacit
 
 export default function ResumePhotos() {
   const router = useRouter();
-  const { initialCarPhoto, vehiclePhotos } = useCreateVehicle();
+  const { initialCarPhoto, vehiclePhotos, vehicle } = useCreateVehicle();
   const [submitting, setSubmitting] = useState(false);
 
   const handleBack = () => router.back();
@@ -22,14 +23,15 @@ export default function ResumePhotos() {
     try {
       const formData = new FormData();
 
-      if (initialCarPhoto) {
-        formData.append('initial_photo', {
-          uri: initialCarPhoto,
-          name: 'initial_photo.jpg',
-          type: 'image/jpeg'
-        } as any);
-      }
+      // if (initialCarPhoto) {
+      //   formData.append('initial_photo', {
+      //     uri: initialCarPhoto,
+      //     name: 'initial_photo.jpg',
+      //     type: 'image/jpeg'
+      //   } as any);
+      // }
 
+      const photoDatas: { file: string; type: string }[] = []
       // append other photos
       vehiclePhotos.forEach((p, idx) => {
         if (p.uri) {
@@ -38,14 +40,26 @@ export default function ResumePhotos() {
             name: `vehicle_photo_${idx}.jpg`,
             type: 'image/jpeg'
           } as any);
+          const photoData = {
+            file: `vehicle_photo_${idx}.jpg`,
+            type: "additional"
+          }
+          photoDatas.push(photoData);
         }
       });
 
+      formData.append('photos', JSON.stringify(photoDatas) as any);
+      formData.append("vehicle_id", vehicle.id as any);
+
       // NOTE: the server endpoint and additional vehicle fields payload are not known here.
       // We'll POST the photos to the assumed endpoint '/vehicle'. Adjust keys as needed.
-    //   const res = await api.post('/vehicle', formData, {
-    //     headers: { 'Content-Type': 'multipart/form-data' }
-    //   });
+      //   const res = await api.post('/vehicle', formData, {
+      //     headers: { 'Content-Type': 'multipart/form-data' }
+      //   });
+
+      const response = await axios.post('/vehicle/images', formData, {
+        headers: { 'Content-Type': 'multipart/form-data' }
+      })
 
       Alert.alert('Sucesso', 'Veículo cadastrado com sucesso.');
       // navigate back to vehicles list
@@ -63,7 +77,7 @@ export default function ResumePhotos() {
   }
 
   return (
-    <View style={[styles.safeArea, { backgroundColor: Colors.background }]}> 
+    <View style={[styles.safeArea, { backgroundColor: Colors.background }]}>
       <ScrollView contentContainerStyle={[commonStyles.scrollContent, { flexGrow: 1 }]} showsVerticalScrollIndicator={false}>
         <Text style={commonStyles.title}>Fotos do veículo</Text>
 

@@ -3,13 +3,17 @@
 import { useAuth } from '@/hooks/useAuth';
 import { FontAwesome } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+import { useEffect, useState } from 'react';
+import api from '@/lib/axios';
 
 export default function HomePage() {
   const router = useRouter();
 
   const { signOut, user } = useAuth()
+  const [vehiclesCount, setVehiclesCount] = useState<number | null>(null);
+  const [loadingVehicles, setLoadingVehicles] = useState(false);
   async function handleLogout() {
     signOut()
     Alert.alert("Vizzia Seguros", "Deslogado.")
@@ -23,6 +27,27 @@ export default function HomePage() {
   const insets = useSafeAreaInsets();
 
   console.log(user);
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadVehicles() {
+      setLoadingVehicles(true);
+      try {
+        const res = await api.get('/vehicle');
+        const data = res.data;
+        const count = Array.isArray(data) ? data.length : (data?.length ?? 0);
+        if (mounted) setVehiclesCount(count);
+      } catch (err) {
+        console.log('Erro ao buscar veículos:', err);
+        if (mounted) setVehiclesCount(0);
+      } finally {
+        if (mounted) setLoadingVehicles(false);
+      }
+    }
+
+    loadVehicles();
+    return () => { mounted = false; };
+  }, []);
 
   return (
     <View
@@ -48,15 +73,27 @@ export default function HomePage() {
         </View>
       </View>
 
-      <Text>Aparentemente você não tem nenhum seguro ativo</Text>
-
-      <TouchableOpacity
-        style={styles.button}
-        onPress={handleRedirect}
-        activeOpacity={0.7}
-      >
-        <Text style={styles.buttonText}>Cadastre seu veículo</Text>
-      </TouchableOpacity>
+      <View style={styles.card}>
+        {loadingVehicles ? (
+          <ActivityIndicator />
+        ) : vehiclesCount === null ? (
+          <Text style={styles.infoText}>Buscando seus veículos...</Text>
+        ) : vehiclesCount === 0 ? (
+          <>
+            <Text style={styles.infoText}>Você ainda não tem veículos cadastrados.</Text>
+            <TouchableOpacity style={styles.button} onPress={handleRedirect} activeOpacity={0.75}>
+              <Text style={styles.buttonText}>Cadastre seu veículo</Text>
+            </TouchableOpacity>
+          </>
+        ) : (
+          <>
+            <Text style={styles.countText}>Você tem <Text style={{ fontWeight: '700' }}>{vehiclesCount}</Text> veículo(s) cadastrado(s)</Text>
+            <TouchableOpacity style={styles.button} onPress={() => router.push('/(app)/(tabs)/my-cars')} activeOpacity={0.75}>
+              <Text style={styles.buttonText}>Ver meus veículos</Text>
+            </TouchableOpacity>
+          </>
+        )}
+      </View>
     </View>
   );
 }
@@ -114,4 +151,25 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     textAlign: 'center',
   },
+  card: {
+    backgroundColor: '#fff',
+    padding: 16,
+    borderRadius: 10,
+    marginTop: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 4,
+    elevation: 2,
+  },
+  infoText: {
+    color: '#555',
+    marginBottom: 12,
+    fontSize: 15
+  },
+  countText: {
+    fontSize: 16,
+    color: '#222',
+    marginBottom: 12
+  }
 });

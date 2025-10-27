@@ -36,7 +36,6 @@ export default function ResumeVehicle() {
       return;
     }
     try {
-        Alert.alert("Iniciando o cadastro do veículo, aguarde um momento.");
         const formData = new FormData();
         formData.append('photos', {
             uri: initialCarPhoto,
@@ -47,7 +46,7 @@ export default function ResumeVehicle() {
           file: "initial_photo.jpg",
           type: "initial"
         }
-        // formData.append('photos', photoData as any);
+        formData.append('photos', photoData as any);
 
         const currentBrandName: string | undefined = carBrands.find((item: CarBrand) => item.code === vehicle.brand)?.name;
         formData.append('plate', vehicle.plate); //

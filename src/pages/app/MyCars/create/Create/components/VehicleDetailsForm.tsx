@@ -72,8 +72,12 @@ export default function VehicleDetailsForm() {
         loadModelsFromApi();
     }, [currentBrandName, vehicle.year, vehicle.fuel]);
 
-    // Resolve o nome do modelo atual a partir do código salvo em vehicle.model
-    const currentModelName: string | undefined = modelOptions.find(item => item.code === vehicle.model)?.name;
+    // Resolve o nome do modelo atual. Preferimos procurar pelo `model_code` (código usado para a API).
+    // Se não existir `model_code`, caímos para `vehicle.model` (nome legível) para compatibilidade retroativa.
+    const currentModelName: string | undefined =
+        modelOptions.find(item => item.code === (vehicle as any).model_code)?.name
+        ?? modelOptions.find(item => item.name === vehicle.model)?.name
+        ?? (vehicle.model && String(vehicle.model).length > 0 ? String(vehicle.model) : undefined);
 
     function handleChangePlate(text: string) {
         // Normaliza entrada para maiúsculas e sem espaços
@@ -121,8 +125,9 @@ export default function VehicleDetailsForm() {
                                     return;
                                 }
                                 // set the selected value to the model's display name (ModalPicker works with display strings)
-                                const currentName = modelOptions.find(m => m.code === vehicle.model)?.name ?? '';
-                                setSelectedModel(currentName);
+                                // Prefer using the model_code to lookup the display name; fall back to stored model name.
+                                const currentName = modelOptions.find(m => m.code === (vehicle as any).model_code)?.name ?? vehicle.model ?? '';
+                                setSelectedModel(currentName || null);
                                 setModelModalVisible(true);
                             }}
                     >
@@ -224,7 +229,8 @@ export default function VehicleDetailsForm() {
                     if (selectedModel) {
                         // selectedModel here is the model name (display). Map it back to the code.
                         const found = modelOptions.find(m => m.name === selectedModel);
-                        setVehicle({ ...vehicle, model: found ? found.code : selectedModel, model_name: found ? found.name : selectedModel });
+                        // store human-readable model name in `model`, keep code in `model_code`
+                        setVehicle({ ...vehicle, model: found ? found.name : selectedModel, model_name: found ? found.name : selectedModel, model_code: found ? found.code : selectedModel });
                     } else {
                         setVehicle({ ...vehicle, model: '' });
                     }

@@ -18,7 +18,7 @@ export default function VehicleComponent({ vehicle }: VehicleProps) {
   return (
     <TouchableOpacity onPress={handleOpen} style={styles.container} activeOpacity={0.8}>
       <View style={styles.row}>
-  <Image source={{ uri: 'https://via.placeholder.com/144x96.png?text=Car' }} style={styles.image} />
+        {/* <Image source={{ uri: 'https://via.placeholder.com/144x96.png?text=Car' }} style={styles.image} /> */}
 
         <View style={styles.content}>
           <Text style={styles.title}>{vehicle.brand} {vehicle.model_name ?? vehicle.model}</Text>
