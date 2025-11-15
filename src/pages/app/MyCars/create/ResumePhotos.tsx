@@ -66,6 +66,10 @@ export default function ResumePhotos() {
       router.push('/(app)/(tabs)/my-cars');
     } catch (error) {
       if (axiosLib.isAxiosError(error)) {
+        if (error.response?.data?.message) {
+          Alert.alert('Erro', error.response?.data?.message);
+          return;
+        }
         console.log('Erro ao enviar fotos do veículo:', error.response?.data);
         Alert.alert('Erro', 'Houve um problema ao enviar as fotos. Por favor, tente novamente.');
       } else {

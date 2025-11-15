@@ -55,6 +55,7 @@ export default function ResumeVehicle() {
         formData.append('year', String(vehicle.year)); //
         formData.append('color', vehicle.color); //
         formData.append('odometer', String(vehicle.odomether)); //
+        formData.append('usage', vehicle.usage); //
 
         const fuelIndex = fuelTypes.findIndex((ft: FuelTypes) => ft === vehicle.fuel);
         const fuel_code = fuelIndex >= 0 ? fuelIndex + 1 : null;
@@ -74,6 +75,10 @@ export default function ResumeVehicle() {
     } catch (error) {
         if(axios.isAxiosError(error)) {
             console.log('Erro ao enviar dados do veículo:', error.response?.data);
+            if(error.response?.data?.message) {
+              Alert.alert('Erro', error.response?.data?.message);
+              return;
+            }
             Alert.alert('Erro', 'Houve um problema ao enviar os dados do veículo. Por favor, tente novamente.');
         } else {
             Alert.alert('Erro', 'Ocorreu um erro inesperado. Por favor, tente novamente.');
@@ -98,28 +103,28 @@ export default function ResumeVehicle() {
 
           <View style={{ marginTop: 8 }}>
             <Text style={commonStyles.label}>Modelo</Text>
-            <Text style={commonStyles.input}>{(vehicle as any).model_name ?? vehicle.model}</Text>
+            <Text style={styles.valueText}>{(vehicle as any).model_name ?? vehicle.model}</Text>
 
             <Text style={commonStyles.label}>Marca</Text>
-            <Text style={commonStyles.input}>{vehicle.brand}</Text>
+            <Text style={styles.valueText}>{carBrands.find((b: CarBrand) => b.code === vehicle.brand)?.name ?? String(vehicle.brand)}</Text>
 
             <Text style={commonStyles.label}>Ano</Text>
-            <Text style={commonStyles.input}>{vehicle.year}</Text>
+            <Text style={styles.valueText}>{vehicle.year}</Text>
 
             <Text style={commonStyles.label}>Cor</Text>
-            <Text style={commonStyles.input}>{vehicle.color}</Text>
+            <Text style={styles.valueText}>{vehicle.color}</Text>
 
             <Text style={commonStyles.label}>Placa</Text>
-            <Text style={commonStyles.input}>{vehicle.plate}</Text>
+            <Text style={styles.valueText}>{vehicle.plate}</Text>
 
             <Text style={commonStyles.label}>Odômetro</Text>
-            <Text style={commonStyles.input}>{vehicle.odomether}</Text>
+            <Text style={styles.valueText}>{vehicle.odomether}{typeof vehicle.odomether === 'number' ? ' km' : ''}</Text>
 
             <Text style={commonStyles.label}>Combustível</Text>
-            <Text style={commonStyles.input}>{vehicle.fuel}</Text>
+            <Text style={styles.valueText}>{vehicle.fuel}</Text>
 
             <Text style={commonStyles.label}>Uso</Text>
-            <Text style={commonStyles.input}>{vehicle.usage}</Text>
+            <Text style={styles.valueText}>{vehicle.usage}</Text>
           </View>
 
         </View>
@@ -154,6 +159,12 @@ const styles = StyleSheet.create({
     height: 200,
     borderRadius: 8,
     marginTop: 8,
+  }
+  ,
+  valueText: {
+    paddingVertical: 8,
+    color: '#222',
+    fontSize: 16
   }
 });
 

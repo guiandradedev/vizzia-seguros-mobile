@@ -1,6 +1,4 @@
 import { User, Credentials, Tokens } from '../types/auth';
-
-import users from '../constants/mockup-users.json';
 import { AxiosResponse } from 'axios';
 import axios from '@/lib/axios';
 import { deleteSecure, getSecure, saveSecure } from '@/utils/secure-store';

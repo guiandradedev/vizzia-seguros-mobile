@@ -7,6 +7,8 @@ import { CreateAccountContext } from '../contexts/CreateAccountContext';
 import MaskInput from 'react-native-mask-input';
 import { Picker } from '@react-native-picker/picker';
 import Colors from '@/constants/Colors';
+import { MaritalStatusOptions, MaritalStatusLabelPT, MaritalStatus } from '@/constants/maritalStatus';
+import { GenderOptions, GenderLabelPT, Gender } from '@/constants/gender';
 import { isValidCEP, isValidCPF, isValidCNH } from '@/utils/formatters';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useAuth } from '@/hooks/useAuth';
@@ -26,6 +28,8 @@ const Card = ({ title, children }: { title: string; children: React.ReactNode })
 export default function RegistrationForm() {
   const { setAuthenticated } = useAuth()
   const [modalVisible, setModalVisible] = useState(false);
+  const [maritalModalVisible, setMaritalModalVisible] = useState(false);
+  const [genderModalVisible, setGenderModalVisible] = useState(false);
   const { accountData, updateAccountData, updateAddress, submitRegistration, errors, setErrors } = useCreateAccount();
   const [loading, setLoading] = useState(false);
   const [isDatePickerBirthdateVisible, setDatePickerBirthdateVisible] = useState(false);
@@ -50,7 +54,12 @@ export default function RegistrationForm() {
       if (!isValidCPF(plainCPF)) newErrors.CPF = true;
     }
     if (!accountData.CNH) newErrors.CNH = true;
-    if (!accountData.CHH_emission_date) newErrors.CHH_emission_date = true;
+  if (!accountData.CHH_emission_date) newErrors.CHH_emission_date = true;
+  // required: marital status and gender
+  if (!accountData.marital_status) newErrors.marital_status = true;
+  if (!accountData.gender) newErrors.gender = true;
+    // valida presença da data de nascimento (idade é validada no momento da seleção)
+    if (!accountData.birthDate) newErrors.birthDate = true;
     if (!accountData.address.CEP) newErrors.CEP = true;
     if (!accountData.address.street) newErrors.street = true;
     if (!accountData.address.number) newErrors.number = true;
@@ -85,7 +94,10 @@ export default function RegistrationForm() {
         <Input
           label="Nome Completo"
           value={accountData.name}
-          onChangeText={(text) => updateAccountData('name', text)}
+          onChangeText={(text) => {
+            updateAccountData('name', text);
+            setErrors((prev) => ({ ...prev, name: false }));
+          }}
           error={errors.name ? "Nome é obrigatório" : undefined}
           placeholder="Digite seu nome completo"
         />
@@ -96,6 +108,7 @@ export default function RegistrationForm() {
             // sanitize: remove spaces and force lowercase
             const cleaned = String(text).replace(/\s+/g, '').toLowerCase();
             updateAccountData('email', cleaned);
+            setErrors((prev) => ({ ...prev, email: false }));
           }}
           onBlur={() => {
             const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/i;
@@ -109,7 +122,10 @@ export default function RegistrationForm() {
         <Input
           label="Senha"
           value={accountData.password}
-          onChangeText={(text) => updateAccountData('password', text)}
+          onChangeText={(text) => {
+            updateAccountData('password', text);
+            setErrors((prev) => ({ ...prev, password: false }));
+          }}
           error={errors.password ? "Senha é obrigatória" : undefined}
           placeholder="Crie uma senha segura"
           secureTextEntry
@@ -122,6 +138,7 @@ export default function RegistrationForm() {
             value={accountData.phone.number}
             onChangeText={(masked, unmasked) => {
               updateAccountData('phone', { ...accountData.phone, number: masked });
+              setErrors((prev) => ({ ...prev, phone: false }));
             }}
             mask={['(', /\d/, /\d/, ')', ' ', /\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/, /\d/]}
             placeholder="(XX) XXXXX-XXXX"
@@ -133,7 +150,7 @@ export default function RegistrationForm() {
 
         <View>
           <Text style={styles.label}>Data de Nascimento</Text>
-          <TouchableOpacity onPress={() => setDatePickerBirthdateVisible(true)} style={[styles.input, { justifyContent: 'center' }]}>
+          <TouchableOpacity onPress={() => setDatePickerBirthdateVisible(true)} style={[styles.input, { justifyContent: 'center' }, errors.birthDate && styles.inputError]}>
             <Text>{accountData.birthDate ? (accountData.birthDate instanceof Date ? accountData.birthDate.toLocaleDateString() : String(accountData.birthDate)) : 'Selecione a data'}</Text>
           </TouchableOpacity>
           <DateTimePickerModal
@@ -142,10 +159,52 @@ export default function RegistrationForm() {
             maximumDate={new Date()}
             onConfirm={(date: Date) => {
               setDatePickerBirthdateVisible(false);
+              // valida idade no momento da seleção
+              const today = new Date();
+              const bd = date;
+              let age = today.getFullYear() - bd.getFullYear();
+              const m = today.getMonth() - bd.getMonth();
+              if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+              if (age < 18) {
+                setErrors((prev) => ({ ...prev, birthDate: true }));
+              } else {
+                setErrors((prev) => ({ ...prev, birthDate: false }));
+              }
               updateAccountData('birthDate', date);
             }}
             onCancel={() => setDatePickerBirthdateVisible(false)}
           />
+          {errors.birthDate && (
+            <Text style={styles.errorText}>
+              {accountData.birthDate ? 'Você precisa ter pelo menos 18 anos' : 'Data de nascimento é obrigatória'}
+            </Text>
+          )}
+        </View>
+        <View>
+          <Text style={styles.label}>Status de relacionamento</Text>
+          <TouchableOpacity
+            style={[styles.pickerDisplay, errors.marital_status && styles.inputError]}
+            onPress={() => setMaritalModalVisible(true)}
+          >
+            <Text style={styles.pickerDisplayText}>
+              {accountData.marital_status ? MaritalStatusLabelPT[accountData.marital_status as unknown as MaritalStatus] : 'Selecione o status'}
+            </Text>
+            <Text style={styles.pickerIcon}>▼</Text>
+          </TouchableOpacity>
+          {errors.marital_status && <Text style={styles.errorText}>Status de relacionamento é obrigatório</Text>}
+        </View>
+        <View>
+          <Text style={styles.label}>Gênero</Text>
+          <TouchableOpacity
+            style={[styles.pickerDisplay, errors.gender && styles.inputError]}
+            onPress={() => setGenderModalVisible(true)}
+          >
+            <Text style={styles.pickerDisplayText}>
+              {accountData.gender ? (GenderLabelPT as any)[accountData.gender as unknown as Gender] : 'Selecione o gênero'}
+            </Text>
+            <Text style={styles.pickerIcon}>▼</Text>
+          </TouchableOpacity>
+          {errors.gender && <Text style={styles.errorText}>Gênero é obrigatório</Text>}
         </View>
       </Card>
 
@@ -158,6 +217,7 @@ export default function RegistrationForm() {
             value={accountData.CPF}
             onChangeText={(masked, unmasked) => {
               updateAccountData('CPF', masked);
+              setErrors((prev) => ({ ...prev, CPF: false }));
             }}
             mask={[/\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '.', /\d/, /\d/, /\d/, '-', /\d/, /\d/]}
             placeholder="000.000.000-00"
@@ -179,6 +239,7 @@ export default function RegistrationForm() {
             value={accountData.CNH}
             onChangeText={(masked, unmasked) => {
               updateAccountData('CNH', masked);
+              setErrors((prev) => ({ ...prev, CNH: false }));
             }}
             placeholder="Digite o número da CNH"
             placeholderTextColor="#999"
@@ -194,7 +255,10 @@ export default function RegistrationForm() {
 
         <View>
           <Text style={styles.label}>Data de Emissão da Primeira CNH</Text>
-          <TouchableOpacity onPress={() => setDatePickerFirstCNHEmissionVisible(true)} style={[styles.input, { justifyContent: 'center' }]}>
+          <TouchableOpacity
+            onPress={() => setDatePickerFirstCNHEmissionVisible(true)}
+            style={[styles.input, { justifyContent: 'center' }, errors.CHH_emission_date && styles.inputError]}
+          >
             <Text>{accountData.CHH_emission_date ? (accountData.CHH_emission_date instanceof Date ? accountData.CHH_emission_date.toLocaleDateString() : String(accountData.CHH_emission_date)) : 'Selecione a data'}</Text>
           </TouchableOpacity>
           <DateTimePickerModal
@@ -204,9 +268,12 @@ export default function RegistrationForm() {
             onConfirm={(date: Date) => {
               setDatePickerFirstCNHEmissionVisible(false);
               updateAccountData('CHH_emission_date', date);
+              // clear error when user selects a valid date
+              setErrors((prev) => ({ ...prev, CHH_emission_date: false }));
             }}
             onCancel={() => setDatePickerFirstCNHEmissionVisible(false)}
           />
+          {errors.CHH_emission_date && <Text style={styles.errorText}>Data de emissão é obrigatória</Text>}
         </View>
       </Card>
 
@@ -219,6 +286,7 @@ export default function RegistrationForm() {
             value={accountData.address.CEP}
             onChangeText={(masked, unmasked) => {
               updateAddress('CEP', masked);
+              setErrors((prev) => ({ ...prev, CEP: false }));
             }}
             mask={[/\d/, /\d/, /\d/, /\d/, /\d/, '-', /\d/, /\d/, /\d/]}
             placeholder="00000-000"
@@ -256,14 +324,20 @@ export default function RegistrationForm() {
         <Input
           label="Rua / Logradouro"
           value={accountData.address.street}
-          onChangeText={(text) => updateAddress('street', text)}
+          onChangeText={(text) => {
+            updateAddress('street', text);
+            setErrors((prev) => ({ ...prev, street: false }));
+          }}
           error={errors.street ? "Rua é obrigatória" : undefined}
           placeholder="Ex: Av. Brasil"
         />
         <Input
           label="Número"
           value={accountData.address.number}
-          onChangeText={(text) => updateAddress('number', text)}
+          onChangeText={(text) => {
+            updateAddress('number', text);
+            setErrors((prev) => ({ ...prev, number: false }));
+          }}
           error={errors.number ? "Número é obrigatório" : undefined}
           placeholder="123"
           keyboardType="numeric"
@@ -278,14 +352,20 @@ export default function RegistrationForm() {
         <Input
           label="Bairro"
           value={accountData.address.neighborhood}
-          onChangeText={(text) => updateAddress('neighborhood', text)}
+          onChangeText={(text) => {
+            updateAddress('neighborhood', text);
+            setErrors((prev) => ({ ...prev, neighborhood: false }));
+          }}
           error={errors.neighborhood ? "Bairro é obrigatório" : undefined}
           placeholder="Centro"
         />
         <Input
           label="Cidade"
           value={accountData.address.city}
-          onChangeText={(text) => updateAddress('city', text)}
+          onChangeText={(text) => {
+            updateAddress('city', text);
+            setErrors((prev) => ({ ...prev, city: false }));
+          }}
           error={errors.city ? "Cidade é obrigatória" : undefined}
           placeholder="Ex: São Paulo"
         />
@@ -317,10 +397,44 @@ export default function RegistrationForm() {
               <Text style={styles.modalButtonText}>Confirmar</Text>
             </TouchableOpacity>
           </View>
-          <Picker selectedValue={accountData.address.state} itemStyle={styles.contentPicker} onValueChange={(itemValue) => updateAddress('state', itemValue)}>
+          <Picker selectedValue={accountData.address.state} itemStyle={styles.contentPicker} onValueChange={(itemValue) => { updateAddress('state', itemValue); setErrors((prev) => ({ ...prev, state: false })); }}>
             <Picker.Item label="Selecione um Estado" value="" />
             {ufs.map((uf) => (
               <Picker.Item key={uf} label={uf} value={uf} />
+            ))}
+          </Picker>
+        </View>
+      </Modal>
+
+      <Modal transparent={true} visible={maritalModalVisible} animationType="slide" onRequestClose={() => setMaritalModalVisible(false)}>
+        <TouchableOpacity style={styles.modalOverlay} onPress={() => setMaritalModalVisible(false)} />
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setMaritalModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Confirmar</Text>
+            </TouchableOpacity>
+          </View>
+          <Picker selectedValue={accountData.marital_status} itemStyle={styles.contentPicker} onValueChange={(itemValue) => { updateAccountData('marital_status', itemValue); setErrors((prev) => ({ ...prev, marital_status: false })); }}>
+            <Picker.Item label="Selecione um status" value="" />
+            {MaritalStatusOptions.map((m) => (
+              <Picker.Item key={m} label={MaritalStatusLabelPT[m]} value={m} />
+            ))}
+          </Picker>
+        </View>
+      </Modal>
+
+      <Modal transparent={true} visible={genderModalVisible} animationType="slide" onRequestClose={() => setGenderModalVisible(false)}>
+        <TouchableOpacity style={styles.modalOverlay} onPress={() => setGenderModalVisible(false)} />
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setGenderModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Confirmar</Text>
+            </TouchableOpacity>
+          </View>
+          <Picker selectedValue={accountData.gender} itemStyle={styles.contentPicker} onValueChange={(itemValue) => { updateAccountData('gender', itemValue); setErrors((prev) => ({ ...prev, gender: false })); }}>
+            <Picker.Item label="Selecione o gênero" value="" />
+            {GenderOptions.map((g) => (
+              <Picker.Item key={g} label={(GenderLabelPT as any)[g]} value={g} />
             ))}
           </Picker>
         </View>

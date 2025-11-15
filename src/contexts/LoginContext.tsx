@@ -4,6 +4,8 @@ import { saveSecure } from '@/utils/secure-store';
 import axios, { AxiosResponse } from 'axios';
 import { jwtDecode } from "jwt-decode";
 import React, { createContext, ReactNode, useContext, useState } from 'react';
+import { MaritalStatusType, getMaritalStatusApiValue } from '@/constants/maritalStatus';
+import { GenderType, getGenderApiValue } from '@/constants/gender';
 
 export interface ResponseSocialAuthUserNotExistsAPI {
   email: string,
@@ -28,6 +30,8 @@ interface User {
   neighborhood: string;
   city: string;
   state: string | null;
+  marital_status?: MaritalStatusType | '';
+  gender?: GenderType | '';
 }
 
 interface InitialData {
@@ -76,7 +80,9 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       complement: '',
       neighborhood: '',
       city: '',
-      state: null
+      state: null,
+      marital_status: '',
+      gender: ''
     });
   }
 
@@ -105,6 +111,23 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
       const decodedToken = jwtDecode<CreateUserSocialTokenDecode>(initialData.createusersocialtoken);
       if (!decodedToken) return false;
 
+      // validações: marital_status e gender não podem ser vazios
+      if (!user.marital_status || !user.gender) {
+        console.error('Missing required social registration fields: marital_status or gender');
+        return false;
+      }
+
+      const computeAge = (d: Date | null) => {
+        if (!d) return undefined;
+        const today = new Date();
+        let age = today.getFullYear() - d.getFullYear();
+        const m = today.getMonth() - d.getMonth();
+        if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
+        return age;
+      };
+
+      // age validation is handled on change in the UI; don't block here
+
       const data = {
         email: user.email,
         name: user.nome,
@@ -126,6 +149,9 @@ export const LoginProvider: React.FC<{ children: ReactNode }> = ({ children }) =
         neighborhood: user.neighborhood,
         city: user.city,
         state: user.state,
+        gender: getGenderApiValue((user as any).gender),
+        marital_status: getMaritalStatusApiValue((user as any).marital_status),
+        age: computeAge(user.birthDate),
       }
       const response: AxiosResponse<Tokens> = await axiosNoAuth.post('/social-auth/register', data, {
         headers: {

@@ -8,8 +8,11 @@ export interface Vehicle {
   year: number;
   color: string;
   odometer: string;
-  finished: boolean
+  state: number
 }
+
+import { MaritalStatusType } from '@/constants/maritalStatus';
+import { GenderType } from '@/constants/gender';
 
 export interface User {
   id: number;
@@ -22,6 +25,8 @@ export interface User {
   birthday_date: Date;
   status: boolean;
   vehicles: Vehicle[];
+  marital_status: MaritalStatusType;
+  gender?: GenderType | '';
 }
 
 export interface Credentials {

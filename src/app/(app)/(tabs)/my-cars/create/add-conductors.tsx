@@ -31,7 +31,7 @@ export default function AddConductorsScreen() {
     phone: '',
     email: '',
     document: '',
-    birthDate: new Date(),
+    birthDate: null,
   };
 
   const [conductor, setConductor] = useState<Conductor>(emptyConductor);
@@ -44,10 +44,20 @@ export default function AddConductorsScreen() {
   const [canRedirect, setCanRedirect] = useState(false);
 
   useEffect(() => {
-    setCanRedirect(!!(conductor.birthDate && conductor.document &&
-      conductor.email && conductor.licenseExpiry && conductor.licenseFirstEmission &&
-      conductor.licenseNumber, conductor.licensePhoto, conductor.name, conductor.phone &&
-      conductor.relationship));
+    // Validate required fields strictly. Dates must be valid Date objects.
+    const hasName = typeof conductor.name === 'string' && conductor.name.trim().length > 0;
+    const hasDocument = typeof conductor.document === 'string' && isValidCPF(conductor.document);
+    const hasEmail = typeof conductor.email === 'string' && isValidEmail(conductor.email);
+    const phoneDigits = String(conductor.phone || '').replace(/\D/g, '');
+    const hasPhone = phoneDigits.length >= 10; // allow 10 or 11 depending on format
+    const hasLicenseNumber = typeof conductor.licenseNumber === 'string' && conductor.licenseNumber.replace(/\D/g, '').length >= 11;
+    const hasLicensePhoto = !!conductor.licensePhoto;
+    const hasRelationship = typeof conductor.relationship === 'string' && conductor.relationship.trim().length > 0;
+    const birthValid = conductor.birthDate instanceof Date && !isNaN(conductor.birthDate.getTime());
+    const expiryValid = conductor.licenseExpiry instanceof Date && !isNaN(conductor.licenseExpiry.getTime());
+    const issueValid = conductor.licenseFirstEmission instanceof Date && !isNaN(conductor.licenseFirstEmission.getTime());
+
+    setCanRedirect(hasName && hasDocument && hasEmail && hasPhone && hasLicenseNumber && hasLicensePhoto && hasRelationship && birthValid && expiryValid && issueValid);
   }, [conductor]);
 
 
@@ -114,6 +124,39 @@ export default function AddConductorsScreen() {
 
     if (!isValidEmail(conductor.email)) {
       Alert.alert('Erro', 'Email inválido.');
+      return;
+    }
+
+    // Additional strict validations to prevent incomplete dates or missing required fields
+    if (!(conductor.birthDate instanceof Date) || isNaN(conductor.birthDate.getTime())) {
+      Alert.alert('Erro', 'Data de nascimento inválida ou não selecionada.');
+      return;
+    }
+
+    if (!(conductor.licenseExpiry instanceof Date) || isNaN(conductor.licenseExpiry.getTime())) {
+      Alert.alert('Erro', 'Validade da CNH inválida ou não selecionada.');
+      return;
+    }
+
+    if (!(conductor.licenseFirstEmission instanceof Date) || isNaN(conductor.licenseFirstEmission.getTime())) {
+      Alert.alert('Erro', 'Data de primeira emissão da CNH inválida ou não selecionada.');
+      return;
+    }
+
+    if (!conductor.licensePhoto) {
+      Alert.alert('Erro', 'Foto da CNH é obrigatória.');
+      return;
+    }
+
+    const phoneDigits = String(conductor.phone || '').replace(/\D/g, '');
+    if (!phoneDigits || phoneDigits.length < 10) {
+      Alert.alert('Erro', 'Telefone inválido. Informe DDD + número (min. 10 dígitos).');
+      return;
+    }
+
+    const cnhDigits = String(conductor.licenseNumber || '').replace(/\D/g, '');
+    if (!cnhDigits || cnhDigits.length < 11) {
+      Alert.alert('Erro', 'Número da CNH inválido. Informe os dígitos (mín. 11).');
       return;
     }
 
@@ -217,7 +260,8 @@ export default function AddConductorsScreen() {
                     isVisible={isExpiryPickerVisible}
                     mode="date"
                     minimumDate={new Date(1900, 0, 1)}
-                    maximumDate={new Date()}
+                    // Allow CNH expiry to be a future date (people have valid CNHs beyond today)
+                    maximumDate={new Date(2100, 11, 31)}
                     onConfirm={date => {
                       setExpiryPickerVisible(false);
                       handleChangeInput('licenseExpiry', date);

@@ -90,7 +90,7 @@ export interface Conductor {
     phone: string;
     email: string;
     document: string, // cpf
-    birthDate: Date,
+    birthDate: Date | null,
 }
 
 export const CreateVehicleProvider: React.FC<CreateVehicleProviderProps> = ({ children }) => {

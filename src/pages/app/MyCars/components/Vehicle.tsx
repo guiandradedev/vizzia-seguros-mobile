@@ -27,7 +27,7 @@ export default function VehicleComponent({ vehicle }: VehicleProps) {
         </View>
 
         {
-          vehicle.finished === false && (
+          vehicle.state !== 3 && (
             <View style={styles.statusDot} accessible accessibilityLabel="Cadastro incompleto" />
           )
         }

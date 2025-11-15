@@ -55,7 +55,7 @@ export default function ShowVehiclePage() {
             phone: a.phone ?? '',
             email: a.email ?? '',
             document: a.cpf ?? '',
-            birthDate: a.birthDate ? new Date(a.birthDate) : new Date(),
+            birthDate: a.birthDate ? new Date(a.birthDate) : null,
           }));
 
           setConductors(adapted as Conductor[]);
@@ -107,7 +107,7 @@ export default function ShowVehiclePage() {
                   <Text style={styles.bannerTitle}>{vehicle.brand} {(vehicle as any).model_name ?? vehicle.model}</Text>
                   <Text style={styles.bannerSubtitle}>{vehicle.plate} • {vehicle.year}</Text>
                 </View>
-                {!vehicle.finished && <View style={styles.badge}><Text style={styles.badgeText}>Incompleto</Text></View>}
+                {vehicle.state !== 3 && <View style={styles.badge}><Text style={styles.badgeText}>Incompleto</Text></View>}
               </View>
             </View>
 

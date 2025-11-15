@@ -66,10 +66,6 @@ export default function LoginPage() {
         initialize();
     }, []);
 
-    if (user) {
-        return <Redirect href="/(app)/(tabs)" />;
-    }
-
     const handleLogin = useCallback(async () => {
         const trimmedEmail = email.trim();
         if (!trimmedEmail || !password) {
@@ -91,6 +87,10 @@ export default function LoginPage() {
             router.replace('/(app)/(tabs)');
         }
     }, [email, password, signIn, router]);
+
+    if (user) {
+        return <Redirect href="/(app)/(tabs)" />;
+    }
 
     return (
         <SafeAreaView style={{ flex: 1, backgroundColor: Colors.background }}>

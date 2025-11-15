@@ -21,13 +21,14 @@ interface AccountData {
     name: string;
     email: string;
     password: string;
-    birthDate: Date;
+    birthDate: Date | null;
     CPF: string;
     CNH: string;
-    CHH_emission_date: Date;
+    CHH_emission_date: Date | null;
     address: Address;
     phone: Phone;
-
+    marital_status: import('@/constants/maritalStatus').MaritalStatusType;
+    gender: import('@/constants/gender').GenderType;
 }
 
 interface CreateAccountContextType {
@@ -42,6 +43,8 @@ interface CreateAccountContextType {
 import axios, { AxiosResponse } from 'axios'
 import { Tokens } from '@/types/auth';
 import { axiosNoAuth } from '@/lib/axios';
+import { getMaritalStatusApiValue } from '@/constants/maritalStatus';
+import { getGenderApiValue } from '@/constants/gender';
 
 export const CreateAccountContext = createContext<CreateAccountContextType | undefined>(undefined);
 
@@ -62,8 +65,10 @@ export const CreateAccountProvider: React.FC<CreateAccountProviderProps> = ({ ch
         password: '',
         CPF: '',
         CNH: '',
-        birthDate: new Date(),
-        CHH_emission_date: new Date(),
+        marital_status: '',
+        gender: '',
+        birthDate: null,
+        CHH_emission_date: null,
         address: {
             street: '',
             number: '',
@@ -98,7 +103,29 @@ export const CreateAccountProvider: React.FC<CreateAccountProviderProps> = ({ ch
 
     const submitRegistration = async () => {
         try {
-            // console.log('Enviando dados de registro:', accountData);
+            // validações: marital_status e gender não podem ser vazios
+            const newErrors: { [key: string]: boolean } = {};
+            if (!accountData.marital_status) newErrors.marital_status = true;
+            if (!accountData.gender) newErrors.gender = true;
+
+            // valida idade mínima 18 anos
+            const computeAge = (d: Date | null) => {
+                if (!d) return undefined;
+                const today = new Date();
+                let age = today.getFullYear() - d.getFullYear();
+                const m = today.getMonth() - d.getMonth();
+                if (m < 0 || (m === 0 && today.getDate() < d.getDate())) age--;
+                return age;
+            };
+
+            // age validation is handled on change in the UI; here we only check required fields
+            if (Object.keys(newErrors).length > 0) {
+                setErrors((prev) => ({ ...prev, ...newErrors }));
+                throw new Error('Campos obrigatórios faltando');
+            }
+
+            // calcula idade a partir da data de nascimento
+
 
             const data = {
                 name: accountData.name,
@@ -117,7 +144,10 @@ export const CreateAccountProvider: React.FC<CreateAccountProviderProps> = ({ ch
                 cep: accountData.address.CEP,
                 phone_number: accountData.phone.number.replace(/\D/g, ''),
                 type: accountData.phone.type,
-                status: true
+                    status: true,
+                    gender: getGenderApiValue(accountData.gender),
+                    marital_status: getMaritalStatusApiValue(accountData.marital_status),
+                    age: computeAge(accountData.birthDate),
             }
 
             console.log(JSON.stringify(data, null, 2));

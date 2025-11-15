@@ -8,6 +8,8 @@ import { useState } from "react";
 import { ActivityIndicator, Alert, KeyboardAvoidingView, Modal, Platform, ScrollView, StyleSheet, Text, TextInput, TouchableOpacity, View } from "react-native";
 import MaskInput from 'react-native-mask-input';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { MaritalStatusOptions, MaritalStatusLabelPT } from '@/constants/maritalStatus';
+import { GenderOptions, GenderLabelPT } from '@/constants/gender';
 
 export default function SocialRegisterPage() {
     const [isCreatingAccount, setisCreatingAccount] = useState(false);
@@ -16,6 +18,8 @@ export default function SocialRegisterPage() {
     const { setAuthenticated } = useAuth()
 
     const [modalVisible, setModalVisible] = useState(false);
+    const [maritalModalVisible, setMaritalModalVisible] = useState(false);
+    const [genderModalVisible, setGenderModalVisible] = useState(false);
     const [isDatePickerBirthdateVisible, setDatePickerBirthdateVisible] = useState(false);
     const [isDatePickerCnhEmissionVisible, setDatePickerCnhEmissionVisible] = useState(false);
     const [errors, setErrors] = useState<Record<string, boolean>>({});
@@ -61,6 +65,8 @@ export default function SocialRegisterPage() {
             Alert.alert("Erro", "Data de nascimento é obrigatória.");
             return;
         }
+
+        // idade mínima é validada no momento da seleção da data (onChange)
 
         if (!user?.cpf?.trim() || !isValidCPF(user.cpf)) {
             newErrors.cpf = true;
@@ -222,6 +228,33 @@ export default function SocialRegisterPage() {
                             <TouchableOpacity onPress={() => setDatePickerBirthdateVisible(true)} style={styles.input}>
                                 <Text>{user?.birthDate ? new Date(user.birthDate).toLocaleDateString() : 'Selecione a data'}</Text>
                             </TouchableOpacity>
+                            {errors.birthDate && <Text style={[styles.inputError, { color: '#EF4444', marginTop: 4 }]}>Você precisa ter pelo menos 18 anos</Text>}
+                        </View>
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.label}>Status de relacionamento</Text>
+                            <TouchableOpacity
+                                style={[styles.pickerDisplay, errors.marital_status && styles.inputError]}
+                                onPress={() => setMaritalModalVisible(true)}
+                            >
+                                <Text style={styles.pickerDisplayText}>
+                                    {user && (user as any).marital_status ? (MaritalStatusLabelPT as any)[(user as any).marital_status] : 'Selecione o status'}
+                                </Text>
+                                <Text style={styles.pickerIcon}>▼</Text>
+                            </TouchableOpacity>
+                            {errors.marital_status && <Text style={[styles.inputError, { color: '#EF4444', marginTop: 4 }]}>Status de relacionamento é obrigatório</Text>}
+                        </View>
+                        <View style={styles.inputContainer}>
+                            <Text style={styles.label}>Gênero</Text>
+                            <TouchableOpacity
+                                style={[styles.pickerDisplay, errors.gender && styles.inputError]}
+                                onPress={() => setGenderModalVisible(true)}
+                            >
+                                <Text style={styles.pickerDisplayText}>
+                                    {user && (user as any).gender ? (GenderLabelPT as any)[(user as any).gender] : 'Selecione o gênero'}
+                                </Text>
+                                <Text style={styles.pickerIcon}>▼</Text>
+                            </TouchableOpacity>
+                            {errors.gender && <Text style={[styles.inputError, { color: '#EF4444', marginTop: 4 }]}>Gênero é obrigatório</Text>}
                         </View>
                     </View>
 
@@ -403,6 +436,18 @@ export default function SocialRegisterPage() {
                     maximumDate={new Date()}
                     onConfirm={(date) => {
                         setDatePickerBirthdateVisible(false);
+                        // valida idade no momento da seleção
+                        const today = new Date();
+                        const bd = date as Date;
+                        let age = today.getFullYear() - bd.getFullYear();
+                        const m = today.getMonth() - bd.getMonth();
+                        if (m < 0 || (m === 0 && today.getDate() < bd.getDate())) age--;
+                        if (age < 18) {
+                            setErrors(prev => ({ ...prev, birthDate: true }));
+                            Alert.alert('Erro', 'Você precisa ter pelo menos 18 anos para se cadastrar.');
+                        } else {
+                            setErrors(prev => ({ ...prev, birthDate: false }));
+                        }
                         changeUserProperty('birthDate', date);
                     }}
                     onCancel={() => setDatePickerBirthdateVisible(false)}
@@ -441,6 +486,56 @@ export default function SocialRegisterPage() {
                             <Picker.Item label="Selecione um Estado" value="" />
                             {ufs.map((uf) => (
                                 <Picker.Item key={uf} label={uf} value={uf} />
+                            ))}
+                        </Picker>
+                    </View>
+                </Modal>
+                {/* Modal for Marital Status Picker */}
+                <Modal transparent={true} visible={maritalModalVisible} animationType="slide" onRequestClose={() => setMaritalModalVisible(false)}>
+                    <TouchableOpacity style={styles.modalOverlay} onPress={() => setMaritalModalVisible(false)} />
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Selecione o Status</Text>
+                            <TouchableOpacity onPress={() => setMaritalModalVisible(false)}>
+                                <Text style={styles.modalButtonText}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Picker
+                            selectedValue={(user as any)?.marital_status || ''}
+                            onValueChange={(itemValue) => {
+                                changeUserProperty('marital_status', itemValue || '');
+                                if (itemValue) setMaritalModalVisible(false);
+                            }}
+                            style={styles.picker}
+                        >
+                            <Picker.Item label="Selecione um status" value="" />
+                            {MaritalStatusOptions.map((m) => (
+                                <Picker.Item key={m} label={(MaritalStatusLabelPT as any)[m]} value={m} />
+                            ))}
+                        </Picker>
+                    </View>
+                </Modal>
+                {/* Modal for Gender Picker */}
+                <Modal transparent={true} visible={genderModalVisible} animationType="slide" onRequestClose={() => setGenderModalVisible(false)}>
+                    <TouchableOpacity style={styles.modalOverlay} onPress={() => setGenderModalVisible(false)} />
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <Text style={styles.modalTitle}>Selecione o Gênero</Text>
+                            <TouchableOpacity onPress={() => setGenderModalVisible(false)}>
+                                <Text style={styles.modalButtonText}>Cancelar</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Picker
+                            selectedValue={(user as any)?.gender || ''}
+                            onValueChange={(itemValue) => {
+                                changeUserProperty('gender', itemValue || '');
+                                if (itemValue) setGenderModalVisible(false);
+                            }}
+                            style={styles.picker}
+                        >
+                            <Picker.Item label="Selecione o gênero" value="" />
+                            {GenderOptions.map((g) => (
+                                <Picker.Item key={g} label={(GenderLabelPT as any)[g]} value={g} />
                             ))}
                         </Picker>
                     </View>

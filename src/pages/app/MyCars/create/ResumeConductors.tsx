@@ -83,7 +83,7 @@ export default function ResumeConductors() {
     async function handleRedirect() {
         // Salvar na API os condutores extra
         try {
-            
+
             const payloadConductors = conductors.map(conductor => {
                 const cnhExpiryISO = conductor.licenseExpiry instanceof Date && !isNaN(conductor.licenseExpiry.getTime()) ? conductor.licenseExpiry.toISOString() : null;
                 const cnhIssueISO = conductor.licenseFirstEmission instanceof Date && !isNaN(conductor.licenseFirstEmission.getTime()) ? conductor.licenseFirstEmission.toISOString() : null;
@@ -113,12 +113,16 @@ export default function ResumeConductors() {
             }, {
                 headers: { 'Content-Type': 'application/json' }
             });
-    
+
             console.log(response.data);
             router.push('/(app)/(tabs)/my-cars/create/take-photos');
-        } catch(err) {
+        } catch (err) {
             console.log('Erro ao salvar condutores adicionais:', err);
-            if(axios.isAxiosError(err)) {
+            if (axios.isAxiosError(err)) {
+                if (err.response?.data?.message) {
+                    Alert.alert('Erro', err.response?.data?.message);
+                    return;
+                }
                 console.log('Erro na resposta da API:', err.response?.data);
             }
             Alert.alert('Erro', 'Houve um problema ao salvar os condutores adicionais. Por favor, tente novamente.');
@@ -200,50 +204,50 @@ export default function ResumeConductors() {
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Nome Completo:</Text>
-                                        <Text style={commonStyles.input}>{conductor.name}</Text>
+                                        <Text style={styles.valueText}>{conductor.name}</Text>
                                     </View>
                                 </FormRow>
 
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Email:</Text>
-                                        <Text style={commonStyles.input}>{conductor.email}</Text>
+                                        <Text style={styles.valueText}>{conductor.email}</Text>
                                     </View>
                                 </FormRow>
 
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>CPF:</Text>
-                                        <Text style={commonStyles.input}>{conductor.document}</Text>
+                                        <Text style={styles.valueText}>{conductor.document}</Text>
                                     </View>
 
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Telefone:</Text>
-                                        <Text style={commonStyles.input}>{conductor.phone}</Text>
+                                        <Text style={styles.valueText}>{conductor.phone}</Text>
                                     </View>
                                 </FormRow>
 
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>CNH:</Text>
-                                        <Text style={commonStyles.input}>{conductor.licenseNumber}</Text>
+                                        <Text style={styles.valueText}>{conductor.licenseNumber}</Text>
                                     </View>
 
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Vencimento da CNH:</Text>
-                                        <Text style={commonStyles.input}>{conductor.licenseExpiry ? (conductor.licenseExpiry as Date).toLocaleDateString() : ''}</Text>
+                                        <Text style={styles.valueText}>{conductor.licenseExpiry ? (conductor.licenseExpiry as Date).toLocaleDateString() : ''}</Text>
                                     </View>
                                 </FormRow>
 
                                 <FormRow>
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Relacionamento:</Text>
-                                        <Text style={commonStyles.input}>{conductor.relationship}</Text>
+                                        <Text style={styles.valueText}>{conductor.relationship}</Text>
                                     </View>
 
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Data de Nascimento:</Text>
-                                        <Text style={commonStyles.input}>{conductor.birthDate.toLocaleDateString()}</Text>
+                                        <Text style={styles.valueText}>{conductor.birthDate ? (conductor.birthDate as Date).toLocaleDateString() : ''}</Text>
                                     </View>
                                 </FormRow>
                                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
@@ -362,4 +366,10 @@ const styles = StyleSheet.create({
     safeArea: {
         flex: 1,
     },
+    valueText: {
+        paddingVertical: 8,
+        color: '#222',
+        fontSize: 15,
+        backgroundColor: 'transparent'
+    }
 });
