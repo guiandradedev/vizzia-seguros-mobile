@@ -12,6 +12,20 @@ import { useState } from 'react';
 import { Alert, ScrollView, StyleSheet, Text, View, Modal, TouchableOpacity } from 'react-native';
 import { formatCPF, formatPhone, isValidCPF } from '@/utils/formatters';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { MaritalStatusOptions, MaritalStatusLabelPT, getMaritalStatusDisplayLabel, getMaritalStatusApiValue } from '@/constants/maritalStatus';
+import { GenderOptions, GenderLabelPT, getGenderDisplayLabel, getGenderApiValue } from '@/constants/gender';
+import { Picker } from '@react-native-picker/picker';
+
+function calculateAge(birthDate: Date | null): number | null {
+    if (!birthDate) return null;
+    const today = new Date();
+    let age = today.getFullYear() - birthDate.getFullYear();
+    const monthDiff = today.getMonth() - birthDate.getMonth();
+    if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+    }
+    return age;
+}
 
 export default function ResumeConductors() {
     const router = useRouter();
@@ -25,6 +39,10 @@ export default function ResumeConductors() {
     const [isEditBirthPickerVisible, setEditBirthPickerVisible] = useState(false);
     const [isEditExpiryPickerVisible, setEditExpiryPickerVisible] = useState(false);
     const [isEditIssuePickerVisible, setEditIssuePickerVisible] = useState(false);
+    const [editMaritalModalVisible, setEditMaritalModalVisible] = useState(false);
+    const [editGenderModalVisible, setEditGenderModalVisible] = useState(false);
+    const [tempEditMarital, setTempEditMarital] = useState<string>('');
+    const [tempEditGender, setTempEditGender] = useState<string>('');
 
     function handleBack() {
         router.back();
@@ -72,6 +90,15 @@ export default function ResumeConductors() {
             return;
         }
 
+        // Validate marital_status and gender
+        if (!MaritalStatusOptions.includes(editedConductor.marital_status as any)) {
+            Alert.alert('Erro', 'Status de relacionamento é obrigatório.');
+            return;
+        }
+        if (!GenderOptions.includes(editedConductor.gender as any)) {
+            Alert.alert('Erro', 'Gênero é obrigatório.');
+            return;
+        }
         // Ensure formatted values are saved
         const toSave = { ...editedConductor, document: formatCPF(String(editedConductor.document)), phone: formatPhone(String(editedConductor.phone)), licenseNumber: cnhDigits } as any;
         updateConductor(editingIndex, toSave);
@@ -103,14 +130,16 @@ export default function ResumeConductors() {
                     relationship: conductor.relationship,
                     cnhIssueDate: cnhIssueISO,
                     birthDate: conductor.birthDate instanceof Date ? conductor.birthDate.toISOString() : null,
+                    marital_status: getMaritalStatusApiValue(conductor.marital_status as any),
+                    gender: getGenderApiValue(conductor.gender as any),
+                    age: calculateAge(conductor.birthDate),
                     // license_photo: conductor.licensePhoto,
                 };
             });
 
-            const response = await api.post(`/vehicle/conductors`, {
-                id_vehicle: vehicle.id,
-                conductors: payloadConductors
-            }, {
+            console.log('Payload condutores adicionais:', payloadConductors);
+
+            const response = await api.post(`/vehicle/step/2`, payloadConductors, {
                 headers: { 'Content-Type': 'application/json' }
             });
 
@@ -120,6 +149,7 @@ export default function ResumeConductors() {
             console.log('Erro ao salvar condutores adicionais:', err);
             if (axios.isAxiosError(err)) {
                 if (err.response?.data?.message) {
+                    console.log(err.response?.data?.message);
                     Alert.alert('Erro', err.response?.data?.message);
                     return;
                 }
@@ -179,6 +209,21 @@ export default function ResumeConductors() {
                                         </View>
                                     </FormRow>
 
+                                    <FormRow>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={commonStyles.label}>Status de Relacionamento</Text>
+                                            <TouchableOpacity style={[commonStyles.input]} onPress={() => { setTempEditMarital(editedConductor.marital_status || ''); setEditMaritalModalVisible(true); }}>
+                                                <Text>{editedConductor.marital_status ? getMaritalStatusDisplayLabel(editedConductor.marital_status) : 'Selecione'}</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                        <View style={{ flex: 1 }}>
+                                            <Text style={commonStyles.label}>Gênero</Text>
+                                            <TouchableOpacity style={[commonStyles.input]} onPress={() => { setTempEditGender(editedConductor.gender || ''); setEditGenderModalVisible(true); }}>
+                                                <Text>{editedConductor.gender ? getGenderDisplayLabel(editedConductor.gender) : 'Selecione'}</Text>
+                                            </TouchableOpacity>
+                                        </View>
+                                    </FormRow>
+
                                     <View style={{ flexDirection: 'row', justifyContent: 'flex-end', gap: 8, marginTop: 12 }}>
                                         <Button title="Cancelar" variant="outline" onPress={() => { setEditModalVisible(false); setEditedConductor(null); setEditingIndex(null); }} />
                                         <Button title="Salvar" variant="primary" onPress={saveEdit} />
@@ -188,6 +233,83 @@ export default function ResumeConductors() {
                         </View>
                     </View>
                 </Modal>
+
+                {/* Edit Marital Status Modal */}
+                <Modal transparent={true} visible={editMaritalModalVisible} animationType="slide" onRequestClose={() => setEditMaritalModalVisible(false)}>
+                    <TouchableOpacity style={styles.modalOverlay} onPress={() => setEditMaritalModalVisible(false)} />
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <TouchableOpacity onPress={() => setEditMaritalModalVisible(false)}>
+                                <Text style={styles.modalButtonText}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.modalTitle}>Selecione o Status</Text>
+                            <TouchableOpacity onPress={() => {
+                                if (!MaritalStatusOptions.includes(tempEditMarital as any)) {
+                                    Alert.alert('Erro', 'Selecione um status válido.');
+                                    return;
+                                }
+                                setEditedConductor((p: any) => ({ ...p, marital_status: tempEditMarital }));
+                                setEditMaritalModalVisible(false);
+                            }}>
+                                <Text style={styles.modalButtonText}>Confirmar</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Picker
+                            selectedValue={tempEditMarital}
+                            itemStyle={styles.contentPicker}
+                            onValueChange={(itemValue) => {
+                                if (itemValue !== '') {
+                                    setTempEditMarital(itemValue || '');
+                                }
+                            }}
+                            style={styles.picker}
+                        >
+                            <Picker.Item label="Selecione um status" value="" enabled={false} color="#999" />
+                            {MaritalStatusOptions.map((m) => (
+                                <Picker.Item key={m} label={MaritalStatusLabelPT[m]} value={m} />
+                            ))}
+                        </Picker>
+                    </View>
+                </Modal>
+
+                {/* Edit Gender Modal */}
+                <Modal transparent={true} visible={editGenderModalVisible} animationType="slide" onRequestClose={() => setEditGenderModalVisible(false)}>
+                    <TouchableOpacity style={styles.modalOverlay} onPress={() => setEditGenderModalVisible(false)} />
+                    <View style={styles.modalContent}>
+                        <View style={styles.modalHeader}>
+                            <TouchableOpacity onPress={() => setEditGenderModalVisible(false)}>
+                                <Text style={styles.modalButtonText}>Cancelar</Text>
+                            </TouchableOpacity>
+                            <Text style={styles.modalTitle}>Selecione o Gênero</Text>
+                            <TouchableOpacity onPress={() => {
+                                if (!GenderOptions.includes(tempEditGender as any)) {
+                                    Alert.alert('Erro', 'Selecione um gênero válido.');
+                                    return;
+                                }
+                                setEditedConductor((p: any) => ({ ...p, gender: tempEditGender }));
+                                setEditGenderModalVisible(false);
+                            }}>
+                                <Text style={styles.modalButtonText}>Confirmar</Text>
+                            </TouchableOpacity>
+                        </View>
+                        <Picker
+                            selectedValue={tempEditGender}
+                            itemStyle={styles.contentPicker}
+                            onValueChange={(itemValue) => {
+                                if (itemValue !== '') {
+                                    setTempEditGender(itemValue || '');
+                                }
+                            }}
+                            style={styles.picker}
+                        >
+                            <Picker.Item label="Selecione o gênero" value="" enabled={false} color="#999" />
+                            {GenderOptions.map((g) => (
+                                <Picker.Item key={g} label={(GenderLabelPT as any)[g]} value={g} />
+                            ))}
+                        </Picker>
+                    </View>
+                </Modal>
+
                 <Text style={commonStyles.title}>Resumo do cadastro!</Text>
 
                 <Text style={commonStyles.subtitle}>Quase lá! Revise as informações de condutores adicionais antes de finalizar o cadastro.</Text>
@@ -248,6 +370,18 @@ export default function ResumeConductors() {
                                     <View style={{ flex: 1 }}>
                                         <Text style={commonStyles.label}>Data de Nascimento:</Text>
                                         <Text style={styles.valueText}>{conductor.birthDate ? (conductor.birthDate as Date).toLocaleDateString() : ''}</Text>
+                                    </View>
+                                </FormRow>
+
+                                <FormRow>
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={commonStyles.label}>Status de Relacionamento:</Text>
+                                        <Text style={styles.valueText}>{conductor.marital_status ? getMaritalStatusDisplayLabel(conductor.marital_status) : ''}</Text>
+                                    </View>
+
+                                    <View style={{ flex: 1 }}>
+                                        <Text style={commonStyles.label}>Gênero:</Text>
+                                        <Text style={styles.valueText}>{conductor.gender ? getGenderDisplayLabel(conductor.gender) : ''}</Text>
                                     </View>
                                 </FormRow>
                                 <View style={{ flexDirection: 'row', gap: 8, marginBottom: 12 }}>
@@ -371,5 +505,44 @@ const styles = StyleSheet.create({
         color: '#222',
         fontSize: 15,
         backgroundColor: 'transparent'
-    }
+    },
+    modalOverlay: {
+        flex: 1,
+        backgroundColor: 'rgba(0,0,0,0.5)',
+    },
+    modalContent: {
+        position: 'absolute',
+        bottom: 0,
+        width: '100%',
+        backgroundColor: '#FFFFFF',
+        borderTopLeftRadius: 20,
+        borderTopRightRadius: 20,
+        height: 275,
+    },
+    modalHeader: {
+        alignItems: 'center',
+        borderBottomColor: '#E0E0E0',
+        borderBottomWidth: 2,
+        padding: 20,
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    },
+    modalTitle: {
+        fontSize: 18,
+        fontWeight: '600',
+        color: '#333',
+    },
+    modalButtonText: {
+        color: '#007AFF',
+        fontSize: 16,
+        fontWeight: '600',
+    },
+    contentPicker: {
+        color: '#000',
+        fontSize: 20,
+    },
+    picker: {
+        flex: 1,
+        paddingHorizontal: 20,
+    },
 });

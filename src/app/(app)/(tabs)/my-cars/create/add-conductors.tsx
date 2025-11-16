@@ -8,6 +8,9 @@ import { useRouter } from 'expo-router';
 import React, { useCallback, useEffect, useState } from 'react';
 import MaskInput from 'react-native-mask-input';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
+import { Picker } from '@react-native-picker/picker';
+import { MaritalStatusOptions, MaritalStatusLabelPT, getMaritalStatusDisplayLabel } from '@/constants/maritalStatus';
+import { GenderOptions, GenderLabelPT, getGenderDisplayLabel } from '@/constants/gender';
 
 import Button from '@/components/Button';
 import FormField from '@/components/FormField';
@@ -15,7 +18,7 @@ import FormRow from '@/components/FormRow';
 import PhotoButton from '@/components/PhotoButton';
 import VehiclePhoto from '@/components/VehiclePhoto';
 import { commonStyles } from '@/styles/CommonStyles';
-import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, KeyboardAvoidingView, Platform, ScrollView, Text, TouchableOpacity, View, Modal, StyleSheet } from 'react-native';
 
 export default function AddConductorsScreen() {
   const router = useRouter();
@@ -32,6 +35,8 @@ export default function AddConductorsScreen() {
     email: '',
     document: '',
     birthDate: null,
+    marital_status: '',
+    gender: '',
   };
 
   const [conductor, setConductor] = useState<Conductor>(emptyConductor);
@@ -42,6 +47,10 @@ export default function AddConductorsScreen() {
   const [emailError, setEmailError] = useState<string | null>(null);
   const [isCameraOpen, setIsCameraOpen] = useState(false);
   const [canRedirect, setCanRedirect] = useState(false);
+  const [maritalModalVisible, setMaritalModalVisible] = useState(false);
+  const [genderModalVisible, setGenderModalVisible] = useState(false);
+  const [tempMarital, setTempMarital] = useState<string>('');
+  const [tempGender, setTempGender] = useState<string>('');
 
   useEffect(() => {
     // Validate required fields strictly. Dates must be valid Date objects.
@@ -56,8 +65,10 @@ export default function AddConductorsScreen() {
     const birthValid = conductor.birthDate instanceof Date && !isNaN(conductor.birthDate.getTime());
     const expiryValid = conductor.licenseExpiry instanceof Date && !isNaN(conductor.licenseExpiry.getTime());
     const issueValid = conductor.licenseFirstEmission instanceof Date && !isNaN(conductor.licenseFirstEmission.getTime());
+    const hasMaritalStatus = typeof conductor.marital_status === 'string' && MaritalStatusOptions.includes(conductor.marital_status as any);
+    const hasGender = typeof conductor.gender === 'string' && GenderOptions.includes(conductor.gender as any);
 
-    setCanRedirect(hasName && hasDocument && hasEmail && hasPhone && hasLicenseNumber && hasLicensePhoto && hasRelationship && birthValid && expiryValid && issueValid);
+    setCanRedirect(hasName && hasDocument && hasEmail && hasPhone && hasLicenseNumber && hasLicensePhoto && hasRelationship && birthValid && expiryValid && issueValid && hasMaritalStatus && hasGender);
   }, [conductor]);
 
 
@@ -145,6 +156,16 @@ export default function AddConductorsScreen() {
 
     if (!conductor.licensePhoto) {
       Alert.alert('Erro', 'Foto da CNH é obrigatória.');
+      return;
+    }
+
+    if (!MaritalStatusOptions.includes(conductor.marital_status as any)) {
+      Alert.alert('Erro', 'Status de relacionamento é obrigatório.');
+      return;
+    }
+
+    if (!GenderOptions.includes(conductor.gender as any)) {
+      Alert.alert('Erro', 'Gênero é obrigatório.');
       return;
     }
 
@@ -300,6 +321,30 @@ export default function AddConductorsScreen() {
               </FormRow>
               <FormRow>
                 <View style={{ flex: 1 }}>
+                  <Text style={commonStyles.label}>Status de relacionamento</Text>
+                  <TouchableOpacity
+                    style={[commonStyles.input]}
+                    onPress={() => { setTempMarital(conductor.marital_status || ''); setMaritalModalVisible(true); }}
+                  >
+                    <Text style={{ color: conductor.marital_status ? '#000' : '#999' }}>
+                      {conductor.marital_status ? getMaritalStatusDisplayLabel(conductor.marital_status) : 'Selecione o status'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text style={commonStyles.label}>Gênero</Text>
+                  <TouchableOpacity
+                    style={[commonStyles.input]}
+                    onPress={() => { setTempGender(conductor.gender || ''); setGenderModalVisible(true); }}
+                  >
+                    <Text style={{ color: conductor.gender ? '#000' : '#999' }}>
+                      {conductor.gender ? getGenderDisplayLabel(conductor.gender) : 'Selecione o gênero'}
+                    </Text>
+                  </TouchableOpacity>
+                </View>
+              </FormRow>
+              <FormRow>
+                <View style={{ flex: 1 }}>
                   <Text style={commonStyles.label}>Primeira emissão de CNH</Text>
                   <TouchableOpacity
                     style={[commonStyles.input]}
@@ -379,7 +424,125 @@ export default function AddConductorsScreen() {
         </View>
 
       </KeyboardAvoidingView>
+
+      {/* Modal for Marital Status Picker */}
+      <Modal transparent={true} visible={maritalModalVisible} animationType="slide" onRequestClose={() => setMaritalModalVisible(false)}>
+        <TouchableOpacity style={styles.modalOverlay} onPress={() => setMaritalModalVisible(false)} />
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setMaritalModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Selecione o Status</Text>
+            <TouchableOpacity onPress={() => {
+              if (!MaritalStatusOptions.includes(tempMarital as any)) {
+                Alert.alert('Erro', 'Selecione um status válido.');
+                return;
+              }
+              handleChangeInput('marital_status', tempMarital);
+              setMaritalModalVisible(false);
+            }}>
+              <Text style={styles.modalButtonText}>Confirmar</Text>
+            </TouchableOpacity>
+          </View>
+          <Picker
+            selectedValue={tempMarital}
+            itemStyle={styles.contentPicker}
+            onValueChange={(itemValue) => {
+              if (itemValue !== '') {
+                setTempMarital(itemValue || '');
+              }
+            }}
+            style={styles.picker}
+          >
+            <Picker.Item label="Selecione um status" value="" enabled={false} color="#999" />
+            {MaritalStatusOptions.map((m) => (
+              <Picker.Item key={m} label={MaritalStatusLabelPT[m]} value={m} />
+            ))}
+          </Picker>
+        </View>
+      </Modal>
+
+      {/* Modal for Gender Picker */}
+      <Modal transparent={true} visible={genderModalVisible} animationType="slide" onRequestClose={() => setGenderModalVisible(false)}>
+        <TouchableOpacity style={styles.modalOverlay} onPress={() => setGenderModalVisible(false)} />
+        <View style={styles.modalContent}>
+          <View style={styles.modalHeader}>
+            <TouchableOpacity onPress={() => setGenderModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <Text style={styles.modalTitle}>Selecione o Gênero</Text>
+            <TouchableOpacity onPress={() => {
+              if (!GenderOptions.includes(tempGender as any)) {
+                Alert.alert('Erro', 'Selecione um gênero válido.');
+                return;
+              }
+              handleChangeInput('gender', tempGender);
+              setGenderModalVisible(false);
+            }}>
+              <Text style={styles.modalButtonText}>Confirmar</Text>
+            </TouchableOpacity>
+          </View>
+          <Picker
+            selectedValue={tempGender}
+            itemStyle={styles.contentPicker}
+            onValueChange={(itemValue) => {
+              if (itemValue !== '') {
+                setTempGender(itemValue || '');
+              }
+            }}
+            style={styles.picker}
+          >
+            <Picker.Item label="Selecione o gênero" value="" enabled={false} color="#999" />
+            {GenderOptions.map((g) => (
+              <Picker.Item key={g} label={(GenderLabelPT as any)[g]} value={g} />
+            ))}
+          </Picker>
+        </View>
+      </Modal>
     </View>
 
   );
 }
+
+const styles = StyleSheet.create({
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+  },
+  modalContent: {
+    position: 'absolute',
+    bottom: 0,
+    width: '100%',
+    backgroundColor: '#FFFFFF',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    height: 275,
+  },
+  modalHeader: {
+    alignItems: 'center',
+    borderBottomColor: '#E0E0E0',
+    borderBottomWidth: 2,
+    padding: 20,
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  modalTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#333',
+  },
+  modalButtonText: {
+    color: '#007AFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  contentPicker: {
+    color: '#000',
+    fontSize: 20,
+  },
+  picker: {
+    flex: 1,
+    paddingHorizontal: 20,
+  },
+});

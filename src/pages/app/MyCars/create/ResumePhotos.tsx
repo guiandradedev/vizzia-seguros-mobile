@@ -32,6 +32,7 @@ export default function ResumePhotos() {
       // }
 
       const photoDatas: { file: string; type: string }[] = []
+
       // append other photos
       vehiclePhotos.forEach((p, idx) => {
         if (p.uri) {
@@ -48,8 +49,7 @@ export default function ResumePhotos() {
         }
       });
 
-      formData.append('photos', JSON.stringify(photoDatas) as any);
-      formData.append("vehicle_id", vehicle.id as any);
+      formData.append('photosmeta', JSON.stringify(photoDatas) as any);
 
       // NOTE: the server endpoint and additional vehicle fields payload are not known here.
       // We'll POST the photos to the assumed endpoint '/vehicle'. Adjust keys as needed.
@@ -57,13 +57,15 @@ export default function ResumePhotos() {
       //     headers: { 'Content-Type': 'multipart/form-data' }
       //   });
 
-      const response = await axios.post('/vehicle/images', formData, {
+      const response = await axios.post('/vehicle/step/3', formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
       })
 
-      Alert.alert('Sucesso', 'Veículo cadastrado com sucesso.');
+
+      console.log(response.data);
+      console.log('Sucesso -> Veículo cadastrado com sucesso.');
       // navigate back to vehicles list
-      router.push('/(app)/(tabs)/my-cars');
+      router.push('/(app)/(tabs)/my-cars/create/finalize');
     } catch (error) {
       if (axiosLib.isAxiosError(error)) {
         if (error.response?.data?.message) {

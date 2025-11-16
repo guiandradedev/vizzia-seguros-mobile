@@ -1,6 +1,6 @@
 import FormField from "@/components/FormField";
 import FormRow from "@/components/FormRow";
-import { CarBrand, CarBrandName, carBrands, fuelTypes, FuelTypes, vehicleUses, VehicleUses } from '@/contexts/CreateVehicleContext';
+import { CarBrand, CarBrandName, carBrands, fuelTypes, FuelTypes, vehicleUses, VehicleUses, transmissionTypes, TransmissionTypes, parkTypes, ParkTypes } from '@/contexts/CreateVehicleContext';
 import { useCreateVehicle } from "@/hooks/useCreateVehicle";
 import { axiosIA } from "@/lib/axios";
 import { commonStyles } from "@/styles/CommonStyles";
@@ -19,6 +19,10 @@ export default function VehicleDetailsForm() {
     const [usageModalVisible, setUsageModalVisible] = useState(false);
     const [selectedUsage, setSelectedUsage] = useState<VehicleUses | null>(null);
     const [modelModalVisible, setModelModalVisible] = useState(false);
+    const [transmissionModalVisible, setTransmissionModalVisible] = useState(false);
+    const [selectedTransmission, setSelectedTransmission] = useState<TransmissionTypes | null>(null);
+    const [parkModalVisible, setParkModalVisible] = useState(false);
+    const [selectedPark, setSelectedPark] = useState<ParkTypes | null>(null);
     // selectedModel armazena o código do modelo (string)
     const [selectedModel, setSelectedModel] = useState<string | null>(null);
     type ModelOption = { code: string; name: string };
@@ -160,6 +164,28 @@ export default function VehicleDetailsForm() {
             </FormRow>
 
             <FormRow>
+                <View style={styles.pickerWrapper}>
+                    <Text style={styles.pickerLabel}>Transmissão</Text>
+                    <TouchableOpacity style={styles.pickerTrigger} onPress={() => { setSelectedTransmission(vehicle.transmission ?? null); setTransmissionModalVisible(true); }}>
+                        <Text style={[styles.pickerTriggerText, { color: vehicle.transmission ? '#000' : '#888' }]}>{vehicle.transmission ? (vehicle.transmission === 'Automatic' ? 'Automático' : 'Manual') : 'Selecione'}</Text>
+                        <Text style={styles.pickerTriggerIcon}><FontAwesome name="chevron-down" size={16} color="#000" /></Text>
+                    </TouchableOpacity>
+                </View>
+                <View style={styles.pickerWrapper}>
+                    <Text style={styles.pickerLabel}>Estacionamento</Text>
+                    <TouchableOpacity style={styles.pickerTrigger} onPress={() => { setSelectedPark(vehicle.park_type ?? null); setParkModalVisible(true); }}>
+                        <Text style={[styles.pickerTriggerText, { color: vehicle.park_type ? '#000' : '#888' }]}>
+                            {vehicle.park_type ? (
+                                vehicle.park_type === 'Garage' ? 'Garagem' :
+                                vehicle.park_type === 'Street' ? 'Rua' : 'Condomínio'
+                            ) : 'Selecione'}
+                        </Text>
+                        <Text style={styles.pickerTriggerIcon}><FontAwesome name="chevron-down" size={16} color="#000" /></Text>
+                    </TouchableOpacity>
+                </View>
+            </FormRow>
+
+            <FormRow>
                 <FormField
                     label="Placa"
                     value={vehicle.plate}
@@ -204,6 +230,30 @@ export default function VehicleDetailsForm() {
                 data={vehicleUses}
                 selected={selectedUsage}
                 onChange={setSelectedUsage}
+            />
+
+            <ModalPicker
+                visible={transmissionModalVisible}
+                onClose={() => setTransmissionModalVisible(false)}
+                onConfirm={() => { if (selectedTransmission) { setVehicle({ ...vehicle, transmission: selectedTransmission }); } }}
+                data={transmissionTypes.map(t => t === 'Automatic' ? 'Automático' : 'Manual')}
+                selected={selectedTransmission ? (selectedTransmission === 'Automatic' ? 'Automático' : 'Manual') : null}
+                onChange={(v) => setSelectedTransmission(v === 'Automático' ? 'Automatic' : 'Manual')}
+            />
+
+            <ModalPicker
+                visible={parkModalVisible}
+                onClose={() => setParkModalVisible(false)}
+                onConfirm={() => { if (selectedPark) { setVehicle({ ...vehicle, park_type: selectedPark }); } }}
+                data={parkTypes.map(p => p === 'Garage' ? 'Garagem' : p === 'Street' ? 'Rua' : 'Condomínio')}
+                selected={selectedPark ? (
+                    selectedPark === 'Garage' ? 'Garagem' :
+                    selectedPark === 'Street' ? 'Rua' : 'Condomínio'
+                ) : null}
+                onChange={(v) => setSelectedPark(
+                    v === 'Garagem' ? 'Garage' :
+                    v === 'Rua' ? 'Street' : 'Condominium'
+                )}
             />
 
             <ModalPicker

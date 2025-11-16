@@ -31,7 +31,9 @@ export default function CreateVehiclePage() {
         const odometherValid = typeof vehicle.odomether === 'number' && !isNaN(vehicle.odomether);
         const fuelValid = !!vehicle.fuel;
         const usageValid = !!vehicle.usage;
-        return modelValid && brandValid && yearValid && colorValid && plateValid && odometherValid && fuelValid && usageValid;
+        const transmissionValid = !!vehicle.transmission;
+        const parkTypeValid = !!vehicle.park_type;
+        return modelValid && brandValid && yearValid && colorValid && plateValid && odometherValid && fuelValid && usageValid && transmissionValid && parkTypeValid;
     }, [vehicle]);
 
     const openCamera = useCallback(() => setIsCameraOpen(true), []);
@@ -72,7 +74,7 @@ export default function CreateVehiclePage() {
             });
 
             const { brand, color, plate } = response.data || {};
-            const foundBrand = carBrands.find(b => b.name.toLowerCase() === (brand?.name || '').toLowerCase());
+            const foundBrand = carBrands.find(b => b.name.toLowerCase() === (brand?.text || '').toLowerCase());
             const brandCode = foundBrand ? foundBrand.code : (vehicle.brand || 0);
             const data = {
                 model: '',

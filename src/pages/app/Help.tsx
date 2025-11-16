@@ -7,8 +7,6 @@ import axios from '@/lib/axios';
 import { AxiosResponse } from 'axios';
 import Button from '@/components/Button';
 
-const theme = Colors.light;
-
 interface FAQData {
   id: string,
   question: string,
@@ -53,7 +51,6 @@ export default function HelpScreen() {
     <View
       style={[
         styles.container,
-        // { backgroundColor: theme.background },
       ]}
     >
       <View style={styles.header}>

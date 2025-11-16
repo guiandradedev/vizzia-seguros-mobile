@@ -62,6 +62,12 @@ export type CarBrandCode = CarBrand['code'];
 export const vehicleUses = ['Particular', 'Comercial'] as const;
 export type VehicleUses = typeof vehicleUses[number];
 
+export const transmissionTypes = ["Automatic", "Manual"] as const;
+export type TransmissionTypes = typeof transmissionTypes[number];
+
+export const parkTypes = ["Garage", "Street", "Condominium"] as const;
+export type ParkTypes = typeof parkTypes[number];
+
 interface Vehicle {
     id?: number;
     model: string,
@@ -77,7 +83,9 @@ interface Vehicle {
     odomether: number,
     plate: string,
     fuel: FuelTypes,
-    usage: VehicleUses
+    usage: VehicleUses,
+    transmission: TransmissionTypes,
+    park_type: ParkTypes
 }
 
 export interface Conductor {
@@ -91,6 +99,8 @@ export interface Conductor {
     email: string;
     document: string, // cpf
     birthDate: Date | null,
+    marital_status?: string;
+    gender?: string;
 }
 
 export const CreateVehicleProvider: React.FC<CreateVehicleProviderProps> = ({ children }) => {

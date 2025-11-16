@@ -22,7 +22,9 @@ export default function ResumeVehicle() {
     const odometherValid = typeof vehicle.odomether === 'number' && !isNaN(vehicle.odomether);
     const fuelValid = !!vehicle.fuel;
     const usageValid = !!vehicle.usage;
-    return modelValid && brandValid && yearValid && colorValid && plateValid && odometherValid && fuelValid && usageValid;
+    const transmissionValid = !!vehicle.transmission;
+    const parkTypeValid = !!vehicle.park_type;
+    return modelValid && brandValid && yearValid && colorValid && plateValid && odometherValid && fuelValid && usageValid && transmissionValid && parkTypeValid;
   }, [vehicle]);
 
   function handleBack() {
@@ -37,25 +39,27 @@ export default function ResumeVehicle() {
     }
     try {
         const formData = new FormData();
-        formData.append('photos', {
+        formData.append('photo', {
             uri: initialCarPhoto,
             name: 'initial_photo.jpg',
             type: 'image/jpeg'
         } as any);
-        const photoData = {
-          file: "initial_photo.jpg",
-          type: "initial"
-        }
-        formData.append('photos', photoData as any);
+        // const photoData = {
+        //   file: "initial_photo.jpg",
+        //   type: "initial"
+        // }
+        formData.append('photoType', "initial");
 
         const currentBrandName: string | undefined = carBrands.find((item: CarBrand) => item.code === vehicle.brand)?.name;
         formData.append('plate', vehicle.plate); //
-        formData.append('brand', currentBrandName!); //
+        formData.append('brand', String(vehicle.brand)); //
         formData.append('model', vehicle.model); //
         formData.append('year', String(vehicle.year)); //
         formData.append('color', vehicle.color); //
         formData.append('odometer', String(vehicle.odomether)); //
-        formData.append('usage', vehicle.usage); //
+        formData.append('transmission', vehicle.transmission); //
+        formData.append('park_type', vehicle.park_type); //
+        formData.append('use_type', vehicle.usage)
 
         const fuelIndex = fuelTypes.findIndex((ft: FuelTypes) => ft === vehicle.fuel);
         const fuel_code = fuelIndex >= 0 ? fuelIndex + 1 : null;
@@ -63,7 +67,7 @@ export default function ResumeVehicle() {
 
         console.log(JSON.stringify(formData))
 
-        const response = await api.post('/vehicle', formData, {
+        const response = await api.post('/vehicle/step/1', formData, {
           headers: { 'Content-Type': 'multipart/form-data' }
         })
 
@@ -125,6 +129,15 @@ export default function ResumeVehicle() {
 
             <Text style={commonStyles.label}>Uso</Text>
             <Text style={styles.valueText}>{vehicle.usage}</Text>
+
+            <Text style={commonStyles.label}>Transmissão</Text>
+            <Text style={styles.valueText}>{vehicle.transmission === 'Automatic' ? 'Automático' : 'Manual'}</Text>
+
+            <Text style={commonStyles.label}>Estacionamento</Text>
+            <Text style={styles.valueText}>
+                {vehicle.park_type === 'Garage' ? 'Garagem' :
+                 vehicle.park_type === 'Street' ? 'Rua' : 'Condomínio'}
+            </Text>
           </View>
 
         </View>
