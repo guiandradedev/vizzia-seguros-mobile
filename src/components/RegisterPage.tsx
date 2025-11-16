@@ -7,8 +7,8 @@ import { CreateAccountContext } from '../contexts/CreateAccountContext';
 import MaskInput from 'react-native-mask-input';
 import { Picker } from '@react-native-picker/picker';
 import Colors from '@/constants/Colors';
-import { MaritalStatusOptions, MaritalStatusLabelPT, MaritalStatus } from '@/constants/maritalStatus';
-import { GenderOptions, GenderLabelPT, Gender } from '@/constants/gender';
+import { MaritalStatusOptions, MaritalStatusLabelPT, MaritalStatus, getMaritalStatusDisplayLabel } from '@/constants/maritalStatus';
+import { GenderOptions, GenderLabelPT, Gender, getGenderDisplayLabel } from '@/constants/gender';
 import { isValidCEP, isValidCPF, isValidCNH } from '@/utils/formatters';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { useAuth } from '@/hooks/useAuth';
@@ -34,6 +34,9 @@ export default function RegistrationForm() {
   const [loading, setLoading] = useState(false);
   const [isDatePickerBirthdateVisible, setDatePickerBirthdateVisible] = useState(false);
   const [isDatePickerFirstCNHEmissionVisible, setDatePickerFirstCNHEmissionVisible] = useState(false);
+  const [tempState, setTempState] = useState<string>('');
+  const [tempMarital, setTempMarital] = useState<string>('');
+  const [tempGender, setTempGender] = useState<string>('');
   const ufs = ["AC", "AL", "AP", "AM", "BA", "CE", "DF", "ES", "GO", "MA", "MT", "MS", "MG", "PA", "PB", "PR", "PE", "PI", "RJ", "RN", "RS", "RO", "RR", "SC", "SP", "SE", "TO"];
 
   const router = useRouter()
@@ -56,8 +59,9 @@ export default function RegistrationForm() {
     if (!accountData.CNH) newErrors.CNH = true;
   if (!accountData.CHH_emission_date) newErrors.CHH_emission_date = true;
   // required: marital status and gender
-  if (!accountData.marital_status) newErrors.marital_status = true;
-  if (!accountData.gender) newErrors.gender = true;
+  // ensure selected values are valid options (not the placeholder)
+  if (!MaritalStatusOptions.includes(accountData.marital_status as unknown as any)) newErrors.marital_status = true;
+  if (!GenderOptions.includes(accountData.gender as unknown as any)) newErrors.gender = true;
     // valida presença da data de nascimento (idade é validada no momento da seleção)
     if (!accountData.birthDate) newErrors.birthDate = true;
     if (!accountData.address.CEP) newErrors.CEP = true;
@@ -65,7 +69,7 @@ export default function RegistrationForm() {
     if (!accountData.address.number) newErrors.number = true;
     if (!accountData.address.neighborhood) newErrors.neighborhood = true;
     if (!accountData.address.city) newErrors.city = true;
-    if (!accountData.address.state || accountData.address.state === "Selecione um Estado") newErrors.state = true;
+  if (!ufs.includes(accountData.address.state || '')) newErrors.state = true;
     if (!accountData.phone.number) newErrors.phone = true;
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -184,10 +188,13 @@ export default function RegistrationForm() {
           <Text style={styles.label}>Status de relacionamento</Text>
           <TouchableOpacity
             style={[styles.pickerDisplay, errors.marital_status && styles.inputError]}
-            onPress={() => setMaritalModalVisible(true)}
+            onPress={() => {
+              setTempMarital(accountData.marital_status || '');
+              setMaritalModalVisible(true);
+            }}
           >
             <Text style={styles.pickerDisplayText}>
-              {accountData.marital_status ? MaritalStatusLabelPT[accountData.marital_status as unknown as MaritalStatus] : 'Selecione o status'}
+              {accountData.marital_status ? getMaritalStatusDisplayLabel(accountData.marital_status as unknown as string) : 'Selecione o status'}
             </Text>
             <Text style={styles.pickerIcon}>▼</Text>
           </TouchableOpacity>
@@ -197,10 +204,13 @@ export default function RegistrationForm() {
           <Text style={styles.label}>Gênero</Text>
           <TouchableOpacity
             style={[styles.pickerDisplay, errors.gender && styles.inputError]}
-            onPress={() => setGenderModalVisible(true)}
+            onPress={() => {
+              setTempGender(accountData.gender || '');
+              setGenderModalVisible(true);
+            }}
           >
             <Text style={styles.pickerDisplayText}>
-              {accountData.gender ? (GenderLabelPT as any)[accountData.gender as unknown as Gender] : 'Selecione o gênero'}
+              {accountData.gender ? getGenderDisplayLabel(accountData.gender as unknown as string) : 'Selecione o gênero'}
             </Text>
             <Text style={styles.pickerIcon}>▼</Text>
           </TouchableOpacity>
@@ -372,7 +382,10 @@ export default function RegistrationForm() {
         <Text style={styles.label}>Estado</Text>
         <TouchableOpacity
           style={[styles.pickerDisplay, errors.state && styles.inputError]}
-          onPress={() => setModalVisible(true)}
+          onPress={() => {
+            setTempState(accountData.address.state || '');
+            setModalVisible(true);
+          }}
         >
           <Text style={styles.pickerDisplayText}>
             {accountData.address.state || "Selecione um Estado"}
@@ -394,11 +407,27 @@ export default function RegistrationForm() {
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+              // validate state selection before saving
+              if (!ufs.includes(tempState)) {
+                setErrors((prev) => ({ ...prev, state: true }));
+                return;
+              }
+              updateAddress('state', tempState);
+              setErrors((prev) => ({ ...prev, state: false }));
+              setModalVisible(false);
+            }}>
               <Text style={styles.modalButtonText}>Confirmar</Text>
             </TouchableOpacity>
           </View>
-          <Picker selectedValue={accountData.address.state} itemStyle={styles.contentPicker} onValueChange={(itemValue) => { updateAddress('state', itemValue); setErrors((prev) => ({ ...prev, state: false })); }}>
-            <Picker.Item label="Selecione um Estado" value="" />
+          <Picker selectedValue={tempState} itemStyle={styles.contentPicker} onValueChange={(itemValue) => { 
+            if (itemValue !== '') {
+              setTempState(itemValue); 
+            }
+          }}>
+            <Picker.Item label="Selecione um Estado" value="" enabled={false} color="#999" />
             {ufs.map((uf) => (
               <Picker.Item key={uf} label={uf} value={uf} />
             ))}
@@ -411,11 +440,27 @@ export default function RegistrationForm() {
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setMaritalModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+              // prevent saving placeholder
+              if (!MaritalStatusOptions.includes(tempMarital as any)) {
+                setErrors((prev) => ({ ...prev, marital_status: true }));
+                return;
+              }
+              updateAccountData('marital_status', tempMarital as any);
+              setErrors((prev) => ({ ...prev, marital_status: false }));
+              setMaritalModalVisible(false);
+            }}>
               <Text style={styles.modalButtonText}>Confirmar</Text>
             </TouchableOpacity>
           </View>
-          <Picker selectedValue={accountData.marital_status} itemStyle={styles.contentPicker} onValueChange={(itemValue) => { updateAccountData('marital_status', itemValue); setErrors((prev) => ({ ...prev, marital_status: false })); }}>
-            <Picker.Item label="Selecione um status" value="" />
+          <Picker selectedValue={tempMarital} itemStyle={styles.contentPicker} onValueChange={(itemValue) => { 
+            if (itemValue !== '') {
+              setTempMarital(itemValue); 
+            }
+          }}>
+            <Picker.Item label="Selecione um status" value="" enabled={false} color="#999" />
             {MaritalStatusOptions.map((m) => (
               <Picker.Item key={m} label={MaritalStatusLabelPT[m]} value={m} />
             ))}
@@ -428,11 +473,26 @@ export default function RegistrationForm() {
         <View style={styles.modalContent}>
           <View style={styles.modalHeader}>
             <TouchableOpacity onPress={() => setGenderModalVisible(false)}>
+              <Text style={styles.modalButtonText}>Cancelar</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={() => {
+              if (!GenderOptions.includes(tempGender as any)) {
+                setErrors((prev) => ({ ...prev, gender: true }));
+                return;
+              }
+              updateAccountData('gender', tempGender as any);
+              setErrors((prev) => ({ ...prev, gender: false }));
+              setGenderModalVisible(false);
+            }}>
               <Text style={styles.modalButtonText}>Confirmar</Text>
             </TouchableOpacity>
           </View>
-          <Picker selectedValue={accountData.gender} itemStyle={styles.contentPicker} onValueChange={(itemValue) => { updateAccountData('gender', itemValue); setErrors((prev) => ({ ...prev, gender: false })); }}>
-            <Picker.Item label="Selecione o gênero" value="" />
+          <Picker selectedValue={tempGender} itemStyle={styles.contentPicker} onValueChange={(itemValue) => { 
+            if (itemValue !== '') {
+              setTempGender(itemValue); 
+            }
+          }}>
+            <Picker.Item label="Selecione o gênero" value="" enabled={false} color="#999" />
             {GenderOptions.map((g) => (
               <Picker.Item key={g} label={(GenderLabelPT as any)[g]} value={g} />
             ))}

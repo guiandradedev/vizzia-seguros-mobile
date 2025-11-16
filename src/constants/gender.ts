@@ -27,3 +27,18 @@ export const getGenderApiValue = (gender: GenderType) => {
   if (!gender) return '';
   return GenderApiLabel[gender as Gender] || '';
 };
+
+// Return the PT display label for a stored value. Accepts either the enum key (e.g. 'MALE')
+// or the API value (e.g. 'Masculine'). Falls back to returning the raw value as string.
+export const getGenderDisplayLabel = (gender: string | GenderType) => {
+  if (!gender) return '';
+  if (GenderOptions.includes(gender as Gender)) {
+    return GenderLabelPT[gender as Gender];
+  }
+  const entry = Object.entries(GenderApiLabel).find(([, apiVal]) => apiVal === gender);
+  if (entry && entry[0]) {
+    const key = entry[0] as Gender;
+    return GenderLabelPT[key];
+  }
+  return String(gender);
+};
