@@ -2,6 +2,7 @@ export interface Insurance {
   estimated_price: number;
   id_insurance: number;
   vehicle: Vehicle;
+  status: string;
 }
 
 export interface Vehicle {

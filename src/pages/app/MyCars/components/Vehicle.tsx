@@ -21,14 +21,46 @@ export default function VehicleComponent({ vehicle }: VehicleProps) {
     }).format(value);
   };
 
+  const getStatusLabel = (status?: string): string => {
+    if (!status) return 'Desconhecido';
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Pendente';
+      case 'approved':
+        return 'Aprovado';
+      case 'denied':
+        return 'Negado';
+      case 'cancel':
+        return 'Cancelado';
+      default:
+        return status;
+    }
+  };
+
+  const getStatusColor = (status?: string): string => {
+    if (!status) return '#64748b';
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return '#F59E0B'; // Amarelo para pendente
+      case 'approved':
+        return '#10B981'; // Verde para aprovado
+      case 'denied':
+        return '#EF4444'; // Vermelho para negado
+      case 'cancel':
+        return '#6B7280'; // Cinza para cancelado
+      default:
+        return '#64748b';
+    }
+  };
+
   return (
     <TouchableOpacity onPress={handleOpen} style={styles.container} activeOpacity={0.8}>
       <View style={styles.cardHeader}>
         <View style={styles.vehicleIcon}>
           <FontAwesome name="car" size={24} color="#6D94C5" />
         </View>
-        <View style={styles.statusBadge}>
-          <Text style={styles.statusText}>Ativo</Text>
+        <View style={[styles.statusBadge, { backgroundColor: getStatusColor(vehicle.status) }]}>
+          <Text style={styles.statusText}>{getStatusLabel(vehicle.status)}</Text>
         </View>
       </View>
 

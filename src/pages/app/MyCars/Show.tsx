@@ -131,6 +131,38 @@ export default function ShowVehiclePage() {
     return fuel;
   }
 
+  function getStatusLabel(status?: string): string {
+    if (!status) return 'Desconhecido';
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return 'Pendente';
+      case 'approved':
+        return 'Aprovado';
+      case 'denied':
+        return 'Negado';
+      case 'cancel':
+        return 'Cancelado';
+      default:
+        return status;
+    }
+  }
+
+  function getStatusColor(status?: string): string {
+    if (!status) return '#64748b';
+    switch (status.toLowerCase()) {
+      case 'pending':
+        return '#F59E0B'; // Amarelo para pendente
+      case 'approved':
+        return '#10B981'; // Verde para aprovado
+      case 'denied':
+        return '#EF4444'; // Vermelho para negado
+      case 'cancel':
+        return '#6B7280'; // Cinza para cancelado
+      default:
+        return '#64748b';
+    }
+  }
+
   return (
     <View style={{ flex: 1 }}>
       <View style={{ paddingTop: 12 }}>
@@ -159,8 +191,8 @@ export default function ShowVehiclePage() {
                 <Text style={styles.bannerTitle}>{vehicle.vehicle.brand} {(vehicle as any).model_name ?? vehicle.vehicle.model}</Text>
                 <Text style={styles.bannerSubtitle}>{vehicle.vehicle.plate} • {vehicle.vehicle.year}</Text>
               </View>
-              <View style={styles.statusBadge}>
-                <Text style={styles.statusText}>Ativo</Text>
+              <View style={[styles.statusBadge, { backgroundColor: getStatusColor(vehicle.status) }]}>
+                <Text style={styles.statusText}>{getStatusLabel(vehicle.status)}</Text>
               </View>
             </View>
 
@@ -238,7 +270,7 @@ export default function ShowVehiclePage() {
                   <FontAwesome name="shield" size={24} color="#10B981" />
                 </View>
                 <View style={styles.insuranceInfo}>
-                  <Text style={styles.insuranceTitle}>Seguro Ativo</Text>
+                  <Text style={styles.insuranceTitle}>Seguro {getStatusLabel(vehicle.status)}</Text>
                   <Text style={styles.insuranceSubtitle}>Apólice #{vehicle.id_insurance}</Text>
                 </View>
               </View>
