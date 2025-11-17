@@ -1,12 +1,14 @@
 // app/(tabs)/index.tsx (Rota: /)
 
 import { useAuth } from '@/hooks/useAuth';
-import { FontAwesome } from '@expo/vector-icons';
+import { Car, Bell, User, LogOut, Plus, Eye } from 'lucide-react-native';
 import { useRouter } from 'expo-router';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
+import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useEffect, useState } from 'react';
 import api from '@/lib/axios';
+import Colors from '@/constants/Colors';
+import { commonStyles } from '@/styles/CommonStyles';
 
 export default function HomePage() {
   const router = useRouter();
@@ -21,7 +23,7 @@ export default function HomePage() {
   }
 
   const handleRedirect = () => {
-    router.push('/(app)/(tabs)/my-cars/create'); // Redireciona para login
+    router.push('/(app)/(tabs)/my-cars/create'); // Redireciona para criar veículo
   };
 
   const insets = useSafeAreaInsets();
@@ -50,126 +52,247 @@ export default function HomePage() {
   }, []);
 
   return (
-    <View
-      style={[
-        styles.container,
-        { paddingHorizontal: 20 },
-      ]}
-    >
-      <View style={styles.header}>
+    <View style={[styles.container, { backgroundColor: Colors.background }]}>
+      <View style={[styles.header, { paddingTop: insets.top, paddingHorizontal: 20 }]}>
         <View style={styles.headerLeft}>
-          <Text>Bem-vindo, {user?.name}</Text>
+          <Text style={styles.welcomeText}>Olá, {user?.name}!</Text>
+          <Text style={styles.subtitleText}>Bem-vindo ao Vizzia Seguros</Text>
         </View>
         <View style={styles.headerRight}>
           <TouchableOpacity style={styles.headerButton} onPress={() => router.push('/(app)/notify')}>
-            <FontAwesome name="bell" size={30} />
+            <Bell size={24} color={Colors.text} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerButton} onPress={() => router.push('/(app)/profile')}>
-            <FontAwesome name="user-circle" size={30} />
+            <User size={24} color={Colors.text} />
           </TouchableOpacity>
           <TouchableOpacity style={styles.headerButton} onPress={handleLogout}>
-            <FontAwesome name="angle-double-right" size={30} />
+            <LogOut size={24} color={Colors.text} />
           </TouchableOpacity>
         </View>
       </View>
 
-      <View style={styles.card}>
-        {loadingVehicles ? (
-          <ActivityIndicator />
-        ) : vehiclesCount === null ? (
-          <Text style={styles.infoText}>Buscando seus veículos...</Text>
-        ) : vehiclesCount === 0 ? (
-          <>
-            <Text style={styles.infoText}>Você ainda não tem veículos cadastrados.</Text>
-            <TouchableOpacity style={styles.button} onPress={handleRedirect} activeOpacity={0.75}>
-              <Text style={styles.buttonText}>Cadastre seu veículo</Text>
-            </TouchableOpacity>
-          </>
-        ) : (
-          <>
-            <Text style={styles.countText}>Você tem <Text style={{ fontWeight: '700' }}>{vehiclesCount}</Text> veículo(s) cadastrado(s)</Text>
-            <TouchableOpacity style={styles.button} onPress={() => router.push('/(app)/(tabs)/my-cars')} activeOpacity={0.75}>
-              <Text style={styles.buttonText}>Ver meus veículos</Text>
-            </TouchableOpacity>
-          </>
-        )}
-      </View>
+      <ScrollView
+        style={styles.scrollContainer}
+        contentContainerStyle={{ flexGrow: 1, paddingHorizontal: 20 }}
+      >
+        <View style={styles.content}>
+          <View style={styles.heroCard}>
+            <Car size={48} color={Colors.primary} style={styles.heroIcon} />
+            <Text style={styles.heroTitle}>Gerencie seus Veículos</Text>
+            <Text style={styles.heroSubtitle}>Mantenha seus seguros sempre em dia</Text>
+          </View>
+
+          <View style={styles.card}>
+            {loadingVehicles ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color={Colors.primary} />
+                <Text style={styles.loadingText}>Carregando seus veículos...</Text>
+              </View>
+            ) : vehiclesCount === null ? (
+              <View style={styles.emptyContainer}>
+                <Text style={styles.infoText}>Buscando seus veículos...</Text>
+              </View>
+            ) : vehiclesCount === 0 ? (
+              <View style={styles.emptyContainer}>
+                <Car size={32} color={Colors.textSecondary} style={styles.emptyIcon} />
+                <Text style={styles.emptyTitle}>Nenhum veículo cadastrado</Text>
+                <Text style={styles.emptySubtitle}>Adicione seu primeiro veículo para começar</Text>
+                <TouchableOpacity style={styles.primaryButton} onPress={handleRedirect} activeOpacity={0.8}>
+                  <Plus size={20} color="white" />
+                  <Text style={styles.primaryButtonText}>Cadastrar Veículo</Text>
+                </TouchableOpacity>
+              </View>
+            ) : (
+              <View style={styles.vehiclesContainer}>
+                <Car size={32} color={Colors.primary} style={styles.vehiclesIcon} />
+                <Text style={styles.vehiclesTitle}>
+                  Você tem <Text style={styles.vehiclesCount}>{vehiclesCount}</Text> veículo{vehiclesCount !== 1 ? 's' : ''} cadastrado{vehiclesCount !== 1 ? 's' : ''}
+                </Text>
+                <TouchableOpacity style={styles.secondaryButton} onPress={() => router.push('/(app)/(tabs)/my-cars')} activeOpacity={0.8}>
+                  <Eye size={20} color={Colors.primary} />
+                  <Text style={styles.secondaryButtonText}>Ver Meus Veículos</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+          </View>
+        </View>
+      </ScrollView>
     </View>
   );
 }
 
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
+  scrollContainer: {
+    flex: 1,
+  },
   header: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 20,
+    paddingVertical: 16,
   },
   headerLeft: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flex: 1,
+  },
+  welcomeText: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: Colors.text,
+    marginBottom: 4,
+  },
+  subtitleText: {
+    fontSize: 14,
+    color: Colors.textSecondary,
   },
   headerRight: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 5,
+    gap: 8,
   },
   headerButton: {
-    padding: 6,
-    alignItems: 'center',
+    padding: 8,
+    borderRadius: 8,
+    backgroundColor: Colors.backgroundSecondary,
+    elevation: 1,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+  },
+  content: {
+    flex: 1,
     justifyContent: 'center',
   },
-  container: {
-    flex: 1,
-    // justifyContent: 'center',
-    // alignItems: 'center',
-    padding: 0,
-    // backgroundColor: '#fff',
-  },
-  title: {
-    fontSize: 24,
-    marginBottom: 30,
-  },
-  button: {
-    backgroundColor: '#6D94C5',
-    paddingHorizontal: 30,
-    paddingVertical: 12,
-    borderRadius: 8,
-    elevation: 2,
+  heroCard: {
+    alignItems: 'center',
+    marginBottom: 32,
+    padding: 24,
+    backgroundColor: Colors.backgroundSecondary,
+    borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: {
-      width: 0,
-      height: 2,
-    },
-    shadowOpacity: 0.25,
-    shadowRadius: 3.84,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
   },
-  buttonText: {
-    color: 'white',
-    fontSize: 16,
+  heroIcon: {
+    marginBottom: 16,
+  },
+  heroTitle: {
+    fontSize: 20,
     fontWeight: '600',
+    color: Colors.text,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  heroSubtitle: {
+    fontSize: 14,
+    color: Colors.textSecondary,
     textAlign: 'center',
   },
   card: {
-    backgroundColor: '#fff',
-    padding: 16,
-    borderRadius: 10,
-    marginTop: 12,
+    backgroundColor: Colors.backgroundSecondary,
+    padding: 24,
+    borderRadius: 16,
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.08,
-    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+  },
+  loadingContainer: {
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  loadingText: {
+    marginTop: 12,
+    fontSize: 16,
+    color: Colors.textSecondary,
+  },
+  emptyContainer: {
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  emptyIcon: {
+    marginBottom: 16,
+  },
+  emptyTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: Colors.text,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  emptySubtitle: {
+    fontSize: 14,
+    color: Colors.textSecondary,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  primaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
     elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    gap: 8,
+  },
+  primaryButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  vehiclesContainer: {
+    alignItems: 'center',
+    paddingVertical: 16,
+  },
+  vehiclesIcon: {
+    marginBottom: 16,
+  },
+  vehiclesTitle: {
+    fontSize: 16,
+    color: Colors.text,
+    textAlign: 'center',
+    marginBottom: 24,
+  },
+  vehiclesCount: {
+    fontWeight: '700',
+    color: Colors.primary,
+  },
+  secondaryButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'transparent',
+    borderWidth: 1,
+    borderColor: Colors.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 12,
+    gap: 8,
+  },
+  secondaryButtonText: {
+    color: Colors.primary,
+    fontSize: 16,
+    fontWeight: '600',
   },
   infoText: {
-    color: '#555',
-    marginBottom: 12,
-    fontSize: 15
+    color: Colors.textSecondary,
+    fontSize: 16,
+    textAlign: 'center',
   },
   countText: {
     fontSize: 16,
-    color: '#222',
-    marginBottom: 12
-  }
+    color: Colors.text,
+    marginBottom: 12,
+  },
 });

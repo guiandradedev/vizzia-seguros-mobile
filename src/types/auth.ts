@@ -1,3 +1,9 @@
+export interface Insurance {
+  estimated_price: number;
+  id_insurance: number;
+  vehicle: Vehicle;
+}
+
 export interface Vehicle {
   id: number;
   plate: string;
@@ -8,7 +14,11 @@ export interface Vehicle {
   year: number;
   color: string;
   odometer: string;
-  state: number
+
+  park_type: string;
+  use_type: string;
+  transmission: string;
+  motorization: string;
 }
 
 import { MaritalStatusType } from '@/constants/maritalStatus';
@@ -19,7 +29,7 @@ export interface User {
   name: string;
   email: string;
   cpf: string;
-  cnh: string;
+  cnhN: string;
   expedition_cnh_date: number
   phone_id: string;
   birthday_date: Date;
