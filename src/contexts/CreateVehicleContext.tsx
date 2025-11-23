@@ -31,7 +31,7 @@ export type FuelTypes = typeof fuelTypes[number];
 
 // Cada marca agora tem um código associado (ex: Volkswagen -> 59)
 export const carBrands = [
-    { code: 1, name: 'Acura' },
+    // { code: 1, name: 'Acura' },
     { code: 6, name: 'Audi' },
     { code: 7, name: 'BMW' },
     { code: 23, name: 'Chevrolet' },
@@ -40,20 +40,20 @@ export const carBrands = [
     { code: 22, name: 'Ford' },
     { code: 25, name: 'Honda' },
     { code: 26, name: 'Hyundai' },
-    { code: 31, name: 'KIA' },
-    { code: 33, name: 'Land Rover' },
-    { code: 34, name: 'Lexus' },
-    { code: 38, name: 'Mazda' },
+    // { code: 31, name: 'KIA' },
+    // { code: 33, name: 'Land Rover' },
+    // { code: 34, name: 'Lexus' },
+    // { code: 38, name: 'Mazda' },
     { code: 39, name: 'Mercedes' },
-    { code: 41, name: 'Mitsubishi' },
+    // { code: 41, name: 'Mitsubishi' },
     { code: 43, name: 'Nissan' },
     { code: 44, name: 'Peugeot' },
-    { code: 47, name: 'Porsche' },
+    // { code: 47, name: 'Porsche' },
     { code: 48, name: 'Renault' },
-    { code: 55, name: 'Suzuki' },
+    // { code: 55, name: 'Suzuki' },
     { code: 56, name: 'Toyota' },
     { code: 59, name: 'Volkswagen' },
-    { code: 58, name: 'Volvo' }
+    // { code: 58, name: 'Volvo' }
 ] as const;
 
 export type CarBrand = typeof carBrands[number];

@@ -4,10 +4,11 @@ import { Insurance, Vehicle } from '@/types/auth';
 import axios, { AxiosResponse } from 'axios';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View, Image } from 'react-native';
+import { ActivityIndicator, ScrollView, StyleSheet, Text, TouchableOpacity, View, Image, Alert } from 'react-native';
 import { FontAwesome, MaterialIcons, Ionicons } from '@expo/vector-icons';
 import { Conductor } from '@/contexts/CreateVehicleContext';
 import { useAuth } from '@/hooks/useAuth';
+import { capitalizeFirstLetter } from '@/utils/formatters';
 
 export default function ShowVehiclePage() {
   const { id } = useLocalSearchParams() as { id?: string };
@@ -163,6 +164,25 @@ export default function ShowVehiclePage() {
     }
   }
 
+  const handleAddConductor = () => {
+    Alert.alert(
+      'Adicionar Condutor',
+      'Ao adicionar condutores autorizados, o valor do seguro pode ser alterado. Deseja continuar?',
+      [
+        {
+          text: 'Cancelar',
+          style: 'cancel',
+        },
+        {
+          text: 'Continuar',
+          onPress: () => {
+            router.push(`/(app)/(tabs)/my-cars/${vehicle?.id_insurance}/add-conductor` as any);
+          },
+        },
+      ]
+    );
+  };
+
   return (
     <View style={{ flex: 1 }}>
       <View style={{ paddingTop: 12 }}>
@@ -207,7 +227,7 @@ export default function ShowVehiclePage() {
                   </View>
                   <View style={styles.detailContent}>
                     <Text style={styles.detailLabel}>Cor</Text>
-                    <Text style={styles.detailValue}>{vehicle.vehicle.color || '—'}</Text>
+                    <Text style={styles.detailValue}>{capitalizeFirstLetter(vehicle.vehicle.color) || '—'}</Text>
                   </View>
                 </View>
 
@@ -310,7 +330,16 @@ export default function ShowVehiclePage() {
                 <View style={styles.cardIcon}>
                   <FontAwesome name="users" size={20} color="#6D94C5" />
                 </View>
-                <Text style={styles.cardTitle}>Condutores Autorizados</Text>
+                <View style={styles.cardTitleContainer}>
+                  <Text style={styles.cardTitle}>Condutores Autorizados</Text>
+                  <TouchableOpacity
+                    style={styles.addButton}
+                    onPress={handleAddConductor}
+                    activeOpacity={0.7}
+                  >
+                    <FontAwesome name="plus" size={16} color="#6D94C5" />
+                  </TouchableOpacity>
+                </View>
               </View>
 
               {conductorsLoading && (
@@ -680,5 +709,21 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 16,
     backgroundColor: '#f0f4ff',
-  }
+  },
+  cardTitleContainer: {
+    flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  addButton: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: '#f0f4ff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#e2e8f0',
+  },
 });

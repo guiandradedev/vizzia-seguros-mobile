@@ -78,3 +78,7 @@ export function isValidCNH(cnh: string) {
     // if (secondVerifier === 10) secondVerifier = 0;
     // return secondVerifier === cnhDigits[10];
 }
+
+export function capitalizeFirstLetter(val: string) {
+    return String(val).charAt(0).toUpperCase() + String(val).slice(1);
+}

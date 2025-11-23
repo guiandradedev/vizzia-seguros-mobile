@@ -2,6 +2,7 @@ import { Insurance, Vehicle } from "@/types/auth";
 import { useRouter } from 'expo-router';
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import { FontAwesome, MaterialIcons, Ionicons } from '@expo/vector-icons';
+import { capitalizeFirstLetter } from "@/utils/formatters";
 
 interface VehicleProps {
   vehicle: Insurance;
@@ -77,7 +78,7 @@ export default function VehicleComponent({ vehicle }: VehicleProps) {
 
           <View style={styles.detailItem}>
             <MaterialIcons name="palette" size={16} color="#64748b" />
-            <Text style={styles.detailText}>{vehicle.vehicle.color || '—'}</Text>
+            <Text style={styles.detailText}>{capitalizeFirstLetter(vehicle.vehicle.color) || '—'}</Text>
           </View>
 
           <View style={styles.detailItem}>

@@ -1,14 +1,13 @@
 // app/(tabs)/index.tsx (Rota: /)
 
-import { useAuth } from '@/hooks/useAuth';
-import { Car, Bell, User, LogOut, Plus, Eye } from 'lucide-react-native';
-import { useRouter } from 'expo-router';
-import { View, Text, TouchableOpacity, StyleSheet, Alert, ActivityIndicator, ScrollView } from 'react-native';
-import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useEffect, useState } from 'react';
-import api from '@/lib/axios';
 import Colors from '@/constants/Colors';
-import { commonStyles } from '@/styles/CommonStyles';
+import { useAuth } from '@/hooks/useAuth';
+import api from '@/lib/axios';
+import { useRouter } from 'expo-router';
+import { AlertCircle, Bell, Car, Eye, LogOut, Phone, Plus, User } from 'lucide-react-native';
+import { useEffect, useRef, useState } from 'react';
+import { ActivityIndicator, Alert, Animated, Linking, Modal, ScrollView, StyleSheet, Text, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
+import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 export default function HomePage() {
   const router = useRouter();
@@ -16,6 +15,40 @@ export default function HomePage() {
   const { signOut, user } = useAuth()
   const [vehiclesCount, setVehiclesCount] = useState<number | null>(null);
   const [loadingVehicles, setLoadingVehicles] = useState(false);
+  const [contactModalVisible, setContactModalVisible] = useState(false);
+
+  // Vetor de textos aleatórios para a seção de destaque
+  const randomTexts = [
+    "Seu carro foi roubado ou furtado?",
+    "Ocorreu algum problema com seu veículo?",
+    "Emergência com seu seguro?"
+  ];
+
+  // Selecionar um texto aleatório
+  const [randomText] = useState(() => randomTexts[Math.floor(Math.random() * randomTexts.length)]);
+
+  // Animação para o sinal "live" piscando
+  const liveOpacity = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    const blinkAnimation = Animated.loop(
+      Animated.sequence([
+        Animated.timing(liveOpacity, {
+          toValue: 0.3,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+        Animated.timing(liveOpacity, {
+          toValue: 1,
+          duration: 500,
+          useNativeDriver: true,
+        }),
+      ])
+    );
+    blinkAnimation.start();
+    return () => blinkAnimation.stop();
+  }, [liveOpacity]);
+
   async function handleLogout() {
     signOut()
     Alert.alert("Vizzia Seguros", "Deslogado.")
@@ -24,6 +57,20 @@ export default function HomePage() {
 
   const handleRedirect = () => {
     router.push('/(app)/(tabs)/my-cars/create'); // Redireciona para criar veículo
+  };
+
+  const handleContact = () => {
+    setContactModalVisible(true);
+  };
+
+  const handleCall = () => {
+    setContactModalVisible(false);
+    Linking.openURL('tel:19999999999');
+  };
+
+  const handleEmail = () => {
+    setContactModalVisible(false);
+    Linking.openURL('mailto:contato@vizzia.com.br');
   };
 
   const insets = useSafeAreaInsets();
@@ -82,6 +129,27 @@ export default function HomePage() {
             <Text style={styles.heroSubtitle}>Mantenha seus seguros sempre em dia</Text>
           </View>
 
+          {/* Seção de destaque com texto aleatório - só aparece se tiver mais de 1 veículo */}
+          {vehiclesCount !== null && vehiclesCount >= 1 && (
+            <View style={styles.highlightCard}>
+              <View style={styles.highlightHeader}>
+                <AlertCircle size={24} color="white" />
+                <Text style={styles.highlightTitle}>Assistência 24h</Text>
+              </View>
+              <Text style={styles.highlightText}>{randomText}</Text>
+              <View style={styles.liveContainer}>
+                <Animated.View style={{ opacity: liveOpacity }}>
+                  <View style={styles.liveDot} />
+                </Animated.View>
+                <Text style={styles.liveText}>Central de atendimento 24h</Text>
+              </View>
+              <TouchableOpacity style={styles.contactCTA} onPress={handleContact}>
+                <Phone size={20} color="white" />
+                <Text style={styles.contactText}>Ligue Agora</Text>
+              </TouchableOpacity>
+            </View>
+          )}
+
           <View style={styles.card}>
             {loadingVehicles ? (
               <View style={styles.loadingContainer}>
@@ -117,6 +185,41 @@ export default function HomePage() {
           </View>
         </View>
       </ScrollView>
+
+      {/* Modal de contato */}
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={contactModalVisible}
+        onRequestClose={() => setContactModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={styles.modalOverlay}
+          activeOpacity={1}
+          onPress={() => setContactModalVisible(false)}
+        >
+          <TouchableWithoutFeedback>
+            <View style={styles.modalContent}>
+              <Text style={styles.modalTitle}>Conte com a gente</Text>
+              <Text style={styles.modalSubtitle}>Como deseja começar seu chamado?</Text>
+              <View style={styles.modalButtonContainer}>
+                <TouchableOpacity style={styles.modalButton} onPress={handleEmail}>
+                  <Text style={styles.modalButtonText}>E-mail</Text>
+                </TouchableOpacity>
+                <TouchableOpacity style={styles.modalButton} onPress={handleCall}>
+                  <Text style={styles.modalButtonText}>Telefone</Text>
+                </TouchableOpacity>
+              </View>
+              <TouchableOpacity
+                style={styles.modalCloseButton}
+                onPress={() => setContactModalVisible(false)}
+              >
+                <Text style={styles.modalCloseText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableWithoutFeedback>
+        </TouchableOpacity>
+      </Modal>
     </View>
   );
 }
@@ -294,5 +397,129 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: Colors.text,
     marginBottom: 12,
+  },
+  highlightCard: {
+    backgroundColor: Colors.primary, // Fundo azul primário para destaque
+    padding: 24,
+    borderRadius: 16,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 0, // Remover borda
+  },
+  highlightHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 12,
+  },
+  highlightTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: 'white', // Branco para contraste com fundo azul
+    marginLeft: 8,
+  },
+  highlightText: {
+    fontSize: 16,
+    fontWeight: '500',
+    color: 'white', // Branco para contraste
+    textAlign: 'center',
+    marginBottom: 16,
+    lineHeight: 22,
+  },
+  liveContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 20,
+  },
+  liveDot: {
+    width: 10,
+    height: 10,
+    borderRadius: 5,
+    backgroundColor: 'white', // Branco para piscar no fundo azul
+    marginRight: 8,
+  },
+  liveText: {
+    fontSize: 14,
+    color: 'white', // Branco para contraste
+    fontWeight: '600',
+  },
+  contactCTA: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#5A7FA0', // Azul mais escuro que o primary
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+    borderRadius: 12,
+    elevation: 2,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+  },
+  contactText: {
+    fontSize: 16,
+    color: 'white',
+    fontWeight: '600',
+    marginLeft: 8,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+    justifyContent: 'flex-end',
+  },
+  modalContent: {
+    backgroundColor: 'white',
+    borderTopLeftRadius: 20,
+    borderTopRightRadius: 20,
+    padding: 24,
+    alignItems: 'center',
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: Colors.text,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  modalSubtitle: {
+    fontSize: 16,
+    color: Colors.textSecondary,
+    marginBottom: 24,
+    textAlign: 'center',
+  },
+  modalButtonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginBottom: 16,
+  },
+  modalButton: {
+    backgroundColor: Colors.primary,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    flex: 1,
+    marginHorizontal: 8,
+    alignItems: 'center',
+  },
+  modalButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  modalCloseButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+  },
+  modalCloseText: {
+    color: Colors.textSecondary,
+    fontSize: 16,
+    fontWeight: '500',
   },
 });
