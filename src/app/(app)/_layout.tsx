@@ -11,6 +11,7 @@ export default function AppLayout() {
         <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
         <Stack.Screen name="notify" options={{ headerShown: false }} />
         <Stack.Screen name="profile" options={{ headerShown: false }} />
+        <Stack.Screen name="vehicle-assistance" options={{ headerShown: false }} />
       </Stack>
     </View>
   );
